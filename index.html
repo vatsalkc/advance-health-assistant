@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Health Assistant - Live Preview</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .preview-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            margin: 2rem auto;
+            max-width: 1000px;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+        
+        .demo-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .tech-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .screenshot-section {
+            margin: 3rem 0;
+        }
+        
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .screenshot-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .screenshot-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        .screenshot-info {
+            padding: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .preview-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="preview-container">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <h1 class="hero-title">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                    Advanced Health Assistant
+                </h1>
+                <p class="hero-subtitle">
+                    A comprehensive AI-powered healthcare platform with ML disease prediction, 
+                    multi-device support, and real-time health tracking. Features 216 diseases, 
+                    30+ medical specializations, and seamless mobile access.
+                </p>
+                
+                <div class="tech-stack">
+                    <span class="tech-badge"><i class="bi bi-code-slash"></i> React 18.2.0</span>
+                    <span class="tech-badge"><i class="bi bi-server"></i> Flask 2.3.3</span>
+                    <span class="tech-badge"><i class="bi bi-robot"></i> Machine Learning</span>
+                    <span class="tech-badge"><i class="bi bi-phone"></i> Mobile Ready</span>
+                    <span class="tech-badge"><i class="bi bi-shield-check"></i> JWT Auth</span>
+                </div>
+            </div>
+
+            <!-- Live Demo Section -->
+            <div class="demo-section">
+                <h2><i class="bi bi-rocket-takeoff"></i> Live Demo</h2>
+                <p class="mb-4">Experience the full health assistant application with interactive features and demo data.</p>
+                
+                <a href="https://vatsalkc.github.io/advance-health-assistant/app" class="demo-button">
+                    <i class="bi bi-play-circle-fill me-2"></i>
+                    Launch Live Demo
+                </a>
+                
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Demo includes sample data and all UI features. For full AI functionality, see setup guide below.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon text-primary">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <h4>AI Disease Prediction</h4>
+                    <p>216 diseases with 100% training accuracy using Random Forest algorithm</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon text-success">
+                        <i class="bi bi-calendar-plus"></i>
+                    </div>
+                    <h4>Doctor Appointments</h4>
+                    <p>100+ doctors across 30+ medical specializations with easy booking</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon text-warning">
+                        <i class="bi bi-alarm"></i>
+                    </div>
+                    <h4>Medicine Reminders</h4>
+                    <p>Smart medication scheduling with dosage tracking and notifications</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon text-info">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h4>Health Dashboard</h4>
+                    <p>Comprehensive health overview with statistics and recent activity</p>
+                </div>
+            </div>
+
+            <!-- Screenshots Section -->
+            <div class="screenshot-section">
+                <h3 class="text-center mb-4">Application Screenshots</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            <i class="bi bi-house-door me-2"></i>
+                            Dashboard Preview
+                        </div>
+                        <div class="screenshot-info">
+                            <h5>Health Dashboard</h5>
+                            <p>Comprehensive overview of health statistics, appointments, and medicines</p>
+                        </div>
+                    </div>
+                    
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            <i class="bi bi-clipboard2-pulse me-2"></i>
+                            Symptom Checker
+                        </div>
+                        <div class="screenshot-info">
+                            <h5>AI Symptom Analysis</h5>
+                            <p>Smart symptom input with AI-powered disease prediction and confidence scoring</p>
+                        </div>
+                    </div>
+                    
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            Appointments
+                        </div>
+                        <div class="screenshot-info">
+                            <h5>Doctor Appointments</h5>
+                            <p>Browse doctors by specialization and book appointments with calendar integration</p>
+                        </div>
+                    </div>
+                    
+                    <div class="screenshot-card">
+                        <div class="screenshot-placeholder">
+                            <i class="bi bi-phone me-2"></i>
+                            Mobile View
+                        </div>
+                        <div class="screenshot-info">
+                            <h5>Mobile Responsive</h5>
+                            <p>Fully responsive design optimized for mobile devices and tablets</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Deploy Section -->
+            <div class="demo-section">
+                <h3><i class="bi bi-cloud-upload"></i> Deploy Your Own</h3>
+                <p class="mb-4">Get your own live version with one-click deployment</p>
+                
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="https://vercel.com/new/clone?repository-url=https://github.com/vatsalkc/advance-health-assistant" 
+                       class="btn btn-outline-primary">
+                        <i class="bi bi-lightning"></i> Deploy to Vercel
+                    </a>
+                    <a href="https://app.netlify.com/start/deploy?repository=https://github.com/vatsalkc/advance-health-assistant" 
+                       class="btn btn-outline-success">
+                        <i class="bi bi-globe"></i> Deploy to Netlify
+                    </a>
+                    <a href="https://github.com/vatsalkc/advance-health-assistant" 
+                       class="btn btn-outline-dark">
+                        <i class="bi bi-github"></i> View Source Code
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-5 pt-4 border-top">
+                <p class="text-muted">
+                    <i class="bi bi-heart-fill text-danger"></i>
+                    Built with React, Flask, and Machine Learning by 
+                    <a href="https://github.com/vatsalkc" class="text-decoration-none">Vatsal KC</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

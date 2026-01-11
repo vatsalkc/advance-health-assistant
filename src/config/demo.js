@@ -1,5 +1,9 @@
 // Demo configuration for preview deployment
-export const DEMO_MODE = process.env.NODE_ENV === 'production' && !process.env.REACT_APP_API_URL;
+export const DEMO_MODE = process.env.NODE_ENV === 'production' || 
+                         window.location.hostname.includes('vercel.app') ||
+                         window.location.hostname.includes('netlify.app') ||
+                         window.location.hostname.includes('github.io') ||
+                         !process.env.REACT_APP_API_URL;
 
 export const DEMO_USER = {
   id: 1,

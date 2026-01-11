@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Navbar, Nav, Button } from 'react-bootstrap';
+import { Container, Navbar, Nav, Button, Alert } from 'react-bootstrap';
 import authService from './services/authService';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
@@ -17,6 +17,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [showDemoAlert, setShowDemoAlert] = useState(false);
 
   useEffect(() => {
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
@@ -28,6 +29,11 @@ function App() {
       if (authService.isAuthenticated()) {
         const currentUser = authService.getCurrentUser();
         if (currentUser) {
+          // Check if we're in demo mode
+          if (authService.isDemoMode()) {
+            setShowDemoAlert(true);
+          }
+          
           // Validate token if it's been a while
           if (authService.shouldValidateToken()) {
             const isValid = await authService.validateToken();
@@ -35,6 +41,9 @@ function App() {
               setUser(authService.getCurrentUser());
               setIsAuthenticated(true);
               setCurrentView('dashboard');
+              if (authService.isDemoMode()) {
+                setShowDemoAlert(true);
+              }
             } else {
               // Token invalid, stay on login
               setCurrentView('login');
@@ -44,6 +53,9 @@ function App() {
             setUser(currentUser);
             setIsAuthenticated(true);
             setCurrentView('dashboard');
+            if (authService.isDemoMode()) {
+              setShowDemoAlert(true);
+            }
           }
         }
       }
@@ -56,6 +68,11 @@ function App() {
     setUser(userData);
     setIsAuthenticated(true);
     setCurrentView('dashboard');
+    
+    // Check if we're in demo mode after login
+    if (authService.isDemoMode()) {
+      setShowDemoAlert(true);
+    }
   };
 
   const handleLogout = async () => {
@@ -65,6 +82,7 @@ function App() {
       setIsAuthenticated(false);
       setCurrentView('login');
       setPredictionResult(null);
+      setShowDemoAlert(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -81,11 +99,30 @@ function App() {
     <div className="App">
       <NetworkStatus />
       
+      {/* Demo Mode Alert */}
+      {showDemoAlert && (
+        <Alert variant="info" dismissible onClose={() => setShowDemoAlert(false)} className="mb-0">
+          <div className="d-flex align-items-center">
+            <i className="bi bi-info-circle-fill me-2"></i>
+            <div>
+              <strong>Demo Mode Active</strong> - You're using sample data. 
+              For full functionality with AI predictions, follow the 
+              <a href="https://github.com/vatsalkc/advance-health-assistant#-quick-start" target="_blank" rel="noopener noreferrer" className="ms-1">
+                setup guide
+              </a>.
+            </div>
+          </div>
+        </Alert>
+      )}
+      
       <Navbar bg={darkMode ? 'dark' : 'primary'} variant="dark" expand="lg" className="navbar-custom">
         <Container>
           <Navbar.Brand href="#home" className="fw-bold">
             <i className="bi bi-heart-pulse-fill me-2"></i>
             Health Assistant
+            {authService.isDemoMode() && (
+              <span className="badge bg-warning text-dark ms-2">DEMO</span>
+            )}
           </Navbar.Brand>
           {isAuthenticated && (
             <>

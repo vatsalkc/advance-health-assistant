@@ -13,6 +13,8 @@ import {
   Modal
 } from 'react-bootstrap';
 import { appointmentsAPI } from '../../utils/api';
+import authService from '../../services/authService';
+import demoService from '../../services/demoService';
 import axios from 'axios';
 
 function Appointments({ user }) {
@@ -39,6 +41,14 @@ function Appointments({ user }) {
 
   const fetchDoctors = async () => {
     try {
+      // Check if we're in demo mode
+      if (authService.isDemoMode()) {
+        console.log('Appointments: Using demo mode for doctors');
+        const response = await demoService.getDoctors();
+        setDoctors(response.doctors);
+        return;
+      }
+      
       // Use the dynamic API URL detection from api.js
       const getApiBaseUrl = () => {
         if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
@@ -66,6 +76,15 @@ function Appointments({ user }) {
 
   const fetchAppointments = async () => {
     try {
+      // Check if we're in demo mode
+      if (authService.isDemoMode()) {
+        console.log('Appointments: Using demo mode for appointments');
+        const response = await demoService.getAppointments();
+        setAppointments(response.appointments);
+        setLoading(false);
+        return;
+      }
+      
       const response = await appointmentsAPI.getAll();
       setAppointments(response.data.appointments);
       setLoading(false);
@@ -88,15 +107,29 @@ function Appointments({ user }) {
     e.preventDefault();
 
     try {
-      await appointmentsAPI.create({
-        doctor_id: selectedDoctor.id,
-        doctor_name: selectedDoctor.name,
-        specialization: selectedDoctor.specialization,
-        date: formData.date,
-        time: formData.time,
-        reason: formData.reason,
-        status: 'Pending'
-      });
+      // Check if we're in demo mode
+      if (authService.isDemoMode()) {
+        console.log('Appointments: Using demo mode for booking');
+        await demoService.createAppointment({
+          doctor_id: selectedDoctor.id,
+          doctor_name: selectedDoctor.name,
+          specialization: selectedDoctor.specialization,
+          date: formData.date,
+          time: formData.time,
+          reason: formData.reason,
+          status: 'Pending'
+        });
+      } else {
+        await appointmentsAPI.create({
+          doctor_id: selectedDoctor.id,
+          doctor_name: selectedDoctor.name,
+          specialization: selectedDoctor.specialization,
+          date: formData.date,
+          time: formData.time,
+          reason: formData.reason,
+          status: 'Pending'
+        });
+      }
 
       setFormData({ date: '', time: '', reason: '' });
       setShowBookingModal(false);
