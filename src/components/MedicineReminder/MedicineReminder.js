@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Row, Col, ListGroup, Badge, Alert } from 'react-bootstrap';
-import { 
-  createMedicine, 
-  subscribeToMedicines, 
-  updateMedicine, 
-  deleteMedicine 
-} from '../../firebase/firebaseService';
+import { medicinesAPI } from '../../utils/api';
 
 function MedicineReminder({ user }) {
   const [reminders, setReminders] = useState([]);
   const [formData, setFormData] = useState({
-    medicineName: '',
+    medicine_name: '',
     dosage: '',
     time: '',
     frequency: 'daily'
@@ -19,16 +14,21 @@ function MedicineReminder({ user }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.uid) {
-      // Real-time listener for medicines
-      const unsubscribe = subscribeToMedicines(user.uid, (updatedMedicines) => {
-        setReminders(updatedMedicines);
-        setLoading(false);
-      });
-      
-      return () => unsubscribe();
+    if (user) {
+      fetchMedicines();
     }
   }, [user]);
+
+  const fetchMedicines = async () => {
+    try {
+      const response = await medicinesAPI.getAll();
+      setReminders(response.data.medicines);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching medicines:', err);
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,18 +38,14 @@ function MedicineReminder({ user }) {
     e.preventDefault();
     
     try {
-      const medicineData = {
-        medicineName: formData.medicineName,
-        dosage: formData.dosage,
-        time: formData.time,
-        frequency: formData.frequency
-      };
+      await medicinesAPI.create(formData);
       
-      await createMedicine(user.uid, medicineData);
-      
-      setFormData({ medicineName: '', dosage: '', time: '', frequency: 'daily' });
+      setFormData({ medicine_name: '', dosage: '', time: '', frequency: 'daily' });
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
+      
+      // Refresh the list
+      fetchMedicines();
     } catch (err) {
       console.error('Error creating medicine:', err);
       alert('Failed to add medicine reminder. Please try again.');
@@ -58,7 +54,8 @@ function MedicineReminder({ user }) {
 
   const toggleReminder = async (id, currentStatus) => {
     try {
-      await updateMedicine(id, { active: !currentStatus });
+      await medicinesAPI.update(id, { active: !currentStatus });
+      fetchMedicines(); // Refresh the list
     } catch (err) {
       console.error('Error updating medicine:', err);
       alert('Failed to update medicine. Please try again.');
@@ -68,7 +65,8 @@ function MedicineReminder({ user }) {
   const handleDeleteReminder = async (id) => {
     if (window.confirm('Are you sure you want to delete this reminder?')) {
       try {
-        await deleteMedicine(id);
+        await medicinesAPI.delete(id);
+        fetchMedicines(); // Refresh the list
       } catch (err) {
         console.error('Error deleting medicine:', err);
         alert('Failed to delete medicine. Please try again.');
@@ -94,8 +92,8 @@ function MedicineReminder({ user }) {
                 <Form.Label>Medicine Name</Form.Label>
                 <Form.Control
                   type="text"
-                  name="medicineName"
-                  value={formData.medicineName}
+                  name="medicine_name"
+                  value={formData.medicine_name}
                   onChange={handleChange}
                   required
                 />
@@ -157,7 +155,7 @@ function MedicineReminder({ user }) {
                   <ListGroup.Item key={reminder.id} className="medicine-reminder">
                     <div className="d-flex justify-content-between align-items-start">
                       <div>
-                        <h6>{reminder.medicineName}</h6>
+                        <h6>{reminder.medicine_name}</h6>
                         <p className="mb-1">Dosage: {reminder.dosage}</p>
                         <p className="mb-1">Time: {reminder.time}</p>
                         <Badge bg="info">{reminder.frequency}</Badge>

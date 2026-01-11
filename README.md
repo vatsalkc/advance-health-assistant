@@ -1,363 +1,524 @@
-# 🏥 Health Assistant - AI-Powered Healthcare Platform
+# 🏥 Advanced Health Assistant - AI-Powered Healthcare Platform
 
-A complete full-stack health assistant application with ML disease prediction, real-time data sync, and comprehensive health management features.
+A comprehensive full-stack health management system with ML disease prediction, multi-device support, and real-time health tracking. Features 216 diseases, 30+ medical specializations, and seamless mobile access.
 
-## ✨ Features
+![Health Assistant](https://img.shields.io/badge/Status-Live-brightgreen)
+![React](https://img.shields.io/badge/React-18.2.0-blue)
+![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
+![Python](https://img.shields.io/badge/Python-3.8+-yellow)
+![ML](https://img.shields.io/badge/ML-Scikit--Learn-orange)
 
-### 🔐 User Management
-- Firebase Authentication (Email/Password)
-- Secure user registration and login
-- User profile management
+## ✨ Key Features
 
-### 🤖 AI Disease Prediction
-- ML-powered symptom analysis
-- 60+ diseases across 6 specializations
-- 200+ symptoms database
-- Confidence scores and alternative diagnoses
-- Precautions and recommendations
+### 🤖 Advanced AI Disease Prediction
+- **216 Diseases Database** across 17+ medical specializations
+- **613 Unique Symptoms** for comprehensive analysis
+- **100% Training Accuracy** with Random Forest algorithm
+- **Confidence Scoring** for reliable predictions
+- **Real-time Symptom Suggestions** with autocomplete
+- **Detailed Disease Information** with precautions and descriptions
 
-### 👨‍⚕️ Doctor Management
-- 15 doctors across 6 specializations
-- Doctor ratings and experience
-- Specialization-based filtering
-- Real-time availability
+### 👨‍⚕️ Comprehensive Doctor Network
+- **100+ Doctors** across all medical specializations
+- **30+ Specializations** including Nephrology, Gynecology, Hematology
+- **Smart Filtering** by specialization and availability
+- **Doctor Ratings & Experience** for informed decisions
+- **Easy Appointment Booking** with calendar integration
 
-### 📅 Appointment Booking
-- Book appointments with doctors
-- View upcoming appointments
-- Real-time sync across devices
-- Appointment status tracking
+### 💊 Smart Medicine Management
+- **Personalized Reminders** with custom schedules
+- **Dosage Tracking** and frequency management
+- **Active/Inactive Status** for current and past medications
+- **Dashboard Integration** for quick overview
+- **Real-time Updates** across all devices
 
-### 💊 Medicine Reminders
-- Add medicine schedules
-- Set dosage and frequency
-- Active/inactive toggle
-- Real-time updates
+### 📊 Intelligent Health Dashboard
+- **Personal Health Overview** with comprehensive statistics
+- **Recent Activity Tracking** for all health interactions
+- **User Profile Management** with detailed health information
+- **Quick Action Buttons** for fast access to features
+- **Visual Health Analytics** with charts and insights
 
-### 📊 Dashboard
-- Health statistics overview
-- Upcoming appointments
-- Today's medicines
-- Symptom check history
+### 📱 Multi-Device & Mobile Support
+- **Cross-Platform Compatibility** - Desktop, tablet, and mobile
+- **Network Access** - Use same account on multiple devices simultaneously
+- **Responsive Design** optimized for all screen sizes
+- **Mobile-First UI** with touch-friendly interactions
+- **Real-time Sync** across all connected devices
 
-### 🌓 Dark Mode
-- Toggle between light and dark themes
-- Persistent theme preference
-
-### 🔄 Real-time Sync
-- Data syncs instantly across all devices
-- Firebase Firestore real-time listeners
-- Offline support
+### 🔐 Secure Authentication System
+- **JWT Token Authentication** for secure sessions
+- **Multi-device Login** support
+- **Automatic Token Refresh** for seamless experience
+- **Password Hashing** with Werkzeug security
+- **Session Management** across devices
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** - UI framework
-- **Bootstrap 5** - Styling
-- **React Bootstrap** - UI components
-- **Firebase SDK** - Authentication & Database
-- **Axios** - HTTP client
+- **React.js 18.2.0** - Modern UI framework with hooks
+- **Bootstrap 5** - Responsive design system
+- **React Bootstrap** - Bootstrap components for React
+- **Axios** - HTTP client for API communication
+- **JWT Decode** - Token management
 
-### Backend (ML Model)
-- **Python Flask** - API server
-- **scikit-learn** - Machine learning
-- **pandas** - Data processing
-- **Random Forest** - ML algorithm
+### Backend
+- **Flask 2.3.3** - Python web framework
+- **SQLite** - Lightweight relational database
+- **SQLAlchemy** - ORM for database operations
+- **JWT Authentication** - Secure token-based auth
+- **Flask-CORS** - Cross-origin resource sharing
+- **Werkzeug** - Password hashing and security
 
-### Database
-- **Firebase Firestore** - NoSQL cloud database
-- **Firebase Authentication** - User management
-- **Real-time listeners** - Live data sync
+### Machine Learning
+- **Scikit-Learn** - ML algorithms and model training
+- **Random Forest Classifier** - Disease prediction algorithm
+- **Pandas** - Data manipulation and analysis
+- **NumPy** - Numerical computing
+- **Pickle** - Model serialization and storage
 
-## 📦 Installation
+### Database Schema
+- **Users** - Authentication and profile data
+- **Appointments** - Doctor booking and scheduling
+- **Medicines** - Medication reminders and tracking
+- **SymptomChecks** - ML predictions and history
+- **Doctors** - Medical professionals database
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 14+ and npm
-- Python 3.8+ (for ML model)
-- Firebase account
-- Git
+- **Python 3.8+** with pip
+- **Node.js 14+** with npm
+- **Git** for version control
 
-### Quick Start
-
-1. **Clone the repository**
+### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd health-assistant
+git clone https://github.com/vatsalkc/advance-health-assistant.git
+cd advance-health-assistant
 ```
 
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Setup Firebase**
-   - Create Firebase project at https://console.firebase.google.com/
-   - Enable Authentication (Email/Password)
-   - Enable Firestore Database
-   - Get your Firebase config
-
-4. **Configure environment**
-```bash
-cp .env.example .env
-# Edit .env and add your Firebase config
-```
-
-5. **Verify setup**
-```bash
-npm run verify
-```
-
-6. **Seed doctors data**
-```bash
-npm run seed-firebase
-```
-
-7. **Start the app**
-```bash
-npm start
-```
-
-App opens at: http://localhost:3000
-
-## 📚 Documentation
-
-- **[START_HERE.md](START_HERE.md)** - Complete setup guide with testing
-- **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Step-by-step Firebase setup
-- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Detailed Firebase configuration
-- **[QUICK_FIREBASE_START.md](QUICK_FIREBASE_START.md)** - 5-minute quick start
-- **[ML_SETUP_GUIDE.md](ML_SETUP_GUIDE.md)** - ML model setup and training
-- **[backend/ML_MODEL_README.md](backend/ML_MODEL_README.md)** - ML model documentation
-
-## 🚀 Usage
-
-### Register & Login
-1. Click "Register" to create account
-2. Fill in your details
-3. Login with your credentials
-
-### Check Symptoms
-1. Go to "Symptom Checker"
-2. Add your symptoms
-3. Click "Check Symptoms"
-4. View disease prediction with confidence score
-5. See recommended doctors
-
-### Book Appointment
-1. Go to "Appointments"
-2. Browse doctors by specialization
-3. Click "Book Appointment"
-4. Fill in date, time, and reason
-5. Confirm booking
-
-### Add Medicine Reminder
-1. Go to "Medicines"
-2. Fill in medicine details
-3. Set time and frequency
-4. Click "Add Reminder"
-
-### View Dashboard
-- See total appointments
-- View active medicines
-- Check symptom history
-- Quick access to all features
-
-## 🔥 Firebase Collections
-
-### users
-```javascript
-{
-  uid: "user123",
-  name: "John Doe",
-  email: "john@example.com",
-  phone: "555-0101",
-  age: 35,
-  gender: "male"
-}
-```
-
-### doctors
-```javascript
-{
-  name: "Dr. John Smith",
-  specialization: "Cardiologist",
-  experience: "10 years",
-  rating: 4.5,
-  available: true
-}
-```
-
-### appointments
-```javascript
-{
-  userId: "user123",
-  doctorId: "doc1",
-  doctorName: "Dr. John Smith",
-  specialization: "Cardiologist",
-  date: "2026-01-15",
-  time: "10:00 AM",
-  reason: "Chest pain",
-  status: "Pending"
-}
-```
-
-### medicines
-```javascript
-{
-  userId: "user123",
-  medicineName: "Aspirin",
-  dosage: "100mg",
-  time: "08:00 AM",
-  frequency: "daily",
-  active: true
-}
-```
-
-### symptomChecks
-```javascript
-{
-  userId: "user123",
-  symptoms: ["fever", "cough", "fatigue"],
-  predictedDisease: "Common Cold",
-  recommendedSpecialization: "General Physician",
-  confidence: 92.5
-}
-```
-
-## 🧪 Testing
-
-### Run Verification
-```bash
-npm run verify
-```
-
-### Test Registration
-1. Register new user
-2. Check Firebase Console → Authentication
-3. Verify user appears
-
-### Test Real-time Sync
-1. Login on Device 1
-2. Add appointment
-3. Login on Device 2 with same account
-4. Verify appointment appears instantly
-
-### Test ML Model
+### 2. Backend Setup
 ```bash
 cd backend
-python train_model.py
+
+# Create and activate virtual environment
+python -m venv venv
+
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Initialize database and train ML model
+python create_model.py
+
+# Start the Flask server
 python app.py
 ```
 
-## 📊 Project Structure
+Backend will be available at `http://localhost:5000`
 
-```
-health-assistant/
-├── src/
-│   ├── components/
-│   │   ├── Auth/              # Login & Register
-│   │   ├── Dashboard/         # Main dashboard
-│   │   ├── Appointments/      # Appointment booking
-│   │   ├── MedicineReminder/  # Medicine management
-│   │   ├── SymptomChecker/    # Disease prediction
-│   │   └── DoctorRecommendation/ # Doctor suggestions
-│   ├── firebase/
-│   │   ├── config.js          # Firebase configuration
-│   │   ├── firebaseService.js # Firebase operations
-│   │   └── seedAllData.js     # Data seeding script
-│   ├── utils/
-│   │   └── api.js             # API client (for ML backend)
-│   ├── App.js                 # Main app component
-│   ├── App.css                # Global styles
-│   └── index.js               # Entry point
-├── backend/
-│   ├── app.py                 # Flask API server
-│   ├── ml_model.py            # ML model class
-│   ├── models.py              # Database models
-│   ├── disease_data.csv       # Training dataset
-│   └── train_model.py         # Model training script
-├── public/
-│   └── index.html             # HTML template
-├── .env.example               # Environment template
-├── package.json               # Dependencies
-└── README.md                  # This file
+### 3. Frontend Setup
+```bash
+# Return to root directory
+cd ..
+
+# Install Node.js dependencies
+npm install
+
+# Create environment file
+echo "REACT_APP_API_URL=http://localhost:5000/api" > .env
+
+# Start the React development server
+npm start
 ```
 
-## 🔒 Security
+Frontend will be available at `http://localhost:3000`
 
-- Firebase Authentication for secure login
-- Firestore security rules for data protection
-- User-specific data isolation
-- No passwords stored in frontend
-- Environment variables for sensitive config
+### 4. Mobile Access Setup
+For mobile device access on the same network:
 
-## 🌐 Deployment
+1. **Start backend with network access**:
+   ```bash
+   cd backend
+   python app.py  # Already configured for 0.0.0.0
+   ```
 
-### Frontend (Vercel/Netlify)
+2. **Find your network IP** (displayed in backend console)
+
+3. **Access from mobile**: `http://YOUR_NETWORK_IP:3000`
+
+4. **Login with same account** - works across all devices simultaneously
+
+## 📱 Mobile Access Guide
+
+The application supports seamless multi-device access:
+
+- **Desktop**: `http://localhost:3000`
+- **Mobile/Tablet**: `http://YOUR_NETWORK_IP:3000`
+- **Same Account**: Login simultaneously on multiple devices
+- **Real-time Sync**: Data updates instantly across all devices
+- **Responsive Design**: Optimized for all screen sizes
+
+### Network Configuration
+- Backend runs on `0.0.0.0:5000` (all network interfaces)
+- Frontend detects access method and adjusts API URLs automatically
+- CORS configured for cross-origin mobile access
+
+## 🏗️ Project Structure
+
+```
+advance-health-assistant/
+├── backend/                    # Flask Backend
+│   ├── app.py                 # Main Flask application
+│   ├── models.py              # SQLAlchemy database models
+│   ├── database.py            # Database initialization
+│   ├── ml_model.py            # ML model implementation
+│   ├── create_model.py        # Model training and data setup
+│   ├── train_model.py         # Model training script
+│   ├── requirements.txt       # Python dependencies
+│   ├── disease_data.csv       # ML training dataset
+│   ├── disease_model.pkl      # Trained ML model
+│   └── instance/              # SQLite database files
+├── src/                       # React Frontend
+│   ├── components/            # React components
+│   │   ├── Auth/             # Login & Registration
+│   │   ├── Dashboard/        # Main dashboard
+│   │   ├── SymptomChecker/   # AI symptom analysis
+│   │   ├── Appointments/     # Doctor appointments
+│   │   ├── MedicineReminder/ # Medicine management
+│   │   ├── UserHistory/      # Health history tracking
+│   │   ├── DoctorRecommendation/ # Doctor suggestions
+│   │   └── NetworkStatus/    # Mobile connectivity
+│   ├── services/             # API services
+│   │   └── authService.js    # Authentication service
+│   ├── utils/                # Utility functions
+│   │   └── api.js            # API client with dynamic URLs
+│   ├── firebase/             # Firebase configuration (legacy)
+│   ├── App.js                # Main application component
+│   ├── App.css               # Global styles
+│   └── index.js              # Application entry point
+├── public/                   # Static assets
+│   └── index.html            # HTML template
+├── docs/                     # Documentation
+│   ├── MOBILE_ACCESS_GUIDE.md # Mobile setup guide
+│   ├── ML_SETUP_GUIDE.md     # ML model documentation
+│   └── SETUP_CHECKLIST.md   # Setup verification
+├── .env                      # Environment variables
+├── .env.example              # Environment template
+├── package.json              # Node.js dependencies
+└── README.md                 # This file
+```
+
+## 🚀 Usage Guide
+
+### 1. User Registration & Login
+```bash
+# Register new account
+1. Click "Register" button
+2. Fill in: Name, Email, Password, Phone, Age, Gender
+3. Click "Create Account"
+
+# Login to existing account
+1. Enter email and password
+2. Click "Login"
+3. Access granted across all devices
+```
+
+### 2. AI Symptom Checker
+```bash
+# Check symptoms with AI
+1. Navigate to "Symptom Checker"
+2. Type symptoms (autocomplete suggestions appear)
+3. Add multiple symptoms from suggestions
+4. Click "Analyze Symptoms"
+5. View AI prediction with confidence score
+6. See recommended doctor specialization
+7. Read disease description and precautions
+```
+
+### 3. Doctor Appointments
+```bash
+# Book appointments
+1. Go to "Appointments" section
+2. Browse 100+ doctors by specialization
+3. Filter by: Cardiologist, Neurologist, etc.
+4. Click "Book" on preferred doctor
+5. Select date, time, and reason
+6. Confirm appointment booking
+```
+
+### 4. Medicine Management
+```bash
+# Set up medicine reminders
+1. Navigate to "Medicine Reminder"
+2. Enter medicine name and dosage
+3. Set time and frequency
+4. Click "Add Reminder"
+5. Toggle active/inactive status
+6. View all medicines in dashboard
+```
+
+### 5. Health Dashboard
+```bash
+# Monitor your health
+- View total appointments count
+- See active medicines
+- Check symptom analysis history
+- Access quick action buttons
+- Review personal health profile
+```
+
+## 🔬 Machine Learning Model
+
+### Disease Prediction Engine
+- **Algorithm**: Random Forest Classifier
+- **Training Data**: 216 diseases with associated symptoms
+- **Accuracy**: 100% on training dataset
+- **Symptoms Database**: 613 unique medical symptoms
+- **Specializations**: 30+ medical specialties covered
+
+### Model Features
+- **Real-time Analysis**: Instant symptom processing
+- **Confidence Scoring**: Reliability percentage for predictions
+- **Top Predictions**: Multiple disease possibilities ranked
+- **Specialist Recommendations**: Appropriate doctor specialization
+- **Disease Information**: Detailed descriptions and precautions
+
+### Supported Medical Specializations
+```
+Cardiologist, Neurologist, Dermatologist, Gastroenterologist,
+Pulmonologist, Orthopedist, Psychiatrist, Urologist,
+Nephrologist, Gynecologist, Hematologist, Rheumatologist,
+Infectious Disease Specialist, Endocrinologist, Oncologist,
+Ophthalmologist, ENT Specialist, General Physician, and more...
+```
+
+## 🔐 Security & Authentication
+
+### JWT Token System
+- **Secure Authentication**: Industry-standard JWT tokens
+- **Multi-device Support**: Same account on multiple devices
+- **Automatic Refresh**: Seamless token renewal
+- **Session Management**: Secure session handling
+- **Password Security**: Werkzeug hashing algorithm
+
+### Data Protection
+- **User Isolation**: Each user's data is completely separate
+- **Input Validation**: Server-side data validation
+- **CORS Security**: Configured for safe cross-origin requests
+- **SQL Injection Prevention**: SQLAlchemy ORM protection
+
+## 🌐 API Endpoints
+
+### Authentication Endpoints
+```bash
+POST /api/auth/register     # User registration
+POST /api/auth/login        # User login
+GET  /api/auth/me          # Get current user
+POST /api/auth/refresh     # Refresh JWT token
+GET  /api/auth/validate    # Validate token
+```
+
+### Health Management Endpoints
+```bash
+# Symptom Analysis
+POST /api/symptom-check    # Analyze symptoms with AI
+GET  /api/symptom-checks   # Get user's symptom history
+GET  /api/symptoms/all     # Get all available symptoms
+
+# Doctor Management
+GET  /api/doctors          # Get all doctors
+GET  /api/doctors?specialization=Cardiologist  # Filter by specialty
+
+# Appointments
+GET  /api/appointments     # Get user appointments
+POST /api/appointments     # Book new appointment
+DELETE /api/appointments/:id  # Cancel appointment
+
+# Medicine Reminders
+GET  /api/medicines        # Get user medicines
+POST /api/medicines        # Add medicine reminder
+PUT  /api/medicines/:id    # Update medicine
+DELETE /api/medicines/:id  # Delete medicine
+
+# User Profile & Stats
+GET  /api/user/profile     # Comprehensive user data
+GET  /api/stats           # User health statistics
+```
+
+## 🚀 Deployment Options
+
+### Local Development
+```bash
+# Backend (Terminal 1)
+cd backend
+venv\Scripts\activate  # Windows
+python app.py
+
+# Frontend (Terminal 2)
+npm start
+
+# Access: http://localhost:3000
+```
+
+### Network Deployment (Multi-device)
+```bash
+# Backend automatically runs on 0.0.0.0:5000
+# Frontend accessible via network IP
+# Mobile access: http://YOUR_IP:3000
+```
+
+### Production Deployment
+
+#### Frontend (Vercel/Netlify)
 ```bash
 npm run build
-# Deploy build/ folder
+# Deploy build/ folder to hosting service
+# Set environment variables in hosting dashboard
 ```
 
-### Backend (Heroku/Railway)
+#### Backend (Heroku/Railway/DigitalOcean)
 ```bash
-cd backend
-# Deploy Flask app
+# Create Procfile
+echo "web: python app.py" > Procfile
+
+# Deploy Flask app with requirements.txt
+# Set environment variables in hosting dashboard
 ```
 
-### Firebase
-- Already deployed (cloud-based)
-- No additional deployment needed
+#### Database Options
+- **Development**: SQLite (included)
+- **Production**: PostgreSQL, MySQL, or cloud database
+- **Migration**: Update SQLALCHEMY_DATABASE_URI in config
 
-## 📈 Future Enhancements
+## 📈 Recent Updates & Features
 
-- [ ] Email notifications for appointments
-- [ ] SMS reminders for medicines
-- [ ] Video consultation integration
-- [ ] Health records upload
-- [ ] Family member management
-- [ ] Insurance integration
-- [ ] Prescription management
-- [ ] Lab test results
-- [ ] Health analytics dashboard
-- [ ] Multi-language support
+### ✅ Latest Improvements (January 2026)
+- **Mobile Compatibility**: Full mobile device support with network access
+- **Enhanced ML Model**: 216 diseases, 613 symptoms, 30+ specializations
+- **Multi-device Login**: Same account works on desktop and mobile simultaneously
+- **Improved UI/UX**: Better responsive design and mobile-first approach
+- **Advanced Dashboard**: Comprehensive health overview with statistics
+- **Real-time Sync**: Data updates instantly across all connected devices
+- **Better Error Handling**: Enhanced debugging and user feedback
+- **Network Status**: Mobile connectivity indicators
 
-## 🤝 Contributing
+### 🔄 Architecture Migration
+- **From Firebase to Flask+SQLite**: Better control and customization
+- **JWT Authentication**: More secure and flexible than Firebase Auth
+- **Local ML Model**: Faster predictions without external API calls
+- **Responsive API**: Dynamic URL detection for mobile access
 
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Open pull request
+## 🎯 Future Enhancements
 
-## 📄 License
+### Planned Features
+- [ ] **Email Notifications** for appointment confirmations
+- [ ] **SMS Reminders** for medicine schedules
+- [ ] **Video Consultation** integration with doctors
+- [ ] **Health Records Upload** (PDF, images)
+- [ ] **Family Member Management** for multiple profiles
+- [ ] **Insurance Integration** for cost estimation
+- [ ] **Prescription Management** with pharmacy integration
+- [ ] **Lab Test Results** tracking and analysis
+- [ ] **Health Analytics Dashboard** with charts and trends
+- [ ] **Multi-language Support** for global accessibility
+- [ ] **Wearable Device Integration** (fitness trackers)
+- [ ] **Telemedicine Platform** for remote consultations
 
-MIT License - feel free to use for personal or commercial projects
+### Technical Improvements
+- [ ] **Progressive Web App (PWA)** for offline functionality
+- [ ] **Push Notifications** for reminders and updates
+- [ ] **Advanced ML Models** for better disease prediction
+- [ ] **Voice Input** for symptom description
+- [ ] **Image Analysis** for skin condition detection
+- [ ] **API Rate Limiting** for production scaling
+- [ ] **Caching System** for improved performance
+- [ ] **Microservices Architecture** for better scalability
 
-## 👨‍💻 Author
+## 👨‍💻 Author & Contributors
 
-Your Name - Health Assistant Project
+**Vatsal KC**
+- GitHub: [@vatsalkc](https://github.com/vatsalkc)
+- Project: [Advanced Health Assistant](https://github.com/vatsalkc/advance-health-assistant)
+- Role: Full-stack Developer & ML Engineer
+
+### 🏆 Project Achievements
+- **216 Diseases** in ML model with 100% training accuracy
+- **30+ Medical Specializations** covered
+- **100+ Doctors** in database across all specialties
+- **Multi-device Support** with seamless mobile access
+- **Real-time Data Sync** across all connected devices
+- **Comprehensive Health Management** in one platform
 
 ## 🙏 Acknowledgments
 
-- Firebase for backend infrastructure
-- scikit-learn for ML capabilities
-- Bootstrap for UI components
-- React community for excellent tools
+- **Scikit-Learn Community** for excellent ML algorithms
+- **Flask Team** for the robust web framework
+- **React Team** for the powerful UI library
+- **Bootstrap Team** for responsive design components
+- **Medical Community** for disease and symptom data
+- **Open Source Contributors** for various libraries used
 
-## 📞 Support
+## 📞 Support & Contact
 
-For issues or questions:
-1. Check documentation files
-2. Run `npm run verify`
-3. Check Firebase Console
-4. Review browser console errors
-5. Open GitHub issue
+### Getting Help
+1. **Documentation**: Check the comprehensive guides in `/docs`
+2. **Issues**: Open a GitHub issue for bugs or feature requests
+3. **Discussions**: Use GitHub Discussions for questions
+4. **Email**: Contact the maintainer for urgent issues
 
-## ⚠️ Disclaimer
+### Reporting Issues
+When reporting issues, please include:
+- Operating system and browser version
+- Steps to reproduce the problem
+- Error messages or screenshots
+- Expected vs actual behavior
 
-This application is for educational purposes only. It should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare providers for medical concerns.
+### Contributing Guidelines
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request with detailed description
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### MIT License Summary
+- ✅ Commercial use allowed
+- ✅ Modification allowed
+- ✅ Distribution allowed
+- ✅ Private use allowed
+- ❌ No warranty provided
+- ❌ No liability accepted
+
+## ⚠️ Medical Disclaimer
+
+**IMPORTANT**: This application is for **educational and informational purposes only**. It should **NOT** be used as a substitute for professional medical advice, diagnosis, or treatment.
+
+### Guidelines
+- Always consult qualified healthcare providers for medical concerns
+- Do not rely solely on AI predictions for health decisions
+- Seek immediate medical attention for emergency situations
+- Use the app as a supplementary tool, not a replacement for medical care
+- The ML model is trained on general data and may not cover all cases
+
+## 🌟 Show Your Support
+
+If you found this project helpful, please consider:
+- ⭐ **Starring** the repository on GitHub
+- 🍴 **Forking** the project to contribute
+- 📢 **Sharing** with others who might benefit
+- 💬 **Providing feedback** through issues or discussions
+- 🤝 **Contributing** to make it even better
 
 ---
 
-**Built with ❤️ using React, Firebase, and Machine Learning**
+**Built with ❤️ using React, Flask, SQLite, and Machine Learning**
+
+*Empowering individuals to take control of their health through technology*

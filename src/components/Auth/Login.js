@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
-import { loginUser } from '../../firebase/firebaseService';
+import authService from '../../services/authService';
 
 function Login({ onLogin, onSwitchToRegister, darkMode }) {
   const [email, setEmail] = useState('');
@@ -20,23 +20,11 @@ function Login({ onLogin, onSwitchToRegister, darkMode }) {
     }
 
     try {
-      const user = await loginUser(email, password);
+      const user = await authService.login(email, password);
       onLogin(user);
     } catch (err) {
       console.error('Login error:', err);
-      
-      // Firebase error messages
-      if (err.code === 'auth/user-not-found') {
-        setError('No account found with this email. Please register first.');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password. Please try again.');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address.');
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Please try again later.');
-      } else {
-        setError(err.message || 'Login failed. Please try again.');
-      }
+      setError(err.message || 'Login failed. Please try again.');
     }
     
     setLoading(false);

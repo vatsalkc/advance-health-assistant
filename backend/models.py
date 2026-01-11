@@ -90,6 +90,9 @@ class SymptomCheck(db.Model):
     symptoms = db.Column(db.Text, nullable=False)  # Comma-separated symptoms
     predicted_disease = db.Column(db.String(100))
     recommended_specialization = db.Column(db.String(100))
+    confidence = db.Column(db.Float)  # Prediction confidence
+    description = db.Column(db.Text)  # Disease description
+    precautions = db.Column(db.Text)  # Recommended precautions
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -99,6 +102,9 @@ class SymptomCheck(db.Model):
             'symptoms': self.symptoms.split(',') if self.symptoms else [],
             'predicted_disease': self.predicted_disease,
             'recommended_specialization': self.recommended_specialization,
+            'confidence': self.confidence,
+            'description': self.description,
+            'precautions': self.precautions.split(',') if self.precautions else [],
             'timestamp': self.created_at.isoformat() if self.created_at else None
         }
 

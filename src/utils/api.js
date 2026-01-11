@@ -1,6 +1,20 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Dynamic API URL based on how the app is accessed
+const getApiBaseUrl = () => {
+  // If accessed via network IP, use network IP for API
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return `http://${window.location.hostname}:5000/api`;
+  }
+  
+  // Default to localhost for local development
+  return process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+console.log('API Base URL:', API_BASE_URL);
+console.log('Current hostname:', window.location.hostname);
 
 // Create axios instance
 const api = axios.create({
@@ -27,12 +41,38 @@ api.interceptors.request.use(
 // Handle response errors
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // If token expired and we haven't already tried to refresh
+    if (error.response?.status === 401 && 
+        error.response?.data?.error_code === 'TOKEN_EXPIRED' && 
+        !originalRequest._retry) {
+      
+      originalRequest._retry = true;
+      
+      try {
+        // Try to refresh token
+        const authService = (await import('../services/authService')).default;
+        const refreshed = await authService.refreshToken();
+        
+        if (refreshed) {
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${authService.getToken()}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+      }
+    }
+    
+    // If unauthorized and not a refresh attempt, redirect to login
+    if (error.response?.status === 401 && !originalRequest.url?.includes('/auth/')) {
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
       window.location.href = '/';
     }
+    
     return Promise.reject(error);
   }
 );

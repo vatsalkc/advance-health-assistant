@@ -1,375 +1,213 @@
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
+
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
   getDocs,
   addDoc,
   updateDoc,
   deleteDoc,
   query,
   where,
-  orderBy,
-  onSnapshot
+  orderBy
 } from 'firebase/firestore';
+
 import { auth, db } from './config';
 
-// ==================== AUTH SERVICES ====================
+// ==================== AUTH ====================
 
 export const registerUser = async (userData) => {
-  try {
-    // Create user in Firebase Auth
-    const userCredential = await createUserWithEmailAndPassword(
-      auth, 
-      userData.email, 
-      userData.password
-    );
-    
-    const user = userCredential.user;
-    
-    // Save additional user data to Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-      uid: user.uid,
-      name: userData.name,
-      email: userData.email,
-      phone: userData.phone || '',
-      age: userData.age || '',
-      gender: userData.gender || '',
-      createdAt: new Date().toISOString()
-    });
-    
-    return {
-      uid: user.uid,
-      email: user.email,
-      name: userData.name
-    };
-  } catch (error) {
-    console.error('Registration error:', error);
-    throw error;
-  }
+  const cred = await createUserWithEmailAndPassword(
+    auth,
+    userData.email,
+    userData.password
+  );
+
+  const user = cred.user;
+
+  await setDoc(doc(db, 'users', user.uid), {
+    uid: user.uid,
+    name: userData.name,
+    email: userData.email,
+    phone: userData.phone || '',
+    age: userData.age || '',
+    gender: userData.gender || '',
+    createdAt: new Date().toISOString(),
+  });
+
+  return { uid: user.uid, email: user.email };
 };
 
 export const loginUser = async (email, password) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    
-    // Get user data from Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    
-    if (userDoc.exists()) {
-      return {
-        uid: user.uid,
-        ...userDoc.data()
-      };
-    } else {
-      throw new Error('User data not found');
-    }
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-  }
+  const cred = await signInWithEmailAndPassword(auth, email, password);
+  return { uid: cred.user.uid, email: cred.user.email };
 };
 
 export const logoutUser = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.error('Logout error:', error);
-    throw error;
-  }
+  await signOut(auth);
 };
 
-export const getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      unsubscribe();
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          resolve({ uid: user.uid, ...userDoc.data() });
-        } else {
-          resolve(null);
-        }
-      } else {
-        resolve(null);
+export const getCurrentUser = () =>
+  new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return resolve(null);
+
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        resolve({ uid: user.uid, ...snap.data() });
+      } catch {
+        resolve({ uid: user.uid });
       }
-    }, reject);
-  });
-};
-
-// ==================== APPOINTMENTS SERVICES ====================
-
-export const createAppointment = async (userId, appointmentData) => {
-  try {
-    const docRef = await addDoc(collection(db, 'appointments'), {
-      userId,
-      ...appointmentData,
-      createdAt: new Date().toISOString()
     });
-    
-    return {
-      id: docRef.id,
-      ...appointmentData
-    };
-  } catch (error) {
-    console.error('Error creating appointment:', error);
-    throw error;
-  }
+  });
+
+// ==================== APPOINTMENTS ====================
+
+export const createAppointment = async (userId, data) => {
+  const ref = await addDoc(collection(db, 'appointments'), {
+    userId,
+    ...data,
+    createdAt: new Date().toISOString(),
+  });
+
+  return { id: ref.id, ...data };
 };
 
 export const getUserAppointments = async (userId) => {
-  try {
-    const q = query(
-      collection(db, 'appointments'), 
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const querySnapshot = await getDocs(q);
-    const appointments = [];
-    
-    querySnapshot.forEach((doc) => {
-      appointments.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    
-    return appointments;
-  } catch (error) {
-    console.error('Error getting appointments:', error);
-    throw error;
-  }
-};
-
-export const deleteAppointment = async (appointmentId) => {
-  try {
-    await deleteDoc(doc(db, 'appointments', appointmentId));
-  } catch (error) {
-    console.error('Error deleting appointment:', error);
-    throw error;
-  }
-};
-
-// Real-time listener for appointments
-export const subscribeToAppointments = (userId, callback) => {
   const q = query(
     collection(db, 'appointments'),
     where('userId', '==', userId),
     orderBy('createdAt', 'desc')
   );
-  
-  return onSnapshot(q, (snapshot) => {
-    const appointments = [];
-    snapshot.forEach((doc) => {
-      appointments.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    callback(appointments);
-  });
+
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
-// ==================== MEDICINES SERVICES ====================
+export const subscribeToAppointments = (userId, callback) => {
+  let active = true;
 
-export const createMedicine = async (userId, medicineData) => {
-  try {
-    const docRef = await addDoc(collection(db, 'medicines'), {
-      userId,
-      ...medicineData,
-      active: true,
-      createdAt: new Date().toISOString()
-    });
-    
-    return {
-      id: docRef.id,
-      ...medicineData,
-      active: true
-    };
-  } catch (error) {
-    console.error('Error creating medicine:', error);
-    throw error;
-  }
+  getUserAppointments(userId)
+    .then(data => {
+      if (active) callback(data);
+    })
+    .catch(console.error);
+
+  // ✅ ALWAYS return a function
+  return () => {
+    active = false;
+  };
+};
+
+export const deleteAppointment = async (id) => {
+  await deleteDoc(doc(db, 'appointments', id));
+};
+
+// ==================== MEDICINES ====================
+
+export const createMedicine = async (userId, data) => {
+  const ref = await addDoc(collection(db, 'medicines'), {
+    userId,
+    ...data,
+    active: true,
+    createdAt: new Date().toISOString(),
+  });
+
+  return { id: ref.id, ...data };
 };
 
 export const getUserMedicines = async (userId) => {
-  try {
-    const q = query(
-      collection(db, 'medicines'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const querySnapshot = await getDocs(q);
-    const medicines = [];
-    
-    querySnapshot.forEach((doc) => {
-      medicines.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    
-    return medicines;
-  } catch (error) {
-    console.error('Error getting medicines:', error);
-    throw error;
-  }
-};
-
-export const updateMedicine = async (medicineId, updates) => {
-  try {
-    await updateDoc(doc(db, 'medicines', medicineId), updates);
-  } catch (error) {
-    console.error('Error updating medicine:', error);
-    throw error;
-  }
-};
-
-export const deleteMedicine = async (medicineId) => {
-  try {
-    await deleteDoc(doc(db, 'medicines', medicineId));
-  } catch (error) {
-    console.error('Error deleting medicine:', error);
-    throw error;
-  }
-};
-
-// Real-time listener for medicines
-export const subscribeToMedicines = (userId, callback) => {
   const q = query(
     collection(db, 'medicines'),
     where('userId', '==', userId),
     orderBy('createdAt', 'desc')
   );
-  
-  return onSnapshot(q, (snapshot) => {
-    const medicines = [];
-    snapshot.forEach((doc) => {
-      medicines.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    callback(medicines);
-  });
+
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
-// ==================== SYMPTOM CHECKS SERVICES ====================
+export const subscribeToMedicines = (userId, callback) => {
+  let active = true;
 
-export const createSymptomCheck = async (userId, symptomData) => {
-  try {
-    const docRef = await addDoc(collection(db, 'symptomChecks'), {
-      userId,
-      ...symptomData,
-      createdAt: new Date().toISOString()
-    });
-    
-    return {
-      id: docRef.id,
-      ...symptomData
-    };
-  } catch (error) {
-    console.error('Error creating symptom check:', error);
-    throw error;
-  }
+  getUserMedicines(userId)
+    .then(data => {
+      if (active) callback(data);
+    })
+    .catch(console.error);
+
+  return () => {
+    active = false;
+  };
+};
+
+export const updateMedicine = async (id, updates) => {
+  await updateDoc(doc(db, 'medicines', id), updates);
+};
+
+export const deleteMedicine = async (id) => {
+  await deleteDoc(doc(db, 'medicines', id));
+};
+
+// ==================== SYMPTOMS ====================
+
+export const createSymptomCheck = async (userId, data) => {
+  const ref = await addDoc(collection(db, 'symptomChecks'), {
+    userId,
+    ...data,
+    createdAt: new Date().toISOString(),
+  });
+
+  return { id: ref.id, ...data };
 };
 
 export const getUserSymptomChecks = async (userId) => {
-  try {
-    const q = query(
-      collection(db, 'symptomChecks'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const querySnapshot = await getDocs(q);
-    const checks = [];
-    
-    querySnapshot.forEach((doc) => {
-      checks.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    
-    return checks;
-  } catch (error) {
-    console.error('Error getting symptom checks:', error);
-    throw error;
-  }
+  const q = query(
+    collection(db, 'symptomChecks'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
-// ==================== STATS SERVICES ====================
+// ==================== STATS ====================
 
 export const getUserStats = async (userId) => {
-  try {
-    const [appointments, medicines, symptomChecks] = await Promise.all([
-      getUserAppointments(userId),
-      getUserMedicines(userId),
-      getUserSymptomChecks(userId)
-    ]);
-    
-    return {
-      totalAppointments: appointments.length,
-      activeMedicines: medicines.filter(m => m.active).length,
-      symptomsChecked: symptomChecks.length
-    };
-  } catch (error) {
-    console.error('Error getting stats:', error);
-    throw error;
-  }
+  const [a, m, s] = await Promise.all([
+    getUserAppointments(userId),
+    getUserMedicines(userId),
+    getUserSymptomChecks(userId)
+  ]);
+
+  return {
+    totalAppointments: a.length,
+    activeMedicines: m.filter(x => x.active).length,
+    symptomsChecked: s.length
+  };
 };
 
-// ==================== DOCTORS (Static Data) ====================
+// ==================== DOCTORS ====================
 
 export const getAllDoctors = async () => {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'doctors'));
-    const doctors = [];
-    
-    querySnapshot.forEach((doc) => {
-      doctors.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    
-    return doctors;
-  } catch (error) {
-    console.error('Error getting doctors:', error);
-    throw error;
-  }
+  const snap = await getDocs(collection(db, 'doctors'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
 export const getDoctorsBySpecialization = async (specialization) => {
-  try {
-    const q = query(
-      collection(db, 'doctors'),
-      where('specialization', '==', specialization)
-    );
-    
-    const querySnapshot = await getDocs(q);
-    const doctors = [];
-    
-    querySnapshot.forEach((doc) => {
-      doctors.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    
-    return doctors;
-  } catch (error) {
-    console.error('Error getting doctors by specialization:', error);
-    throw error;
-  }
+  const q = query(
+    collection(db, 'doctors'),
+    where('specialization', '==', specialization)
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };

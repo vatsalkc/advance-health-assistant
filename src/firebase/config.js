@@ -28,15 +28,16 @@ const firebaseConfig = {
     "1:1099184695182:web:5e2e5351fed4b93e94e6df",
 };
 
-// Initialize Firebase
+// Initialize Firebase ONCE
 const app = initializeApp(firebaseConfig);
 
-// Authentication
+// Auth
 export const auth = getAuth(app);
 
-// ✅ Firestore (LONG POLLING FIX)
+// 🔥 Firestore (BLOCKED-NETWORK SAFE)
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
+  useFetchStreams: false, // IMPORTANT
 });
 
 export default app;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
-import { logoutUser } from './firebase/firebaseService';
+import authService from './services/authService';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -8,6 +8,8 @@ import SymptomChecker from './components/SymptomChecker/SymptomChecker';
 import DoctorRecommendation from './components/DoctorRecommendation/DoctorRecommendation';
 import Appointments from './components/Appointments/Appointments';
 import MedicineReminder from './components/MedicineReminder/MedicineReminder';
+import UserHistory from './components/UserHistory/UserHistory';
+import NetworkStatus from './components/NetworkStatus/NetworkStatus';
 
 function App() {
   const [currentView, setCurrentView] = useState('login');
@@ -20,6 +22,36 @@ function App() {
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
+  useEffect(() => {
+    // Check if user is already authenticated and validate token
+    const initializeAuth = async () => {
+      if (authService.isAuthenticated()) {
+        const currentUser = authService.getCurrentUser();
+        if (currentUser) {
+          // Validate token if it's been a while
+          if (authService.shouldValidateToken()) {
+            const isValid = await authService.validateToken();
+            if (isValid) {
+              setUser(authService.getCurrentUser());
+              setIsAuthenticated(true);
+              setCurrentView('dashboard');
+            } else {
+              // Token invalid, stay on login
+              setCurrentView('login');
+            }
+          } else {
+            // Token is recent, trust it
+            setUser(currentUser);
+            setIsAuthenticated(true);
+            setCurrentView('dashboard');
+          }
+        }
+      }
+    };
+
+    initializeAuth();
+  }, []);
+
   const handleLogin = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
@@ -28,7 +60,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
+      authService.logout();
       setUser(null);
       setIsAuthenticated(false);
       setCurrentView('login');
@@ -39,12 +71,16 @@ function App() {
   };
 
   const handleSymptomResult = (disease, specialization, fullResult) => {
-    setPredictionResult(fullResult);
+    // If fullResult is not provided, create it from the disease and specialization
+    const result = fullResult || { disease, specialization };
+    setPredictionResult(result);
     setCurrentView('doctorRecommendation');
   };
 
   return (
     <div className="App">
+      <NetworkStatus />
+      
       <Navbar bg={darkMode ? 'dark' : 'primary'} variant="dark" expand="lg" className="navbar-custom">
         <Container>
           <Navbar.Brand href="#home" className="fw-bold">
@@ -67,6 +103,9 @@ function App() {
                   </Nav.Link>
                   <Nav.Link onClick={() => setCurrentView('medicineReminder')} active={currentView === 'medicineReminder'}>
                     <i className="bi bi-alarm me-1"></i>Medicines
+                  </Nav.Link>
+                  <Nav.Link onClick={() => setCurrentView('userHistory')} active={currentView === 'userHistory'}>
+                    <i className="bi bi-clock-history me-1"></i>History
                   </Nav.Link>
                 </Nav>
                 <Nav>
@@ -126,6 +165,10 @@ function App() {
 
         {isAuthenticated && currentView === 'medicineReminder' && (
           <MedicineReminder user={user} />
+        )}
+
+        {isAuthenticated && currentView === 'userHistory' && (
+          <UserHistory user={user} />
         )}
       </Container>
     </div>

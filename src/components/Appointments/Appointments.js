@@ -12,12 +12,8 @@ import {
   Tab,
   Modal
 } from 'react-bootstrap';
-import {
-  createAppointment,
-  subscribeToAppointments,
-  deleteAppointment,
-  getAllDoctors
-} from '../../firebase/firebaseService';
+import { appointmentsAPI } from '../../utils/api';
+import axios from 'axios';
 
 function Appointments({ user }) {
   const [appointments, setAppointments] = useState([]);
@@ -35,24 +31,47 @@ function Appointments({ user }) {
   });
 
   useEffect(() => {
-    if (!user?.uid) return;
-
-    fetchDoctors();
-
-    const unsubscribe = subscribeToAppointments(user.uid, (data) => {
-      setAppointments(data);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    if (user) {
+      fetchDoctors();
+      fetchAppointments();
+    }
   }, [user]);
 
   const fetchDoctors = async () => {
     try {
-      const list = await getAllDoctors();
-      setDoctors(list);
+      // Use the dynamic API URL detection from api.js
+      const getApiBaseUrl = () => {
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          return `http://${window.location.hostname}:5000`;
+        }
+        return process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      };
+      
+      const apiUrl = getApiBaseUrl();
+      console.log('Fetching doctors from:', `${apiUrl}/api/doctors`);
+      
+      const response = await axios.get(`${apiUrl}/api/doctors`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      
+      console.log('Doctors response:', response.data);
+      setDoctors(response.data.doctors);
     } catch (err) {
       console.error('Error fetching doctors:', err);
+      console.error('Error details:', err.response?.data);
+    }
+  };
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await appointmentsAPI.getAll();
+      setAppointments(response.data.appointments);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setLoading(false);
     }
   };
 
@@ -69,9 +88,9 @@ function Appointments({ user }) {
     e.preventDefault();
 
     try {
-      await createAppointment(user.uid, {
-        doctorId: selectedDoctor.id,
-        doctorName: selectedDoctor.name,
+      await appointmentsAPI.create({
+        doctor_id: selectedDoctor.id,
+        doctor_name: selectedDoctor.name,
         specialization: selectedDoctor.specialization,
         date: formData.date,
         time: formData.time,
@@ -83,6 +102,9 @@ function Appointments({ user }) {
       setShowBookingModal(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
+      
+      // Refresh appointments
+      fetchAppointments();
     } catch (err) {
       console.error(err);
       alert('Failed to book appointment');
@@ -93,7 +115,8 @@ function Appointments({ user }) {
     if (!window.confirm('Cancel this appointment?')) return;
 
     try {
-      await deleteAppointment(id);
+      await appointmentsAPI.delete(id);
+      fetchAppointments(); // Refresh appointments
     } catch (err) {
       console.error(err);
       alert('Failed to cancel appointment');
@@ -123,7 +146,7 @@ function Appointments({ user }) {
 
       <Row>
         {/* Doctors Section */}
-        <Col lg={8}>
+        <Col lg={8} md={12} className="mb-4">
           <Card className="mb-4">
             <Card.Body>
               <h4>Available Doctors</h4>
@@ -147,11 +170,23 @@ function Appointments({ user }) {
                 </Nav>
 
                 {loading ? (
-                  <p>Loading doctors...</p>
+                  <div className="text-center py-4">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading doctors...</span>
+                    </div>
+                    <p className="mt-3 text-muted">Loading doctors...</p>
+                  </div>
+                ) : filteredDoctors.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-muted">No doctors found. Please check your connection.</p>
+                    <Button variant="outline-primary" onClick={fetchDoctors}>
+                      Retry Loading Doctors
+                    </Button>
+                  </div>
                 ) : (
                   <Row>
                     {filteredDoctors.map((doctor) => (
-                      <Col md={6} key={doctor.id} className="mb-3">
+                      <Col lg={6} md={6} sm={12} key={doctor.id} className="mb-3">
                         <Card className="h-100">
                           <Card.Body>
                             <h5>{doctor.name}</h5>
@@ -163,17 +198,12 @@ function Appointments({ user }) {
                             </p>
 
                             <div className="d-flex justify-content-between">
-                              <Badge
-                                bg={doctor.available ? 'success' : 'secondary'}
-                              >
-                                {doctor.available
-                                  ? 'Available'
-                                  : 'Unavailable'}
+                              <Badge bg="success">
+                                Available
                               </Badge>
 
                               <Button
                                 size="sm"
-                                disabled={!doctor.available}
                                 onClick={() =>
                                   handleBookAppointment(doctor)
                                 }
@@ -193,7 +223,7 @@ function Appointments({ user }) {
         </Col>
 
         {/* Appointments Section */}
-        <Col lg={4}>
+        <Col lg={4} md={12}>
           <Card>
             <Card.Body>
               <h5>Your Appointments</h5>
@@ -207,7 +237,7 @@ function Appointments({ user }) {
                     <ListGroup.Item key={a.id}>
                       <div className="mb-2">
                         <div className="d-flex justify-content-between">
-                          <strong>{a.doctorName}</strong>
+                          <strong>{a.doctor_name}</strong>
                           <Badge
                             bg={
                               a.status === 'Confirmed'

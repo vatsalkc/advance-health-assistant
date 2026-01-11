@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Button, Badge, Alert, ListGroup } from 'react-bootstrap';
-import { getDoctorsBySpecialization } from '../../firebase/firebaseService';
+import { doctorsAPI } from '../../utils/api';
 
 function DoctorRecommendation({ predictionResult, onBookAppointment }) {
   const [doctors, setDoctors] = useState([]);
@@ -15,8 +15,8 @@ function DoctorRecommendation({ predictionResult, onBookAppointment }) {
   const fetchDoctors = async () => {
     setLoading(true);
     try {
-      const doctorsList = await getDoctorsBySpecialization(predictionResult.specialization);
-      setDoctors(doctorsList);
+      const response = await doctorsAPI.getAll(predictionResult.specialization);
+      setDoctors(response.data.doctors);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching doctors:', error);

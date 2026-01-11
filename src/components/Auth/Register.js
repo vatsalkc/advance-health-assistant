@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
-import { registerUser } from '../../firebase/firebaseService';
+import authService from '../../services/authService';
 
 function Register({ onRegister, onSwitchToLogin, darkMode }) {
   const [formData, setFormData] = useState({
@@ -55,21 +55,11 @@ function Register({ onRegister, onSwitchToLogin, darkMode }) {
     }
 
     try {
-      const user = await registerUser(formData);
+      const user = await authService.register(formData);
       onRegister(user);
     } catch (err) {
       console.error('Registration error:', err);
-      
-      // Firebase error messages
-      if (err.code === 'auth/email-already-in-use') {
-        setError('This email is already registered. Please login instead.');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address.');
-      } else if (err.code === 'auth/weak-password') {
-        setError('Password is too weak. Please use a stronger password.');
-      } else {
-        setError(err.message || 'Registration failed. Please try again.');
-      }
+      setError(err.message || 'Registration failed. Please try again.');
     }
     
     setLoading(false);

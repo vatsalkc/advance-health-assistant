@@ -15,12 +15,22 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db.init_app(app)
-CORS(app)
+
+# Configure CORS for multi-device access including mobile
+CORS(app, 
+     origins="*",  # Allow all origins for development
+     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     supports_credentials=False)  # Set to False when using origins="*"
 
 # Initialize ML model
 print("Initializing ML model...")
-disease_predictor = initialize_model()
-print("ML model ready!")
+try:
+    disease_predictor = initialize_model()
+    print("ML model ready!")
+except Exception as e:
+    print(f"ML model initialization failed: {e}")
+    disease_predictor = None
 
 # Create tables
 with app.app_context():
@@ -33,15 +43,41 @@ def token_required(f):
         token = request.headers.get('Authorization')
         
         if not token:
-            return jsonify({'message': 'Token is missing'}), 401
+            return jsonify({
+                'message': 'Token is missing',
+                'error_code': 'NO_TOKEN'
+            }), 401
         
         try:
             if token.startswith('Bearer '):
                 token = token.split(' ')[1]
+            
+            # Decode token
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = User.query.get(data['user_id'])
-        except:
-            return jsonify({'message': 'Token is invalid'}), 401
+            
+            if not current_user:
+                return jsonify({
+                    'message': 'User not found',
+                    'error_code': 'USER_NOT_FOUND'
+                }), 401
+                
+        except jwt.ExpiredSignatureError:
+            return jsonify({
+                'message': 'Token has expired',
+                'error_code': 'TOKEN_EXPIRED'
+            }), 401
+        except jwt.InvalidTokenError:
+            return jsonify({
+                'message': 'Token is invalid',
+                'error_code': 'INVALID_TOKEN'
+            }), 401
+        except Exception as e:
+            return jsonify({
+                'message': 'Token validation failed',
+                'error_code': 'TOKEN_ERROR',
+                'details': str(e)
+            }), 401
         
         return f(current_user, *args, **kwargs)
     
@@ -115,6 +151,45 @@ def login():
 @token_required
 def get_current_user(current_user):
     return jsonify({'user': current_user.to_dict()}), 200
+
+@app.route('/api/auth/refresh', methods=['POST'])
+@token_required
+def refresh_token(current_user):
+    """Refresh the JWT token"""
+    # Generate new token
+    new_token = jwt.encode({
+        'user_id': current_user.id,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    }, app.config['SECRET_KEY'])
+    
+    return jsonify({
+        'message': 'Token refreshed successfully',
+        'token': new_token,
+        'user': current_user.to_dict()
+    }), 200
+
+@app.route('/api/auth/validate', methods=['GET'])
+@token_required
+def validate_token(current_user):
+    """Validate if the current token is still valid"""
+    return jsonify({
+        'valid': True,
+        'user': current_user.to_dict(),
+        'message': 'Token is valid'
+    }), 200
+
+# ==================== DOCTOR ROUTES ====================
+
+@app.route('/api/doctors', methods=['GET'])
+def get_doctors():
+    specialization = request.args.get('specialization')
+    
+    if specialization:
+        doctors = Doctor.query.filter_by(specialization=specialization).all()
+    else:
+        doctors = Doctor.query.all()
+    
+    return jsonify({'doctors': [doc.to_dict() for doc in doctors]}), 200
 
 # ==================== APPOINTMENT ROUTES ====================
 
@@ -233,6 +308,9 @@ def symptom_check(current_user):
     if not symptoms:
         return jsonify({'message': 'No symptoms provided'}), 400
     
+    if not disease_predictor:
+        return jsonify({'message': 'Disease prediction service unavailable'}), 503
+    
     try:
         # Predict disease using ML model
         predicted_disease, top_diseases = disease_predictor.predict_disease(symptoms)
@@ -243,15 +321,15 @@ def symptom_check(current_user):
         if not disease_info:
             return jsonify({'message': 'Disease information not found'}), 404
         
-        # Get suggested related symptoms
-        suggested_symptoms = disease_predictor.suggest_related_symptoms(symptoms)
-        
-        # Save symptom check
+        # Save symptom check with detailed information
         symptom_check = SymptomCheck(
             user_id=current_user.id,
             symptoms=','.join(symptoms),
             predicted_disease=predicted_disease,
-            recommended_specialization=disease_info['specialization']
+            recommended_specialization=disease_info['specialization'],
+            confidence=float(top_diseases[0][1]) * 100,
+            description=disease_info['description'],
+            precautions=','.join(disease_info['precautions'])
         )
         
         db.session.add(symptom_check)
@@ -269,7 +347,6 @@ def symptom_check(current_user):
                     'confidence': float(prob) * 100
                 } for disease, prob in top_diseases
             ],
-            'suggested_symptoms': suggested_symptoms,
             'symptom_check': symptom_check.to_dict()
         }), 200
         
@@ -280,46 +357,49 @@ def symptom_check(current_user):
 @app.route('/api/symptom-checks', methods=['GET'])
 @token_required
 def get_symptom_checks(current_user):
-    checks = SymptomCheck.query.filter_by(user_id=current_user.id).order_by(SymptomCheck.created_at.desc()).all()
+    limit = request.args.get('limit', 10, type=int)
+    checks = SymptomCheck.query.filter_by(user_id=current_user.id).order_by(SymptomCheck.created_at.desc()).limit(limit).all()
     return jsonify({'symptom_checks': [check.to_dict() for check in checks]}), 200
+
+@app.route('/api/user/profile', methods=['GET'])
+@token_required
+def get_user_profile(current_user):
+    """Get comprehensive user profile with all data"""
+    # Get user stats
+    appointments_count = Appointment.query.filter_by(user_id=current_user.id).count()
+    medicines_count = Medicine.query.filter_by(user_id=current_user.id, active=True).count()
+    symptom_checks_count = SymptomCheck.query.filter_by(user_id=current_user.id).count()
+    
+    # Get recent data
+    recent_appointments = Appointment.query.filter_by(user_id=current_user.id).order_by(Appointment.created_at.desc()).limit(5).all()
+    recent_medicines = Medicine.query.filter_by(user_id=current_user.id).order_by(Medicine.created_at.desc()).limit(5).all()
+    recent_symptom_checks = SymptomCheck.query.filter_by(user_id=current_user.id).order_by(SymptomCheck.created_at.desc()).limit(5).all()
+    
+    return jsonify({
+        'user': current_user.to_dict(),
+        'stats': {
+            'totalAppointments': appointments_count,
+            'activeMedicines': medicines_count,
+            'symptomsChecked': symptom_checks_count
+        },
+        'recent_data': {
+            'appointments': [apt.to_dict() for apt in recent_appointments],
+            'medicines': [med.to_dict() for med in recent_medicines],
+            'symptom_checks': [check.to_dict() for check in recent_symptom_checks]
+        }
+    }), 200
 
 @app.route('/api/symptoms/all', methods=['GET'])
 def get_all_symptoms():
     """Get list of all possible symptoms"""
+    if not disease_predictor:
+        return jsonify({'message': 'Disease prediction service unavailable'}), 503
+    
     try:
         symptoms = disease_predictor.get_all_symptoms()
         return jsonify({'symptoms': symptoms}), 200
     except Exception as e:
         return jsonify({'message': f'Error fetching symptoms: {str(e)}'}), 500
-
-@app.route('/api/diseases/all', methods=['GET'])
-def get_all_diseases():
-    """Get list of all diseases with their info"""
-    try:
-        diseases = []
-        for _, row in disease_predictor.disease_data.iterrows():
-            diseases.append({
-                'name': row['Disease'],
-                'specialization': row['Specialization'],
-                'description': row['Description'],
-                'symptoms': row['Symptoms'].split(',')
-            })
-        return jsonify({'diseases': diseases}), 200
-    except Exception as e:
-        return jsonify({'message': f'Error fetching diseases: {str(e)}'}), 500
-
-# ==================== DOCTOR ROUTES ====================
-
-@app.route('/api/doctors', methods=['GET'])
-def get_doctors():
-    specialization = request.args.get('specialization')
-    
-    if specialization:
-        doctors = Doctor.query.filter_by(specialization=specialization).all()
-    else:
-        doctors = Doctor.query.all()
-    
-    return jsonify({'doctors': [doc.to_dict() for doc in doctors]}), 200
 
 # ==================== STATS ROUTES ====================
 
@@ -337,4 +417,4 @@ def get_stats(current_user):
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
