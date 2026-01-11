@@ -2,13 +2,39 @@
 
 A comprehensive full-stack health management system with ML disease prediction, multi-device support, and real-time health tracking. Features 216 diseases, 30+ medical specializations, and seamless mobile access.
 
+## 🌐 Live Preview & Demo
+
+### 🚀 **Try it Now - One Click Deploy!**
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vatsalkc/advance-health-assistant)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/vatsalkc/advance-health-assistant)
+[![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/vatsalkc/advance-health-assistant)
+
+### 📱 **What You'll Get:**
+- **Live Web App**: Accessible from any device worldwide
+- **Your Own URL**: `https://your-app-name.vercel.app`
+- **Demo Mode**: Works with sample data (no backend setup needed)
+- **Full UI**: Complete health assistant interface
+- **Mobile Ready**: Responsive design for all devices
+
+### ⚡ **Quick Preview Steps:**
+1. **Click "Deploy to Vercel"** button above
+2. **Sign in** with your GitHub account  
+3. **Click "Deploy"** - takes 2 minutes
+4. **Get your live URL** - share with anyone!
+5. **Optional**: Follow [full setup guide](#-quick-start) for AI features
+
+> **💡 Pro Tip**: The one-click deploy gives you a working frontend with demo data. For full AI disease prediction, follow the complete setup guide below.
+
+---
+
 ![Health Assistant](https://img.shields.io/badge/Status-Development-blue)
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
 ![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
 ![Python](https://img.shields.io/badge/Python-3.8+-yellow)
 ![ML](https://img.shields.io/badge/ML-Scikit--Learn-orange)
 
-> **Note**: This is a development project. To run the application, follow the [Quick Start](#-quick-start) guide below.
+> **Note**: For full functionality including AI predictions, follow the complete setup guide. The one-click deploy provides a frontend preview with demo data.
 
 ## ✨ Key Features
 
