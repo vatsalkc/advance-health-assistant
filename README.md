@@ -2,11 +2,13 @@
 
 A comprehensive full-stack health management system with ML disease prediction, multi-device support, and real-time health tracking. Features 216 diseases, 30+ medical specializations, and seamless mobile access.
 
-![Health Assistant](https://img.shields.io/badge/Status-Live-brightgreen)
+![Health Assistant](https://img.shields.io/badge/Status-Development-blue)
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
 ![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
 ![Python](https://img.shields.io/badge/Python-3.8+-yellow)
 ![ML](https://img.shields.io/badge/ML-Scikit--Learn-orange)
+
+> **Note**: This is a development project. To run the application, follow the [Quick Start](#-quick-start) guide below.
 
 ## ✨ Key Features
 
@@ -91,6 +93,8 @@ A comprehensive full-stack health management system with ML disease prediction, 
 - **Node.js 14+** with npm
 - **Git** for version control
 
+### 🏠 Local Development
+
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/vatsalkc/advance-health-assistant.git
@@ -137,6 +141,18 @@ npm start
 ```
 
 Frontend will be available at `http://localhost:3000`
+
+### 🌐 Deploy to Internet (Make it Live!)
+
+Want to make your app accessible from anywhere? 
+
+**👉 [Follow the Complete Deployment Guide](deploy.md) 👈**
+
+Quick options:
+- **Free Hosting**: Vercel (frontend) + Railway (backend)
+- **5 Minutes**: One-click deployment
+- **Global Access**: Anyone can use your app
+- **Mobile Ready**: Works on all devices
 
 ### 4. Mobile Access Setup
 For mobile device access on the same network:
@@ -372,28 +388,76 @@ npm start
 # Mobile access: http://YOUR_IP:3000
 ```
 
-### Production Deployment
+## 🌐 Live Deployment Options
 
-#### Frontend (Vercel/Netlify)
+### Option 1: Deploy to Vercel + Railway (Recommended)
+
+#### Frontend on Vercel (Free)
 ```bash
+# 1. Build the project
 npm run build
-# Deploy build/ folder to hosting service
-# Set environment variables in hosting dashboard
+
+# 2. Install Vercel CLI
+npm i -g vercel
+
+# 3. Deploy to Vercel
+vercel --prod
+
+# 4. Set environment variable in Vercel dashboard:
+# REACT_APP_API_URL=https://your-backend-url.railway.app/api
 ```
 
-#### Backend (Heroku/Railway/DigitalOcean)
+#### Backend on Railway (Free)
 ```bash
-# Create Procfile
-echo "web: python app.py" > Procfile
-
-# Deploy Flask app with requirements.txt
-# Set environment variables in hosting dashboard
+# 1. Create account at railway.app
+# 2. Connect your GitHub repo
+# 3. Deploy backend folder
+# 4. Railway will auto-detect Flask app
+# 5. Set environment variables in Railway dashboard
 ```
 
-#### Database Options
-- **Development**: SQLite (included)
-- **Production**: PostgreSQL, MySQL, or cloud database
-- **Migration**: Update SQLALCHEMY_DATABASE_URI in config
+### Option 2: Deploy to Netlify + Render
+
+#### Frontend on Netlify (Free)
+```bash
+# 1. Build the project
+npm run build
+
+# 2. Drag & drop build/ folder to netlify.com
+# 3. Set environment variable:
+# REACT_APP_API_URL=https://your-backend.onrender.com/api
+```
+
+#### Backend on Render (Free)
+```bash
+# 1. Create account at render.com
+# 2. Connect GitHub repo
+# 3. Create new Web Service
+# 4. Set build command: pip install -r backend/requirements.txt
+# 5. Set start command: python backend/app.py
+```
+
+### Option 3: All-in-One Heroku (Free Tier Ended)
+```bash
+# Note: Heroku no longer offers free tier
+# Consider Railway or Render instead
+```
+
+### Quick Deploy Links
+Once deployed, your app will be accessible at:
+- **Frontend**: `https://your-app-name.vercel.app`
+- **Backend**: `https://your-backend.railway.app`
+- **Full App**: Users access the frontend URL
+
+### Environment Variables for Production
+```bash
+# Frontend (.env)
+REACT_APP_API_URL=https://your-backend-url/api
+
+# Backend (hosting dashboard)
+SECRET_KEY=your-production-secret-key
+SQLALCHEMY_DATABASE_URI=sqlite:///health_assistant.db
+```
 
 ## 📈 Recent Updates & Features
 
