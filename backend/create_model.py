@@ -1069,5 +1069,9 @@ def create_pretrained_model():
     for i in top_indices:
         print(f"  {model.classes_[i]}: {probabilities[i]*100:.2f}%")
 
-if __name__ == "__main__":
+def main():
+    """Main function for deployment"""
     create_pretrained_model()
+
+if __name__ == "__main__":
+    main()
