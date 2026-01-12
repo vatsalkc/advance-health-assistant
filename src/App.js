@@ -103,9 +103,6 @@ function App() {
                   <Nav.Link onClick={() => setCurrentView('userHistory')} active={currentView === 'userHistory'}>
                     <i className="bi bi-clock-history me-1"></i>History
                   </Nav.Link>
-                  <Nav.Link onClick={() => setCurrentView('profile')} active={currentView === 'profile'}>
-                    <i className="bi bi-person-circle me-1"></i>Profile
-                  </Nav.Link>
                 </Nav>
                 <Nav>
                   <Button 
@@ -116,10 +113,16 @@ function App() {
                   >
                     <i className={`bi bi-${darkMode ? 'sun' : 'moon'}-fill`}></i>
                   </Button>
-                  <Navbar.Text className="me-3">
+                  <Button
+                    variant="outline-light"
+                    size="sm"
+                    className="me-3"
+                    onClick={() => setCurrentView('profile')}
+                    title="View Profile"
+                  >
                     <i className="bi bi-person-circle me-1"></i>
                     {user?.name}
-                  </Navbar.Text>
+                  </Button>
                   <Nav.Link onClick={handleLogout}>
                     <i className="bi bi-box-arrow-right me-1"></i>Logout
                   </Nav.Link>

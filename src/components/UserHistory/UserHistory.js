@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Badge, ListGroup, Button, Tab, Tabs, Alert } from 'react-bootstrap';
+import { Card, Row, Col, Badge, ListGroup, Alert } from 'react-bootstrap';
 import { appointmentsAPI, medicinesAPI } from '../../utils/api';
-import axios from 'axios';
 
 function UserHistory({ user }) {
-  const [appointments, setAppointments] = useState([]);
-  const [medicines, setMedicines] = useState([]);
-  const [symptomChecks, setSymptomChecks] = useState([]);
+  const [historyLogs, setHistoryLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('appointments');
 
   useEffect(() => {
     if (user) {
@@ -24,20 +20,51 @@ function UserHistory({ user }) {
 
       // Fetch all appointments
       const appointmentsResponse = await appointmentsAPI.getAll();
-      setAppointments(appointmentsResponse.data.appointments);
+      const appointments = appointmentsResponse.data.appointments;
 
       // Fetch all medicines
       const medicinesResponse = await medicinesAPI.getAll();
-      setMedicines(medicinesResponse.data.medicines);
+      const medicines = medicinesResponse.data.medicines;
 
-      // Fetch all symptom checks
-      const symptomResponse = await axios.get(`${process.env.REACT_APP_API_URL}/symptom-checks`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
+      // Combine and format logs
+      const logs = [];
+
+      // Add appointments to logs
+      appointments.forEach(apt => {
+        logs.push({
+          id: `apt-${apt.id}`,
+          type: 'Appointment',
+          title: apt.doctor_name,
+          subtitle: apt.specialization,
+          details: apt.reason,
+          date: apt.date,
+          time: apt.time,
+          status: apt.status,
+          created_at: apt.created_at,
+          icon: 'calendar-check',
+          color: 'primary'
+        });
       });
-      setSymptomChecks(symptomResponse.data.symptom_checks);
 
+      // Add medicines to logs
+      medicines.forEach(med => {
+        logs.push({
+          id: `med-${med.id}`,
+          type: 'Medicine',
+          title: med.medicine_name,
+          subtitle: med.dosage,
+          details: `${med.time} - ${med.frequency}`,
+          status: med.active ? 'Active' : 'Inactive',
+          created_at: med.created_at,
+          icon: 'capsule',
+          color: 'success'
+        });
+      });
+
+      // Sort by created date (newest first)
+      logs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      setHistoryLogs(logs);
       setLoading(false);
     } catch (err) {
       setError('Failed to load user history');
@@ -56,6 +83,20 @@ function UserHistory({ user }) {
     });
   };
 
+  const getStatusBadge = (log) => {
+    if (log.type === 'Appointment') {
+      const statusColors = {
+        'Confirmed': 'success',
+        'Completed': 'primary',
+        'Cancelled': 'danger',
+        'Pending': 'warning'
+      };
+      return <Badge bg={statusColors[log.status] || 'secondary'}>{log.status}</Badge>;
+    } else {
+      return <Badge bg={log.status === 'Active' ? 'success' : 'secondary'}>{log.status}</Badge>;
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -67,199 +108,93 @@ function UserHistory({ user }) {
     );
   }
 
+  const appointmentCount = historyLogs.filter(log => log.type === 'Appointment').length;
+  const medicineCount = historyLogs.filter(log => log.type === 'Medicine').length;
+
   return (
     <div>
       <div className="mb-4">
         <h2 className="mb-1">Your Health History</h2>
-        <p className="text-muted">Complete overview of your medical records and activities</p>
+        <p className="text-muted">Complete log of your appointments and medicines</p>
       </div>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
       {/* Summary Cards */}
       <Row className="mb-4">
-        <Col md={4}>
+        <Col md={6}>
           <Card className="text-center">
             <Card.Body>
               <i className="bi bi-calendar-check" style={{ fontSize: '2rem', color: 'var(--primary-color)' }}></i>
-              <h3 className="mt-2">{appointments.length}</h3>
+              <h3 className="mt-2">{appointmentCount}</h3>
               <p className="text-muted mb-0">Total Appointments</p>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4}>
+        <Col md={6}>
           <Card className="text-center">
             <Card.Body>
               <i className="bi bi-capsule" style={{ fontSize: '2rem', color: 'var(--success-color)' }}></i>
-              <h3 className="mt-2">{medicines.length}</h3>
+              <h3 className="mt-2">{medicineCount}</h3>
               <p className="text-muted mb-0">Medicine Records</p>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4}>
-          <Card className="text-center">
-            <Card.Body>
-              <i className="bi bi-clipboard2-pulse" style={{ fontSize: '2rem', color: 'var(--info-color)' }}></i>
-              <h3 className="mt-2">{symptomChecks.length}</h3>
-              <p className="text-muted mb-0">Symptom Checks</p>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* Detailed History Tabs */}
+      {/* Activity Log */}
       <Card>
         <Card.Body>
-          <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-3">
-            {/* Appointments Tab */}
-            <Tab eventKey="appointments" title={`Appointments (${appointments.length})`}>
-              <ListGroup variant="flush">
-                {appointments.length === 0 ? (
-                  <div className="text-center py-4">
-                    <i className="bi bi-calendar-x" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-                    <p className="text-muted mt-2">No appointments found</p>
-                  </div>
-                ) : (
-                  appointments.map((appointment) => (
-                    <ListGroup.Item key={appointment.id}>
-                      <Row>
-                        <Col md={8}>
-                          <h6 className="mb-1">{appointment.doctor_name}</h6>
-                          <p className="mb-1 text-muted">
-                            <i className="bi bi-person-badge me-2"></i>
-                            {appointment.specialization}
-                          </p>
-                          <p className="mb-1">
-                            <strong>Reason:</strong> {appointment.reason}
-                          </p>
-                          <small className="text-muted">
-                            <i className="bi bi-calendar3 me-1"></i>
-                            {appointment.date} at {appointment.time}
-                          </small>
-                        </Col>
-                        <Col md={4} className="text-end">
-                          <Badge bg={
-                            appointment.status === 'Confirmed' ? 'success' :
-                            appointment.status === 'Completed' ? 'primary' :
-                            appointment.status === 'Cancelled' ? 'danger' : 'warning'
-                          }>
-                            {appointment.status}
-                          </Badge>
-                          <br />
-                          <small className="text-muted">
-                            Created: {formatDate(appointment.created_at)}
-                          </small>
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
-            </Tab>
-
-            {/* Medicines Tab */}
-            <Tab eventKey="medicines" title={`Medicines (${medicines.length})`}>
-              <ListGroup variant="flush">
-                {medicines.length === 0 ? (
-                  <div className="text-center py-4">
-                    <i className="bi bi-capsule" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-                    <p className="text-muted mt-2">No medicine records found</p>
-                  </div>
-                ) : (
-                  medicines.map((medicine) => (
-                    <ListGroup.Item key={medicine.id}>
-                      <Row>
-                        <Col md={8}>
-                          <h6 className="mb-1">{medicine.medicine_name}</h6>
-                          <p className="mb-1">
-                            <strong>Dosage:</strong> {medicine.dosage}
-                          </p>
-                          <p className="mb-1">
-                            <strong>Schedule:</strong> {medicine.time} - {medicine.frequency}
-                          </p>
-                          <small className="text-muted">
-                            Added: {formatDate(medicine.created_at)}
-                          </small>
-                        </Col>
-                        <Col md={4} className="text-end">
-                          <Badge bg={medicine.active ? 'success' : 'secondary'}>
-                            {medicine.active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
-            </Tab>
-
-            {/* Symptom Checks Tab */}
-            <Tab eventKey="symptoms" title={`Symptom Checks (${symptomChecks.length})`}>
-              <ListGroup variant="flush">
-                {symptomChecks.length === 0 ? (
-                  <div className="text-center py-4">
-                    <i className="bi bi-clipboard2-pulse" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-                    <p className="text-muted mt-2">No symptom checks found</p>
-                  </div>
-                ) : (
-                  symptomChecks.map((check) => (
-                    <ListGroup.Item key={check.id}>
-                      <Row>
-                        <Col md={8}>
-                          <h6 className="mb-1">{check.predicted_disease}</h6>
-                          {check.confidence && (
-                            <p className="mb-1">
-                              <strong>Confidence:</strong> {check.confidence.toFixed(1)}%
-                            </p>
-                          )}
-                          <p className="mb-1">
-                            <strong>Recommended Specialist:</strong> {check.recommended_specialization}
-                          </p>
-                          {check.description && (
-                            <p className="mb-1">
-                              <strong>Description:</strong> {check.description}
-                            </p>
-                          )}
-                          <div className="mb-2">
-                            <strong>Symptoms:</strong>
-                            <div className="mt-1">
-                              {check.symptoms.map((symptom, index) => (
-                                <Badge key={index} bg="light" text="dark" className="me-1 mb-1">
-                                  {symptom}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                          {check.precautions && check.precautions.length > 0 && (
-                            <div className="mb-2">
-                              <strong>Precautions:</strong>
-                              <ul className="mt-1 mb-0">
-                                {check.precautions.slice(0, 3).map((precaution, index) => (
-                                  <li key={index} className="small text-muted">{precaution}</li>
-                                ))}
-                                {check.precautions.length > 3 && (
-                                  <li className="small text-muted">...and {check.precautions.length - 3} more</li>
-                                )}
-                              </ul>
-                            </div>
-                          )}
-                          <small className="text-muted">
-                            <i className="bi bi-clock me-1"></i>
-                            {formatDate(check.timestamp)}
-                          </small>
-                        </Col>
-                        <Col md={4} className="text-end">
-                          <Badge bg="info">
-                            Analysis Complete
-                          </Badge>
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
-            </Tab>
-          </Tabs>
+          <h5 className="mb-3">
+            <i className="bi bi-clock-history me-2"></i>
+            Activity Log
+          </h5>
+          
+          {historyLogs.length === 0 ? (
+            <div className="text-center py-5">
+              <i className="bi bi-inbox" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+              <p className="text-muted mt-3">No activity records found</p>
+            </div>
+          ) : (
+            <ListGroup variant="flush">
+              {historyLogs.map((log) => (
+                <ListGroup.Item key={log.id} className="border-start border-4" style={{ borderColor: `var(--${log.color}-color)` }}>
+                  <Row className="align-items-center">
+                    <Col xs={1} className="text-center">
+                      <i className={`bi bi-${log.icon}`} style={{ fontSize: '1.5rem', color: `var(--${log.color}-color)` }}></i>
+                    </Col>
+                    <Col xs={11} md={7}>
+                      <div className="d-flex align-items-center mb-1">
+                        <Badge bg={log.color} className="me-2">{log.type}</Badge>
+                        <h6 className="mb-0">{log.title}</h6>
+                      </div>
+                      <p className="mb-1 text-muted">
+                        <i className="bi bi-info-circle me-1"></i>
+                        {log.subtitle}
+                      </p>
+                      <p className="mb-1">
+                        <strong>Details:</strong> {log.details}
+                      </p>
+                      {log.date && (
+                        <small className="text-muted">
+                          <i className="bi bi-calendar3 me-1"></i>
+                          {log.date} {log.time && `at ${log.time}`}
+                        </small>
+                      )}
+                    </Col>
+                    <Col xs={12} md={4} className="text-md-end mt-2 mt-md-0">
+                      {getStatusBadge(log)}
+                      <br />
+                      <small className="text-muted">
+                        <i className="bi bi-clock me-1"></i>
+                        {formatDate(log.created_at)}
+                      </small>
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          )}
         </Card.Body>
       </Card>
     </div>
