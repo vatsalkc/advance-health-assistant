@@ -9,6 +9,7 @@ import DoctorRecommendation from './components/DoctorRecommendation/DoctorRecomm
 import Appointments from './components/Appointments/Appointments';
 import MedicineReminder from './components/MedicineReminder/MedicineReminder';
 import UserHistory from './components/UserHistory/UserHistory';
+import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
 
 function App() {
@@ -102,6 +103,9 @@ function App() {
                   <Nav.Link onClick={() => setCurrentView('userHistory')} active={currentView === 'userHistory'}>
                     <i className="bi bi-clock-history me-1"></i>History
                   </Nav.Link>
+                  <Nav.Link onClick={() => setCurrentView('profile')} active={currentView === 'profile'}>
+                    <i className="bi bi-person-circle me-1"></i>Profile
+                  </Nav.Link>
                 </Nav>
                 <Nav>
                   <Button 
@@ -164,6 +168,16 @@ function App() {
 
         {isAuthenticated && currentView === 'userHistory' && (
           <UserHistory user={user} />
+        )}
+
+        {isAuthenticated && currentView === 'profile' && (
+          <Profile 
+            user={user} 
+            onUpdateUser={(updatedUser) => {
+              setUser(updatedUser);
+              localStorage.setItem('user_data', JSON.stringify(updatedUser));
+            }}
+          />
         )}
       </Container>
     </div>

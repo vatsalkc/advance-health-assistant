@@ -390,10 +390,16 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
           <Col md={12}>
             <Card>
               <Card.Body>
-                <Card.Title>
-                  <i className="bi bi-person-circle me-2"></i>
-                  Profile Summary
-                </Card.Title>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <Card.Title className="mb-0">
+                    <i className="bi bi-person-circle me-2"></i>
+                    Profile Summary
+                  </Card.Title>
+                  <Button variant="primary" size="sm" onClick={() => onNavigate('profile')}>
+                    <i className="bi bi-pencil-square me-1"></i>
+                    View Profile
+                  </Button>
+                </div>
                 <Row>
                   <Col md={3} sm={12} className="text-center mb-3">
                     <div>
