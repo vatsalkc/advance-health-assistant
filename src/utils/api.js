@@ -1,5 +1,4 @@
 import axios from 'axios';
-import demoService from './demoService';
 
 // Dynamic API URL based on how the app is accessed
 const getApiBaseUrl = () => {
