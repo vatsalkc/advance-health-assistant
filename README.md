@@ -4,27 +4,23 @@ A comprehensive full-stack health management system with ML disease prediction, 
 
 ## 🌐 Live Preview & Demo
 
-### 🚀 **Try it Now - One Click Deploy!**
+### 🚀 **Live Website - Fully Functional!**
 
+**🌟 [Try the Live App →](https://vatsalkc.github.io/advance-health-assistant/)**
+
+- **Frontend**: `https://vatsalkc.github.io/advance-health-assistant/`
+- **Full AI Features**: Disease prediction, appointments, medicines
+- **Mobile Ready**: Works on all devices
+- **No Setup Required**: Just click and use!
+
+### ⚡ **One-Click Deploy Your Own**
+
+[![Deploy to Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/vatsalkc/advance-health-assistant)
 [![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vatsalkc/advance-health-assistant)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/vatsalkc/advance-health-assistant)
-[![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/vatsalkc/advance-health-assistant)
 
-### 📱 **What You'll Get:**
-- **Live Web App**: Accessible from any device worldwide
-- **Your Own URL**: `https://your-app-name.vercel.app`
-- **Demo Mode**: Works with sample data (no backend setup needed)
-- **Full UI**: Complete health assistant interface
-- **Mobile Ready**: Responsive design for all devices
-
-### ⚡ **Quick Preview Steps:**
-1. **Click "Deploy to Vercel"** button above
-2. **Sign in** with your GitHub account  
-3. **Click "Deploy"** - takes 2 minutes
-4. **Get your live URL** - share with anyone!
-5. **Optional**: Follow [full setup guide](#-quick-start) for AI features
-
-> **💡 Pro Tip**: The one-click deploy gives you a working frontend with demo data. For full AI disease prediction, follow the complete setup guide below.
+### 📋 **Quick Deploy Guide**
+Want your own live version? **[Follow the Complete Deployment Guide →](DEPLOY_GITHUB_PAGES.md)**
 
 ---
 
