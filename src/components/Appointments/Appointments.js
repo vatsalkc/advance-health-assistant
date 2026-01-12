@@ -15,7 +15,7 @@ import {
 import { appointmentsAPI, doctorsAPI } from '../../utils/api';
 import authService from '../../services/authService';
 
-function Appointments({ user }) {
+function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelection }) {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -36,6 +36,18 @@ function Appointments({ user }) {
       fetchAppointments();
     }
   }, [user]);
+
+  // Handle pre-selected doctor from symptom checker
+  useEffect(() => {
+    if (preSelectedDoctor && doctors.length > 0) {
+      setSelectedDoctor(preSelectedDoctor);
+      setShowBookingModal(true);
+      // Clear the selection after opening modal
+      if (onClearSelection) {
+        onClearSelection();
+      }
+    }
+  }, [preSelectedDoctor, doctors]);
 
   const fetchDoctors = async () => {
     try {

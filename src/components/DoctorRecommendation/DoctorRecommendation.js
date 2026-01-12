@@ -163,7 +163,7 @@ function DoctorRecommendation({ predictionResult, onBookAppointment }) {
                         variant="success" 
                         size="sm" 
                         className="w-100"
-                        onClick={onBookAppointment}
+                        onClick={() => onBookAppointment(doctor)}
                       >
                         <i className="bi bi-calendar-plus me-1"></i>
                         Book Appointment

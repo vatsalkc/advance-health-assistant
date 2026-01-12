@@ -17,6 +17,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -71,6 +72,11 @@ function App() {
     const result = fullResult || { disease, specialization };
     setPredictionResult(result);
     setCurrentView('doctorRecommendation');
+  };
+
+  const handleBookAppointment = (doctor) => {
+    setSelectedDoctor(doctor);
+    setCurrentView('appointments');
   };
 
   return (
@@ -157,12 +163,16 @@ function App() {
         {isAuthenticated && currentView === 'doctorRecommendation' && (
           <DoctorRecommendation 
             predictionResult={predictionResult}
-            onBookAppointment={() => setCurrentView('appointments')}
+            onBookAppointment={handleBookAppointment}
           />
         )}
 
         {isAuthenticated && currentView === 'appointments' && (
-          <Appointments user={user} />
+          <Appointments 
+            user={user} 
+            selectedDoctor={selectedDoctor}
+            onClearSelection={() => setSelectedDoctor(null)}
+          />
         )}
 
         {isAuthenticated && currentView === 'medicineReminder' && (
