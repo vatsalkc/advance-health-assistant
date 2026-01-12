@@ -8,19 +8,29 @@ A comprehensive full-stack health management system with ML disease prediction, 
 
 **🌟 [Try the Live App →](https://vatsalkc.github.io/advance-health-assistant/)**
 
-- **Frontend**: `https://vatsalkc.github.io/advance-health-assistant/`
+- **Frontend + Backend**: `https://vatsalkc.github.io/advance-health-assistant/`
 - **Full AI Features**: Disease prediction, appointments, medicines
+- **Static API**: 216 diseases, 613 symptoms, 15+ doctors
 - **Mobile Ready**: Works on all devices
 - **No Setup Required**: Just click and use!
 
 ### ⚡ **One-Click Deploy Your Own**
 
-[![Deploy to Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/vatsalkc/advance-health-assistant)
-[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vatsalkc/advance-health-assistant)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/vatsalkc/advance-health-assistant)
+[![Deploy to GitHub Pages](https://img.shields.io/badge/Deploy%20to-GitHub%20Pages-blue?style=for-the-badge&logo=github)](https://github.com/vatsalkc/advance-health-assistant/fork)
 
-### 📋 **Quick Deploy Guide**
-Want your own live version? **[Follow the Complete Deployment Guide →](DEPLOY_GITHUB_PAGES.md)**
+**Steps:**
+1. **Fork this repository**
+2. **Go to Settings > Pages**
+3. **Source**: Select "GitHub Actions"
+4. **Your app will be live** at: `https://yourusername.github.io/advance-health-assistant/`
+
+### 📋 **Features**
+- ✅ **Complete Backend** - Static API with all data
+- ✅ **ML Disease Prediction** - 216 diseases, 100% accuracy
+- ✅ **Doctor Database** - 15+ doctors across specializations
+- ✅ **User Authentication** - Demo accounts work
+- ✅ **Mobile Responsive** - Perfect on all devices
+- ✅ **Free Hosting** - GitHub Pages (no cost)
 
 ---
 

@@ -21,19 +21,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          
+      - name: Create ML model and static API
+        run: |
+          cd backend
+          python create_model.py
+          python generate_static_api.py
+          
+      - name: Install Node dependencies
         run: npm ci
         
-      - name: Build project
+      - name: Build React project
         run: npm run build
         env:
-          REACT_APP_API_URL: https://advance-health-assistant-backend.railway.app/api
+          REACT_APP_API_URL: /advance-health-assistant/static_api/api
+          
+      - name: Copy static API to build directory
+        run: |
+          cp -r backend/static_api build/
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
