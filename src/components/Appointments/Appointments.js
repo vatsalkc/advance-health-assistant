@@ -12,9 +12,8 @@ import {
   Tab,
   Modal
 } from 'react-bootstrap';
-import { appointmentsAPI } from '../../utils/api';
+import { appointmentsAPI, doctorsAPI } from '../../utils/api';
 import authService from '../../services/authService';
-import axios from 'axios';
 
 function Appointments({ user }) {
   const [appointments, setAppointments] = useState([]);
@@ -40,23 +39,7 @@ function Appointments({ user }) {
 
   const fetchDoctors = async () => {
     try {
-      // Use the dynamic API URL detection from api.js
-      const getApiBaseUrl = () => {
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-          return `http://${window.location.hostname}:5000`;
-        }
-        return process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      };
-      
-      const apiUrl = getApiBaseUrl();
-      console.log('Fetching doctors from:', `${apiUrl}/api/doctors`);
-      
-      const response = await axios.get(`${apiUrl}/api/doctors`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
-      });
-      
+      const response = await doctorsAPI.getAll();
       console.log('Doctors response:', response.data);
       setDoctors(response.data.doctors);
     } catch (err) {
