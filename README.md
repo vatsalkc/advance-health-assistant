@@ -6,13 +6,23 @@ A comprehensive full-stack health management system with ML disease prediction, 
 
 ### 🚀 **Live Website - Fully Functional!**
 
+> **⚠️ First Time Setup Required**: To make the live demo work, you need to enable GitHub Pages first.  
+> **📋 [Follow this 2-minute guide →](ENABLE_GITHUB_PAGES.md)**
+
 **🌟 [Try the Live App →](https://vatsalkc.github.io/advance-health-assistant/)**
 
-- **Frontend + Backend**: `https://vatsalkc.github.io/advance-health-assistant/`
+Once GitHub Pages is enabled, you'll have:
+- **Frontend + Backend**: Complete application at one URL
 - **Full AI Features**: Disease prediction, appointments, medicines
 - **Static API**: 216 diseases, 613 symptoms, 15+ doctors
 - **Mobile Ready**: Works on all devices
 - **No Setup Required**: Just click and use!
+
+### ⚡ **Quick Enable Steps**
+1. Go to [Settings > Pages](https://github.com/vatsalkc/advance-health-assistant/settings/pages)
+2. Source: Select **"GitHub Actions"**
+3. Wait 3-5 minutes for deployment
+4. Visit: `https://vatsalkc.github.io/advance-health-assistant/`
 
 ### ⚡ **One-Click Deploy Your Own**
 
