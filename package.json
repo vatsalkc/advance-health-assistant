@@ -2,7 +2,6 @@
   "name": "health-assistant-frontend",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://vatsalkc.github.io/advance-health-assistant",
   "dependencies": {
     "axios": "^1.6.2",
     "bootstrap": "^5.3.2",
@@ -15,17 +14,13 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:demo": "REACT_APP_DEMO_MODE=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "seed-firebase": "node src/firebase/seedAllData.js",
-    "verify": "node verify-setup.js",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "verify": "node verify-setup.js"
   },
   "devDependencies": {
-    "react-scripts": "5.0.1",
-    "gh-pages": "^6.1.0"
+    "react-scripts": "5.0.1"
   },
   "browserslist": {
     "production": [

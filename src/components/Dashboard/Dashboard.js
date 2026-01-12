@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Badge, Button, ListGroup, Alert } from 'react-bootstrap';
 import { statsAPI, appointmentsAPI, medicinesAPI } from '../../utils/api';
 import authService from '../../services/authService';
-import demoService from '../../services/demoService';
 import axios from 'axios';
 
 function Dashboard({ user, onNavigate, onSymptomResult }) {
@@ -48,35 +47,6 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
-      // Check if we're in demo mode
-      if (authService.isDemoMode()) {
-        console.log('Dashboard: Using demo mode');
-        const profileData = await demoService.getUserProfile();
-        setUserProfile(profileData.user);
-        setStats(profileData.stats);
-        
-        // Set recent data
-        const appointments = profileData.recent_data.appointments;
-        const medicines = profileData.recent_data.medicines;
-        const symptomChecks = profileData.recent_data.symptom_checks;
-        
-        // Filter upcoming appointments
-        const today = new Date();
-        const upcoming = appointments
-          .filter(apt => new Date(apt.date) >= today)
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
-        setUpcomingAppointments(upcoming);
-        
-        // Set active medicines
-        setTodayMedicines(medicines.filter(m => m.active));
-        
-        // Set recent symptom checks
-        setRecentSymptomChecks(symptomChecks);
-        
-        setLoading(false);
-        return;
-      }
       
       // Dynamic API URL detection for mobile compatibility
       const getApiBaseUrl = () => {

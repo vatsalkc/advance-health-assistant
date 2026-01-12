@@ -2,55 +2,11 @@
 
 A comprehensive full-stack health management system with ML disease prediction, multi-device support, and real-time health tracking. Features 216 diseases, 30+ medical specializations, and seamless mobile access.
 
-## 🌐 Live Preview & Demo
-
-### 🚀 **Live Website - Fully Functional!**
-
-> **⚠️ First Time Setup Required**: To make the live demo work, you need to enable GitHub Pages first.  
-> **📋 [Follow this 2-minute guide →](ENABLE_GITHUB_PAGES.md)**
-
-**🌟 [Try the Live App →](https://vatsalkc.github.io/advance-health-assistant/)**
-
-Once GitHub Pages is enabled, you'll have:
-- **Frontend + Backend**: Complete application at one URL
-- **Full AI Features**: Disease prediction, appointments, medicines
-- **Static API**: 216 diseases, 613 symptoms, 15+ doctors
-- **Mobile Ready**: Works on all devices
-- **No Setup Required**: Just click and use!
-
-### ⚡ **Quick Enable Steps**
-1. Go to [Settings > Pages](https://github.com/vatsalkc/advance-health-assistant/settings/pages)
-2. Source: Select **"GitHub Actions"**
-3. Wait 3-5 minutes for deployment
-4. Visit: `https://vatsalkc.github.io/advance-health-assistant/`
-
-### ⚡ **One-Click Deploy Your Own**
-
-[![Deploy to GitHub Pages](https://img.shields.io/badge/Deploy%20to-GitHub%20Pages-blue?style=for-the-badge&logo=github)](https://github.com/vatsalkc/advance-health-assistant/fork)
-
-**Steps:**
-1. **Fork this repository**
-2. **Go to Settings > Pages**
-3. **Source**: Select "GitHub Actions"
-4. **Your app will be live** at: `https://yourusername.github.io/advance-health-assistant/`
-
-### 📋 **Features**
-- ✅ **Complete Backend** - Static API with all data
-- ✅ **ML Disease Prediction** - 216 diseases, 100% accuracy
-- ✅ **Doctor Database** - 15+ doctors across specializations
-- ✅ **User Authentication** - Demo accounts work
-- ✅ **Mobile Responsive** - Perfect on all devices
-- ✅ **Free Hosting** - GitHub Pages (no cost)
-
----
-
 ![Health Assistant](https://img.shields.io/badge/Status-Development-blue)
 ![React](https://img.shields.io/badge/React-18.2.0-blue)
 ![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
 ![Python](https://img.shields.io/badge/Python-3.8+-yellow)
 ![ML](https://img.shields.io/badge/ML-Scikit--Learn-orange)
-
-> **Note**: For full functionality including AI predictions, follow the complete setup guide. The one-click deploy provides a frontend preview with demo data.
 
 ## ✨ Key Features
 
@@ -135,8 +91,6 @@ Once GitHub Pages is enabled, you'll have:
 - **Node.js 14+** with npm
 - **Git** for version control
 
-### 🏠 Local Development
-
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/vatsalkc/advance-health-assistant.git
@@ -183,18 +137,6 @@ npm start
 ```
 
 Frontend will be available at `http://localhost:3000`
-
-### 🌐 Deploy to Internet (Make it Live!)
-
-Want to make your app accessible from anywhere? 
-
-**👉 [Follow the Complete Deployment Guide](deploy.md) 👈**
-
-Quick options:
-- **Free Hosting**: Vercel (frontend) + Railway (backend)
-- **5 Minutes**: One-click deployment
-- **Global Access**: Anyone can use your app
-- **Mobile Ready**: Works on all devices
 
 ### 4. Mobile Access Setup
 For mobile device access on the same network:
@@ -408,7 +350,7 @@ GET  /api/user/profile     # Comprehensive user data
 GET  /api/stats           # User health statistics
 ```
 
-## 🚀 Deployment Options
+## 🚀 Running the Application
 
 ### Local Development
 ```bash
@@ -423,82 +365,11 @@ npm start
 # Access: http://localhost:3000
 ```
 
-### Network Deployment (Multi-device)
+### Network Access (Multi-device)
 ```bash
 # Backend automatically runs on 0.0.0.0:5000
 # Frontend accessible via network IP
-# Mobile access: http://YOUR_IP:3000
-```
-
-## 🌐 Live Deployment Options
-
-### Option 1: Deploy to Vercel + Railway (Recommended)
-
-#### Frontend on Vercel (Free)
-```bash
-# 1. Build the project
-npm run build
-
-# 2. Install Vercel CLI
-npm i -g vercel
-
-# 3. Deploy to Vercel
-vercel --prod
-
-# 4. Set environment variable in Vercel dashboard:
-# REACT_APP_API_URL=https://your-backend-url.railway.app/api
-```
-
-#### Backend on Railway (Free)
-```bash
-# 1. Create account at railway.app
-# 2. Connect your GitHub repo
-# 3. Deploy backend folder
-# 4. Railway will auto-detect Flask app
-# 5. Set environment variables in Railway dashboard
-```
-
-### Option 2: Deploy to Netlify + Render
-
-#### Frontend on Netlify (Free)
-```bash
-# 1. Build the project
-npm run build
-
-# 2. Drag & drop build/ folder to netlify.com
-# 3. Set environment variable:
-# REACT_APP_API_URL=https://your-backend.onrender.com/api
-```
-
-#### Backend on Render (Free)
-```bash
-# 1. Create account at render.com
-# 2. Connect GitHub repo
-# 3. Create new Web Service
-# 4. Set build command: pip install -r backend/requirements.txt
-# 5. Set start command: python backend/app.py
-```
-
-### Option 3: All-in-One Heroku (Free Tier Ended)
-```bash
-# Note: Heroku no longer offers free tier
-# Consider Railway or Render instead
-```
-
-### Quick Deploy Links
-Once deployed, your app will be accessible at:
-- **Frontend**: `https://your-app-name.vercel.app`
-- **Backend**: `https://your-backend.railway.app`
-- **Full App**: Users access the frontend URL
-
-### Environment Variables for Production
-```bash
-# Frontend (.env)
-REACT_APP_API_URL=https://your-backend-url/api
-
-# Backend (hosting dashboard)
-SECRET_KEY=your-production-secret-key
-SQLALCHEMY_DATABASE_URI=sqlite:///health_assistant.db
+# Mobile access: http://YOUR_NETWORK_IP:3000
 ```
 
 ## 📈 Recent Updates & Features

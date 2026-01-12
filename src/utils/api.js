@@ -2,12 +2,6 @@ import axios from 'axios';
 
 // Dynamic API URL based on how the app is accessed
 const getApiBaseUrl = () => {
-  // Check if we're on GitHub Pages
-  if (window.location.hostname.includes('github.io')) {
-    // Use static API on GitHub Pages
-    return `${window.location.origin}/advance-health-assistant/static_api/api`;
-  }
-  
   // If accessed via network IP, use network IP for API
   if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
     return `http://${window.location.hostname}:5000/api`;
@@ -18,11 +12,9 @@ const getApiBaseUrl = () => {
 };
 
 const API_BASE_URL = getApiBaseUrl();
-const IS_STATIC_API = window.location.hostname.includes('github.io');
 
 console.log('API Base URL:', API_BASE_URL);
 console.log('Current hostname:', window.location.hostname);
-console.log('Using static API:', IS_STATIC_API);
 
 // Create axios instance
 const api = axios.create({
@@ -116,16 +108,6 @@ export const symptomCheckAPI = {
 // Doctors API
 export const doctorsAPI = {
   getAll: (specialization = null) => {
-    if (IS_STATIC_API) {
-      return axios.get(`${API_BASE_URL}/doctors.json`).then(response => {
-        let doctors = response.data.doctors;
-        if (specialization) {
-          doctors = doctors.filter(doc => doc.specialization === specialization);
-        }
-        return { data: { doctors } };
-      });
-    }
-    
     const params = specialization ? { specialization } : {};
     return api.get('/doctors', { params });
   }
