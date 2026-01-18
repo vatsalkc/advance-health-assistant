@@ -1,13 +1,18 @@
 import axios from 'axios';
 
-// Dynamic API URL based on how the app is accessed
+// Dynamic API URL based on environment
 const getApiBaseUrl = () => {
-  // If accessed via network IP, use network IP for API
+  // Production: Use Railway backend
+  if (window.location.hostname.includes('github.io')) {
+    return 'https://advance-health-assistant-production.up.railway.app/api';
+  }
+  
+  // Network access (mobile on same WiFi)
   if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
     return `http://${window.location.hostname}:5000/api`;
   }
   
-  // Default to localhost for local development
+  // Local development
   return process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 };
 
