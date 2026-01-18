@@ -35,7 +35,7 @@ jobs:
         run: npm run build
         env:
           CI: false
-          REACT_APP_API_URL: https://advance-health-assistant-production.up.railway.app/api
+          REACT_APP_API_URL: https://health-assistant-backend.onrender.com/api
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

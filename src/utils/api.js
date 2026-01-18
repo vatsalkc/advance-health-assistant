@@ -2,9 +2,9 @@ import axios from 'axios';
 
 // Dynamic API URL based on environment
 const getApiBaseUrl = () => {
-  // Production: Use Railway backend
+  // Production: Use Render backend
   if (window.location.hostname.includes('github.io')) {
-    return 'https://advance-health-assistant-production.up.railway.app/api';
+    return 'https://health-assistant-backend.onrender.com/api';
   }
   
   // Network access (mobile on same WiFi)
