@@ -123,4 +123,21 @@ export const statsAPI = {
   get: () => api.get('/stats')
 };
 
-export default api;
+// Use Supabase API instead of Flask backend
+export { 
+  doctorsAPI, 
+  appointmentsAPI, 
+  medicinesAPI, 
+  symptomCheckAPI, 
+  statsAPI,
+  authAPI 
+} from './supabaseApi';
+
+export default { 
+  doctorsAPI, 
+  appointmentsAPI, 
+  medicinesAPI, 
+  symptomCheckAPI, 
+  statsAPI,
+  authAPI 
+};
