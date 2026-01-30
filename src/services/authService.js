@@ -1,178 +1,196 @@
-import { authAPI } from '../utils/api';
-import axios from 'axios';
+import { supabase } from '../config/supabase';
 
 class AuthService {
   constructor() {
     this.user = null;
-    this.token = localStorage.getItem('auth_token');
-    this.refreshPromise = null;
+    this.loadUserFromStorage();
   }
 
-  async login(email, password) {
-    try {
-      const response = await authAPI.login({ email, password });
-      const { token, user } = response.data;
-      
-      this.setAuthData(token, user);
-      
-      return user;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        throw new Error('Invalid email or password');
-      } else if (error.response?.status === 400) {
-        throw new Error(error.response.data.message || 'Please fill in all fields');
-      } else if (!error.response) {
-        throw new Error('Unable to connect to server. Please check your internet connection.');
-      }
-      
-      throw new Error(error.response?.data?.message || 'Login failed');
+  loadUserFromStorage() {
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+      this.user = JSON.parse(userData);
     }
   }
 
   async register(userData) {
     try {
-      const response = await authAPI.register(userData);
-      const { token, user } = response.data;
-      
-      this.setAuthData(token, user);
-      
-      return user;
-    } catch (error) {
-      if (error.response?.status === 400) {
-        throw new Error(error.response.data.message || 'Please check your input');
-      } else if (!error.response) {
-        throw new Error('Unable to connect to server. Please check your internet connection.');
-      }
-      
-      throw new Error(error.response?.data?.message || 'Registration failed');
-    }
-  }
-
-  setAuthData(token, user) {
-    localStorage.setItem('auth_token', token);
-    localStorage.setItem('user_data', JSON.stringify(user));
-    localStorage.setItem('auth_timestamp', Date.now().toString());
-    
-    this.token = token;
-    this.user = user;
-  }
-
-  async validateToken() {
-    if (!this.token) {
-      return false;
-    }
-
-    try {
-      const getApiUrl = () => {
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-          return `http://${window.location.hostname}:5000/api`;
-        }
-        return process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      };
-
-      const response = await axios.get(`${getApiUrl()}/auth/validate`, {
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        },
-        timeout: 3000
+      // Register user with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
       });
-      
-      if (response.data.valid) {
-        this.user = response.data.user;
-        return true;
+
+      if (authError) throw authError;
+
+      if (!authData.user) {
+        throw new Error('Registration failed - no user returned');
       }
-      
-      return false;
+
+      // Create user profile in users table
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: authData.user.id,
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone || null,
+            age: userData.age ? parseInt(userData.age) : null,
+            gender: userData.gender || null,
+          },
+        ])
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        throw new Error('Failed to create user profile');
+      }
+
+      // Store user data
+      this.user = profile;
+      localStorage.setItem('user_data', JSON.stringify(profile));
+      localStorage.setItem('supabase_session', JSON.stringify(authData.session));
+
+      return profile;
     } catch (error) {
-      console.error('Token validation failed:', error);
-      
-      if (error.response?.data?.error_code === 'TOKEN_EXPIRED') {
-        return await this.refreshToken();
+      console.error('Registration error:', error);
+      if (error.message.includes('already registered')) {
+        throw new Error('This email is already registered');
       }
-      
-      this.logout();
-      return false;
+      throw new Error(error.message || 'Registration failed. Please try again.');
     }
   }
 
-  async refreshToken() {
-    if (this.refreshPromise) {
-      return this.refreshPromise;
-    }
-
-    this.refreshPromise = this._performRefresh();
-    const result = await this.refreshPromise;
-    this.refreshPromise = null;
-    
-    return result;
-  }
-
-  async _performRefresh() {
+  async login(email, password) {
     try {
-      const getApiUrl = () => {
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-          return `http://${window.location.hostname}:5000/api`;
-        }
-        return process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      };
-
-      const response = await axios.post(`${getApiUrl()}/auth/refresh`, {}, {
-        headers: {
-          'Authorization': `Bearer ${this.token}`
-        },
-        timeout: 3000
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      
-      const { token, user } = response.data;
-      this.setAuthData(token, user);
-      
-      console.log('Token refreshed successfully');
-      return true;
+
+      if (authError) throw authError;
+
+      // Get user profile
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Store user data
+      this.user = profile;
+      localStorage.setItem('user_data', JSON.stringify(profile));
+      localStorage.setItem('supabase_session', JSON.stringify(authData.session));
+
+      return profile;
     } catch (error) {
-      console.error('Token refresh failed:', error);
-      this.logout();
-      return false;
+      console.error('Login error:', error);
+      if (error.message.includes('Invalid login credentials')) {
+        throw new Error('Invalid email or password');
+      }
+      throw new Error(error.message || 'Login failed. Please try again.');
     }
   }
 
-  logout() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
-    localStorage.removeItem('auth_timestamp');
-    this.token = null;
-    this.user = null;
+  async logout() {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      this.user = null;
+      localStorage.removeItem('user_data');
+      localStorage.removeItem('supabase_session');
+      localStorage.removeItem('auth_token');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Clear local storage anyway
+      this.user = null;
+      localStorage.removeItem('user_data');
+      localStorage.removeItem('supabase_session');
+      localStorage.removeItem('auth_token');
+    }
   }
 
   getCurrentUser() {
-    if (!this.user && this.token) {
-      const userData = localStorage.getItem('user_data');
-      if (userData) {
-        try {
-          this.user = JSON.parse(userData);
-        } catch (error) {
-          console.error('Error parsing user data:', error);
-          this.logout();
-        }
-      }
+    if (!this.user) {
+      this.loadUserFromStorage();
     }
     return this.user;
   }
 
   isAuthenticated() {
-    return !!this.token;
+    const session = localStorage.getItem('supabase_session');
+    return !!session && !!this.getCurrentUser();
   }
 
-  getToken() {
-    return this.token;
+  async validateToken() {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error || !session) {
+        return false;
+      }
+
+      // Refresh user profile
+      const { data: profile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile) {
+        this.user = profile;
+        localStorage.setItem('user_data', JSON.stringify(profile));
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return false;
+    }
   }
 
   shouldValidateToken() {
-    const lastCheck = localStorage.getItem('auth_timestamp');
-    if (!lastCheck) return true;
-    
-    const fiveMinutes = 5 * 60 * 1000;
-    return (Date.now() - parseInt(lastCheck)) > fiveMinutes;
+    // Check if we should validate the token (e.g., every hour)
+    const lastValidation = localStorage.getItem('last_token_validation');
+    if (!lastValidation) return true;
+
+    const oneHour = 60 * 60 * 1000;
+    return Date.now() - parseInt(lastValidation) > oneHour;
+  }
+
+  async refreshToken() {
+    try {
+      const { data, error } = await supabase.auth.refreshSession();
+      if (error) throw error;
+
+      if (data.session) {
+        localStorage.setItem('supabase_session', JSON.stringify(data.session));
+        localStorage.setItem('last_token_validation', Date.now().toString());
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      return false;
+    }
+  }
+
+  getToken() {
+    const session = localStorage.getItem('supabase_session');
+    if (session) {
+      const sessionData = JSON.parse(session);
+      return sessionData.access_token;
+    }
+    return null;
   }
 }
 
-export default new AuthService();
+const authService = new AuthService();
+export default authService;
