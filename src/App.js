@@ -18,10 +18,16 @@ function App() {
   const [user, setUser] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Load dark mode preference from localStorage
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode === 'true';
+  });
 
   useEffect(() => {
+    // Apply dark mode to body and save preference
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
   useEffect(() => {
