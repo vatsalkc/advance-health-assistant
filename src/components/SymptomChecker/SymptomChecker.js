@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, Form, Button, Badge, Alert, ListGroup } from 'react-bootstrap';
-import { symptomCheckAPI } from '../../utils/api';
-import axios from 'axios';
+import { predictDisease, allSymptoms } from '../../data/diseaseDatabase';
+import { supabase } from '../../config/supabase';
 
 function SymptomChecker({ onResult, user }) {
   const [symptomInput, setSymptomInput] = useState('');
@@ -9,42 +9,10 @@ function SymptomChecker({ onResult, user }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [allSymptoms, setAllSymptoms] = useState([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
-
-  useEffect(() => {
-    // Fetch all available symptoms for auto-suggestions
-    fetchAllSymptoms();
-  }, []);
-
-  useEffect(() => {
-    // Filter suggestions based on input
-    if (symptomInput.trim().length > 1) {
-      const filtered = allSymptoms
-        .filter(symptom => 
-          symptom.toLowerCase().includes(symptomInput.toLowerCase()) &&
-          !symptoms.includes(symptom)
-        )
-        .slice(0, 8); // Limit to 8 suggestions
-      setFilteredSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
-    } else {
-      setFilteredSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [symptomInput, symptoms, allSymptoms]);
-
-  const fetchAllSymptoms = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/symptoms/all`);
-      setAllSymptoms(response.data.symptoms);
-    } catch (err) {
-      console.error('Error fetching symptoms:', err);
-    }
-  };
 
   const addSymptom = (symptom = null) => {
     const symptomToAdd = symptom || symptomInput.trim();
@@ -52,9 +20,9 @@ function SymptomChecker({ onResult, user }) {
       setSymptoms([...symptoms, symptomToAdd]);
       setSymptomInput('');
       setShowSuggestions(false);
-      setError(''); // Clear any previous errors
+      setError('');
       setSuccessMessage(`"${symptomToAdd}" added to symptoms list`);
-      setTimeout(() => setSuccessMessage(''), 2000); // Clear success message after 2 seconds
+      setTimeout(() => setSuccessMessage(''), 2000);
     }
   };
 
@@ -63,27 +31,39 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleInputChange = (e) => {
-    setSymptomInput(e.target.value);
+    const value = e.target.value;
+    setSymptomInput(value);
+    
+    if (value.trim().length > 1) {
+      const filtered = allSymptoms
+        .filter(symptom => 
+          symptom.toLowerCase().includes(value.toLowerCase()) &&
+          !symptoms.includes(symptom)
+        )
+        .slice(0, 8);
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setFilteredSuggestions([]);
+      setShowSuggestions(false);
+    }
   };
 
   const handleSuggestionClick = (suggestion) => {
-    // Prevent any form submission
     addSymptom(suggestion);
     setShowSuggestions(false);
     if (inputRef.current) {
-      inputRef.current.focus(); // Keep focus on input
+      inputRef.current.focus();
     }
   };
 
   const handleCommonSymptomClick = (commonSymptom) => {
-    // Prevent any form submission and only add symptom
     if (!symptoms.includes(commonSymptom)) {
       addSymptom(commonSymptom);
     }
   };
 
   const handleInputBlur = (e) => {
-    // Only hide suggestions if not clicking on a suggestion
     if (suggestionsRef.current && suggestionsRef.current.contains(e.relatedTarget)) {
       return;
     }
@@ -93,7 +73,6 @@ function SymptomChecker({ onResult, user }) {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      // Only add symptom, don't submit form
       addSymptom();
     }
   };
@@ -111,16 +90,64 @@ function SymptomChecker({ onResult, user }) {
     setLoading(true);
 
     try {
-      const response = await symptomCheckAPI.check(symptoms);
+      console.log('[SymptomChecker] Checking symptoms:', symptoms);
       
-      // Pass the full response data to the result handler
-      onResult(response.data.disease, response.data.specialization, response.data);
+      // Predict disease using local algorithm
+      const prediction = predictDisease(symptoms);
+      console.log('[SymptomChecker] Prediction result:', prediction);
+      
+      if (!prediction) {
+        throw new Error('Unable to predict disease');
+      }
+
+      // Try to save to Supabase (but don't fail if it doesn't work)
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          console.log('[SymptomChecker] User logged in, saving to database');
+          
+          const checkData = {
+            user_id: session.user.id,
+            symptoms: symptoms,
+            predicted_disease: prediction.disease,
+            recommended_specialization: prediction.specialization,
+            confidence: prediction.confidence,
+            description: prediction.description,
+            precautions: prediction.precautions,
+          };
+
+          console.log('[SymptomChecker] Saving data:', checkData);
+
+          const { data, error: dbError } = await supabase
+            .from('symptom_checks')
+            .insert([checkData])
+            .select()
+            .single();
+
+          if (dbError) {
+            console.error('[SymptomChecker] Database error (non-fatal):', dbError);
+          } else {
+            console.log('[SymptomChecker] Saved successfully:', data);
+          }
+        } else {
+          console.log('[SymptomChecker] No session - skipping database save');
+        }
+      } catch (saveError) {
+        console.error('[SymptomChecker] Error saving (non-fatal):', saveError);
+      }
+      
+      // Pass result to parent - this should always work
+      console.log('[SymptomChecker] Passing result to parent');
+      onResult(prediction.disease, prediction.specialization, prediction);
+      
       setLoading(false);
       setSymptoms([]);
+      setSuccessMessage('Symptoms analyzed successfully!');
     } catch (err) {
-      setError('Failed to analyze symptoms. Please try again.');
+      console.error('[SymptomChecker] Error:', err);
+      setError('Failed to analyze symptoms: ' + err.message);
       setLoading(false);
-      console.error(err);
     }
   };
 
@@ -167,7 +194,7 @@ function SymptomChecker({ onResult, user }) {
                       <ListGroup.Item
                         key={index}
                         action
-                        onMouseDown={(e) => e.preventDefault()} // Prevent input blur
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();

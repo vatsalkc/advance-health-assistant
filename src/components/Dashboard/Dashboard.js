@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Badge, Button, ListGroup, Alert } from 'react-bootstrap';
-import { statsAPI, appointmentsAPI, medicinesAPI } from '../../utils/api';
-import authService from '../../services/authService';
-import axios from 'axios';
+import { Row, Col, Card, Badge, Button, ListGroup } from 'react-bootstrap';
+import { supabase } from '../../config/supabase';
 
 function Dashboard({ user, onNavigate, onSymptomResult }) {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -22,126 +20,91 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
     }
   }, [user]);
 
-  // Add a refresh function that can be called when data changes
-  const refreshDashboard = () => {
-    fetchDashboardData();
-  };
-
-  // Listen for storage events to refresh dashboard when data changes
-  useEffect(() => {
-    const handleStorageChange = () => {
-      fetchDashboardData();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also refresh every 30 seconds to keep data fresh
-    const interval = setInterval(fetchDashboardData, 30000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
-  }, [user]);
-
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      console.log('[Dashboard] Fetching dashboard data...');
       
-      // Dynamic API URL detection for mobile compatibility
-      const getApiBaseUrl = () => {
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-          return `http://${window.location.hostname}:5000`;
-        }
-        return process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      };
+      // Get current user session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      const apiUrl = getApiBaseUrl();
-      console.log('Dashboard fetching from:', `${apiUrl}/api/user/profile`);
-      
-      // Fetch comprehensive user profile
-      const profileResponse = await axios.get(`${apiUrl}/api/user/profile`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
-      });
-      
-      console.log('Profile response:', profileResponse.data);
-      const profileData = profileResponse.data;
-      setUserProfile(profileData.user);
-      setStats(profileData.stats);
-      
-      // Set recent data
-      const appointments = profileData.recent_data.appointments;
-      const medicines = profileData.recent_data.medicines;
-      const symptomChecks = profileData.recent_data.symptom_checks;
-      
-      // Filter upcoming appointments
-      const today = new Date();
-      const upcoming = appointments
-        .filter(apt => new Date(apt.date) >= today)
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
-      setUpcomingAppointments(upcoming);
-      
-      // Set active medicines
-      setTodayMedicines(medicines.filter(m => m.active));
-      
-      // Set recent symptom checks
-      setRecentSymptomChecks(symptomChecks);
-      
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      console.error('Error response:', error.response?.data);
-      
-      // Fallback to individual API calls if profile endpoint fails
-      try {
-        console.log('Attempting fallback API calls...');
-        
-        // Use dynamic API URL for fallback calls too
-        const getApiBaseUrl = () => {
-          if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            return `http://${window.location.hostname}:5000/api`;
-          }
-          return process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-        };
-        
-        const apiBaseUrl = getApiBaseUrl();
-        const authHeaders = {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        };
-        
-        // Fetch stats
-        const statsResponse = await axios.get(`${apiBaseUrl}/stats`, { headers: authHeaders });
-        setStats(statsResponse.data);
-        console.log('Stats fetched:', statsResponse.data);
-        
-        // Fetch appointments
-        const appointmentsResponse = await axios.get(`${apiBaseUrl}/appointments`, { headers: authHeaders });
-        const appointments = appointmentsResponse.data.appointments;
-        const today = new Date();
-        const upcoming = appointments
-          .filter(apt => new Date(apt.date) >= today)
-          .sort((a, b) => new Date(a.date) - new Date(b.date));
-        setUpcomingAppointments(upcoming);
-        console.log('Appointments fetched:', appointments.length);
-        
-        // Fetch medicines
-        const medicinesResponse = await axios.get(`${apiBaseUrl}/medicines`, { headers: authHeaders });
-        const medicines = medicinesResponse.data.medicines;
-        setTodayMedicines(medicines.filter(m => m.active));
-        console.log('Medicines fetched:', medicines.length);
-        
-        // Fetch recent symptom checks
-        const symptomResponse = await axios.get(`${apiBaseUrl}/symptom-checks?limit=5`, { headers: authHeaders });
-        setRecentSymptomChecks(symptomResponse.data.symptom_checks);
-        console.log('Symptom checks fetched:', symptomResponse.data.symptom_checks.length);
-        
-      } catch (fallbackError) {
-        console.error('Fallback API calls also failed:', fallbackError);
-        console.error('Fallback error response:', fallbackError.response?.data);
+      if (sessionError) {
+        console.error('[Dashboard] Session error:', sessionError);
+        setLoading(false);
+        return;
       }
       
+      if (!session) {
+        console.log('[Dashboard] No session found');
+        setLoading(false);
+        return;
+      }
+
+      const userId = session.user.id;
+      console.log('[Dashboard] User ID:', userId);
+
+      // Fetch all data in parallel
+      const [appointmentsResult, medicinesResult, symptomChecksResult] = await Promise.all([
+        supabase.from('appointments').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('medicines').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+        supabase.from('symptom_checks').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10)
+      ]);
+
+      console.log('[Dashboard] Appointments result:', appointmentsResult);
+      console.log('[Dashboard] Medicines result:', medicinesResult);
+      console.log('[Dashboard] Symptom checks result:', symptomChecksResult);
+
+      // Handle appointments
+      if (appointmentsResult.error) {
+        console.error('[Dashboard] Appointments error:', appointmentsResult.error);
+      } else {
+        const appointments = appointmentsResult.data || [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const upcoming = appointments
+          .filter(apt => {
+            const aptDate = new Date(apt.date);
+            aptDate.setHours(0, 0, 0, 0);
+            return aptDate >= today;
+          })
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+        setUpcomingAppointments(upcoming);
+        setStats(prev => ({ ...prev, totalAppointments: appointments.length }));
+        console.log('[Dashboard] Loaded', appointments.length, 'appointments');
+      }
+
+      // Handle medicines
+      if (medicinesResult.error) {
+        console.error('[Dashboard] Medicines error:', medicinesResult.error);
+      } else {
+        const medicines = medicinesResult.data || [];
+        const activeMeds = medicines.filter(m => m.active);
+        setTodayMedicines(activeMeds);
+        setStats(prev => ({ ...prev, activeMedicines: activeMeds.length }));
+        console.log('[Dashboard] Loaded', activeMeds.length, 'active medicines');
+      }
+
+      // Handle symptom checks
+      if (symptomChecksResult.error) {
+        console.error('[Dashboard] Symptom checks error:', symptomChecksResult.error);
+      } else {
+        const checks = symptomChecksResult.data || [];
+        setRecentSymptomChecks(checks);
+        setStats(prev => ({ ...prev, symptomsChecked: checks.length }));
+        console.log('[Dashboard] Loaded', checks.length, 'symptom checks');
+      }
+
+      // Set user profile
+      setUserProfile({
+        name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+        email: session.user.email,
+        created_at: session.user.created_at
+      });
+
+      console.log('[Dashboard] Dashboard data loaded successfully');
+      setLoading(false);
+    } catch (error) {
+      console.error('[Dashboard] Error fetching dashboard data:', error);
       setLoading(false);
     }
   };
@@ -245,238 +208,213 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
             ))}
           </Row>
 
-      <Row>
-        {/* Upcoming Appointments */}
-        <Col lg={4} md={6} sm={12} className="mb-4">
-          <Card>
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <Card.Title className="mb-0">
-                  <i className="bi bi-calendar-event me-2"></i>
-                  Upcoming Appointments
-                </Card.Title>
-                <Button variant="link" size="sm" onClick={() => onNavigate('appointments')}>
-                  View All
-                </Button>
-              </div>
-              <ListGroup variant="flush">
-                {upcomingAppointments.length === 0 ? (
-                  <p className="text-muted">No upcoming appointments</p>
-                ) : (
-                  upcomingAppointments.slice(0, 3).map((appointment) => (
-                    <ListGroup.Item key={appointment.id}>
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div>
-                          <h6 className="mb-1">{appointment.doctor_name}</h6>
-                          <small className="text-muted">
-                            <i className="bi bi-calendar3 me-1"></i>
-                            {appointment.date} at {appointment.time}
-                          </small>
-                          <br />
-                          <small className="text-muted">
-                            <i className="bi bi-person-badge me-1"></i>
-                            {appointment.specialization}
-                          </small>
-                        </div>
-                        <Badge bg={appointment.status === 'Confirmed' ? 'success' : 'warning'}>
-                          {appointment.status}
-                        </Badge>
-                      </div>
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Today's Medicines */}
-        <Col lg={4} md={6} sm={12} className="mb-4">
-          <Card>
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <Card.Title className="mb-0">
-                  <i className="bi bi-alarm me-2"></i>
-                  Active Medicines
-                </Card.Title>
-                <Button variant="link" size="sm" onClick={() => onNavigate('medicineReminder')}>
-                  View All
-                </Button>
-              </div>
-              <ListGroup variant="flush">
-                {todayMedicines.length === 0 ? (
-                  <p className="text-muted">No active medicines</p>
-                ) : (
-                  todayMedicines.slice(0, 3).map((medicine) => (
-                    <ListGroup.Item key={medicine.id}>
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <h6 className="mb-1">{medicine.medicine_name}</h6>
-                          <small className="text-muted">
-                            <i className="bi bi-clock me-1"></i>
-                            {medicine.time} - {medicine.dosage}
-                          </small>
-                          <br />
-                          <Badge bg="info" className="mt-1">{medicine.frequency}</Badge>
-                        </div>
-                        <Badge bg={medicine.active ? 'success' : 'secondary'}>
-                          {medicine.active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </div>
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        {/* Recent Symptom Checks */}
-        <Col lg={4} md={12} sm={12} className="mb-4">
-          <Card>
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <Card.Title className="mb-0">
-                  <i className="bi bi-clipboard2-pulse me-2"></i>
-                  Recent Symptom Checks
-                </Card.Title>
-                <Button variant="link" size="sm" onClick={() => onNavigate('symptomChecker')}>
-                  Check Now
-                </Button>
-              </div>
-              <ListGroup variant="flush">
-                {recentSymptomChecks.length === 0 ? (
-                  <p className="text-muted">No symptom checks yet</p>
-                ) : (
-                  recentSymptomChecks.slice(0, 3).map((check) => (
-                    <ListGroup.Item key={check.id}>
-                      <div>
-                        <h6 className="mb-1">{check.predicted_disease}</h6>
-                        <small className="text-muted">
-                          <i className="bi bi-clock me-1"></i>
-                          {new Date(check.timestamp).toLocaleDateString()}
-                        </small>
-                        <br />
-                        <small className="text-muted">
-                          <i className="bi bi-person-badge me-1"></i>
-                          {check.recommended_specialization}
-                        </small>
-                        <br />
-                        <div className="mt-1">
-                          {check.symptoms.slice(0, 3).map((symptom, index) => (
-                            <Badge key={index} bg="light" text="dark" className="me-1 mb-1">
-                              {symptom}
+          <Row>
+            {/* Upcoming Appointments */}
+            <Col lg={4} md={6} sm={12} className="mb-4">
+              <Card>
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <Card.Title className="mb-0">
+                      <i className="bi bi-calendar-event me-2"></i>
+                      Upcoming Appointments
+                    </Card.Title>
+                    <Button variant="link" size="sm" onClick={() => onNavigate('appointments')}>
+                      View All
+                    </Button>
+                  </div>
+                  <ListGroup variant="flush">
+                    {upcomingAppointments.length === 0 ? (
+                      <p className="text-muted">No upcoming appointments</p>
+                    ) : (
+                      upcomingAppointments.slice(0, 3).map((appointment) => (
+                        <ListGroup.Item key={appointment.id}>
+                          <div className="d-flex justify-content-between align-items-start">
+                            <div>
+                              <h6 className="mb-1">{appointment.doctor_name}</h6>
+                              <small className="text-muted">
+                                <i className="bi bi-calendar3 me-1"></i>
+                                {appointment.date} at {appointment.time}
+                              </small>
+                              <br />
+                              <small className="text-muted">
+                                <i className="bi bi-person-badge me-1"></i>
+                                {appointment.specialization}
+                              </small>
+                            </div>
+                            <Badge bg={appointment.status === 'Confirmed' ? 'success' : 'warning'}>
+                              {appointment.status}
                             </Badge>
-                          ))}
-                          {check.symptoms.length > 3 && (
-                            <Badge bg="secondary" className="me-1 mb-1">
-                              +{check.symptoms.length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+                          </div>
+                        </ListGroup.Item>
+                      ))
+                    )}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
 
-      {/* User Profile Summary */}
-      {userProfile && (
-        <Row className="mt-4">
-          <Col md={12}>
-            <Card>
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <Card.Title className="mb-0">
-                    <i className="bi bi-person-circle me-2"></i>
-                    Profile Summary
-                  </Card.Title>
-                  <Button variant="primary" size="sm" onClick={() => onNavigate('profile')}>
-                    <i className="bi bi-pencil-square me-1"></i>
-                    View Profile
-                  </Button>
-                </div>
-                <Row>
-                  <Col md={3} sm={12} className="text-center mb-3">
-                    <div>
-                      <i className="bi bi-person-circle" style={{ fontSize: '4rem', color: 'var(--primary-color)' }}></i>
-                      <h5 className="mt-2">{userProfile.name}</h5>
-                      <p className="text-muted">{userProfile.email}</p>
+            {/* Today's Medicines */}
+            <Col lg={4} md={6} sm={12} className="mb-4">
+              <Card>
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <Card.Title className="mb-0">
+                      <i className="bi bi-alarm me-2"></i>
+                      Active Medicines
+                    </Card.Title>
+                    <Button variant="link" size="sm" onClick={() => onNavigate('medicineReminder')}>
+                      View All
+                    </Button>
+                  </div>
+                  <ListGroup variant="flush">
+                    {todayMedicines.length === 0 ? (
+                      <p className="text-muted">No active medicines</p>
+                    ) : (
+                      todayMedicines.slice(0, 3).map((medicine) => (
+                        <ListGroup.Item key={medicine.id}>
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <h6 className="mb-1">{medicine.medicine_name}</h6>
+                              <small className="text-muted">
+                                <i className="bi bi-clock me-1"></i>
+                                {medicine.time} - {medicine.dosage}
+                              </small>
+                              <br />
+                              <Badge bg="info" className="mt-1">{medicine.frequency}</Badge>
+                            </div>
+                            <Badge bg={medicine.active ? 'success' : 'secondary'}>
+                              {medicine.active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </div>
+                        </ListGroup.Item>
+                      ))
+                    )}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {/* Recent Symptom Checks */}
+            <Col lg={4} md={12} sm={12} className="mb-4">
+              <Card>
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <Card.Title className="mb-0">
+                      <i className="bi bi-clipboard2-pulse me-2"></i>
+                      Recent Symptom Checks
+                    </Card.Title>
+                    <Button variant="link" size="sm" onClick={() => onNavigate('symptomChecker')}>
+                      Check Now
+                    </Button>
+                  </div>
+                  <ListGroup variant="flush">
+                    {recentSymptomChecks.length === 0 ? (
+                      <p className="text-muted">No symptom checks yet</p>
+                    ) : (
+                      recentSymptomChecks.slice(0, 3).map((check) => (
+                        <ListGroup.Item key={check.id}>
+                          <div>
+                            <h6 className="mb-1">{check.predicted_disease}</h6>
+                            <small className="text-muted">
+                              <i className="bi bi-clock me-1"></i>
+                              {new Date(check.created_at).toLocaleDateString()}
+                            </small>
+                            <br />
+                            <small className="text-muted">
+                              <i className="bi bi-person-badge me-1"></i>
+                              {check.recommended_specialization}
+                            </small>
+                            <br />
+                            <div className="mt-1">
+                              {check.symptoms && Array.isArray(check.symptoms) && check.symptoms.slice(0, 3).map((symptom, index) => (
+                                <Badge key={index} bg="light" text="dark" className="me-1 mb-1">
+                                  {symptom}
+                                </Badge>
+                              ))}
+                              {check.symptoms && Array.isArray(check.symptoms) && check.symptoms.length > 3 && (
+                                <Badge bg="secondary" className="me-1 mb-1">
+                                  +{check.symptoms.length - 3} more
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </ListGroup.Item>
+                      ))
+                    )}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* User Profile Summary */}
+          {userProfile && (
+            <Row className="mt-4">
+              <Col md={12}>
+                <Card>
+                  <Card.Body>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <Card.Title className="mb-0">
+                        <i className="bi bi-person-circle me-2"></i>
+                        Profile Summary
+                      </Card.Title>
+                      <Button variant="primary" size="sm" onClick={() => onNavigate('profile')}>
+                        <i className="bi bi-pencil-square me-1"></i>
+                        View Profile
+                      </Button>
                     </div>
-                  </Col>
-                  <Col md={9} sm={12}>
                     <Row>
-                      <Col lg={4} md={6} sm={12} className="mb-3">
+                      <Col md={3} sm={12} className="text-center mb-3">
                         <div>
-                          <strong>Personal Information</strong>
-                          <div className="mt-2">
-                            {userProfile.age && (
-                              <p className="mb-1">
-                                <i className="bi bi-calendar3 me-2"></i>
-                                Age: {userProfile.age} years
-                              </p>
-                            )}
-                            {userProfile.gender && (
-                              <p className="mb-1">
-                                <i className="bi bi-gender-ambiguous me-2"></i>
-                                Gender: {userProfile.gender}
-                              </p>
-                            )}
-                            {userProfile.phone && (
-                              <p className="mb-1">
-                                <i className="bi bi-telephone me-2"></i>
-                                Phone: {userProfile.phone}
-                              </p>
-                            )}
-                          </div>
+                          <i className="bi bi-person-circle" style={{ fontSize: '4rem', color: 'var(--primary-color)' }}></i>
+                          <h5 className="mt-2">{userProfile.name}</h5>
+                          <p className="text-muted">{userProfile.email}</p>
                         </div>
                       </Col>
-                      <Col lg={4} md={6} sm={12} className="mb-3">
-                        <div>
-                          <strong>Health Activity</strong>
-                          <div className="mt-2">
-                            <p className="mb-1">
-                              <i className="bi bi-calendar-check me-2"></i>
-                              {stats.totalAppointments} Total Appointments
-                            </p>
-                            <p className="mb-1">
-                              <i className="bi bi-capsule me-2"></i>
-                              {stats.activeMedicines} Active Medicines
-                            </p>
-                            <p className="mb-1">
-                              <i className="bi bi-heart-pulse me-2"></i>
-                              {stats.symptomsChecked} Symptom Checks
-                            </p>
-                          </div>
-                        </div>
-                      </Col>
-                      <Col lg={4} md={12} sm={12} className="mb-3">
-                        <div>
-                          <strong>Account Information</strong>
-                          <div className="mt-2">
-                            <p className="mb-1">
-                              <i className="bi bi-calendar-plus me-2"></i>
-                              Member since: {new Date(userProfile.created_at).toLocaleDateString()}
-                            </p>
-                            <p className="mb-1">
-                              <i className="bi bi-shield-check me-2"></i>
-                              Account Status: Active
-                            </p>
-                          </div>
-                        </div>
+                      <Col md={9} sm={12}>
+                        <Row>
+                          <Col lg={6} md={6} sm={12} className="mb-3">
+                            <div>
+                              <strong>Health Activity</strong>
+                              <div className="mt-2">
+                                <p className="mb-1">
+                                  <i className="bi bi-calendar-check me-2"></i>
+                                  {stats.totalAppointments} Total Appointments
+                                </p>
+                                <p className="mb-1">
+                                  <i className="bi bi-capsule me-2"></i>
+                                  {stats.activeMedicines} Active Medicines
+                                </p>
+                                <p className="mb-1">
+                                  <i className="bi bi-heart-pulse me-2"></i>
+                                  {stats.symptomsChecked} Symptom Checks
+                                </p>
+                              </div>
+                            </div>
+                          </Col>
+                          <Col lg={6} md={6} sm={12} className="mb-3">
+                            <div>
+                              <strong>Account Information</strong>
+                              <div className="mt-2">
+                                <p className="mb-1">
+                                  <i className="bi bi-calendar-plus me-2"></i>
+                                  Member since: {new Date(userProfile.created_at).toLocaleDateString()}
+                                </p>
+                                <p className="mb-1">
+                                  <i className="bi bi-shield-check me-2"></i>
+                                  Account Status: Active
+                                </p>
+                              </div>
+                            </div>
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      )}
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          )}
         </>
       )}
     </div>

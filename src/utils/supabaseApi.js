@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabase';
+import { predictDisease } from '../data/diseaseDatabase';
 
 // Helper to get current user ID
 const getCurrentUserId = async () => {
@@ -135,9 +136,44 @@ export const medicinesAPI = {
 // Symptom Checks API
 export const symptomCheckAPI = {
   async check(symptoms) {
-    // This will use client-side ML prediction
-    // For now, return a mock response - you'll need to implement ML model
-    throw new Error('Symptom check requires ML model - coming soon');
+    // Use client-side disease prediction
+    const prediction = predictDisease(symptoms);
+    
+    if (!prediction) {
+      throw new Error('Unable to predict disease from symptoms');
+    }
+
+    // Save to database
+    const userId = await getCurrentUserId();
+    
+    const { data, error } = await supabase
+      .from('symptom_checks')
+      .insert([
+        {
+          user_id: userId,
+          symptoms: symptoms.join(', '),
+          predicted_disease: prediction.disease,
+          recommended_specialization: prediction.specialization,
+          confidence: prediction.confidence,
+          description: prediction.description,
+          precautions: prediction.precautions.join('; '),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Return prediction result
+    return {
+      disease: prediction.disease,
+      specialization: prediction.specialization,
+      description: prediction.description,
+      precautions: prediction.precautions,
+      confidence: prediction.confidence,
+      top_predictions: prediction.top_predictions,
+      symptoms: symptoms
+    };
   },
 
   async getHistory() {
