@@ -12,7 +12,7 @@ import {
 import { statsAPI } from '../../utils/api';
 import authService from '../../services/authService';
 
-function Profile({ user, onUpdateUser }) {
+function Profile({ user, onUpdateUser, onLogout }) {
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -316,8 +316,12 @@ function Profile({ user, onUpdateUser }) {
                   variant="outline-danger"
                   onClick={() => {
                     if (window.confirm('Are you sure you want to logout?')) {
-                      authService.logout();
-                      window.location.href = '/';
+                      if (onLogout) {
+                        onLogout();
+                      } else {
+                        authService.logout();
+                        window.location.reload();
+                      }
                     }
                   }}
                 >

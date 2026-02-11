@@ -98,20 +98,34 @@ class AuthService {
 
   async logout() {
     try {
+      console.log('[AuthService] Logging out...');
+      
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.error('[AuthService] Supabase signout error:', error);
+      }
 
+      // Clear all auth data
       this.user = null;
       localStorage.removeItem('user_data');
       localStorage.removeItem('supabase_session');
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('last_token_validation');
+      
+      // Clear Supabase storage
+      localStorage.removeItem('sb-mklbffjqlcvowdardqkb-auth-token');
+      
+      console.log('[AuthService] Logout complete');
+      return true;
     } catch (error) {
-      console.error('Logout error:', error);
-      // Clear local storage anyway
+      console.error('[AuthService] Logout error:', error);
+      
+      // Force clear everything even if there's an error
       this.user = null;
-      localStorage.removeItem('user_data');
-      localStorage.removeItem('supabase_session');
-      localStorage.removeItem('auth_token');
+      localStorage.clear(); // Clear all localStorage to be safe
+      
+      return true; // Return true anyway so UI can proceed
     }
   }
 
@@ -123,34 +137,80 @@ class AuthService {
   }
 
   isAuthenticated() {
-    const session = localStorage.getItem('supabase_session');
-    return !!session && !!this.getCurrentUser();
+    try {
+      // Check if we have a valid session
+      const session = localStorage.getItem('supabase_session');
+      const userData = localStorage.getItem('user_data');
+      
+      if (!session || !userData) {
+        return false;
+      }
+
+      // Parse and validate session
+      const sessionData = JSON.parse(session);
+      if (!sessionData.access_token) {
+        return false;
+      }
+
+      // Check if session is expired
+      if (sessionData.expires_at) {
+        const expiresAt = sessionData.expires_at * 1000; // Convert to milliseconds
+        if (Date.now() >= expiresAt) {
+          console.log('[AuthService] Session expired');
+          this.logout();
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[AuthService] isAuthenticated error:', error);
+      return false;
+    }
   }
 
   async validateToken() {
     try {
+      console.log('[AuthService] Validating token...');
+      
       const { data: { session }, error } = await supabase.auth.getSession();
       
-      if (error || !session) {
+      if (error) {
+        console.error('[AuthService] Session error:', error);
+        await this.logout();
+        return false;
+      }
+      
+      if (!session) {
+        console.log('[AuthService] No active session');
+        await this.logout();
         return false;
       }
 
       // Refresh user profile
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
-      if (profile) {
-        this.user = profile;
-        localStorage.setItem('user_data', JSON.stringify(profile));
-        return true;
+      if (profileError || !profile) {
+        console.error('[AuthService] Profile error:', profileError);
+        await this.logout();
+        return false;
       }
 
-      return false;
+      // Update stored data
+      this.user = profile;
+      localStorage.setItem('user_data', JSON.stringify(profile));
+      localStorage.setItem('supabase_session', JSON.stringify(session));
+      localStorage.setItem('last_token_validation', Date.now().toString());
+      
+      console.log('[AuthService] Token validated successfully');
+      return true;
     } catch (error) {
-      console.error('Token validation error:', error);
+      console.error('[AuthService] Token validation error:', error);
+      await this.logout();
       return false;
     }
   }

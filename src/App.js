@@ -32,24 +32,37 @@ function App() {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      if (authService.isAuthenticated()) {
-        const currentUser = authService.getCurrentUser();
-        if (currentUser) {
-          if (authService.shouldValidateToken()) {
-            const isValid = await authService.validateToken();
-            if (isValid) {
-              setUser(authService.getCurrentUser());
-              setIsAuthenticated(true);
-              setCurrentView('dashboard');
-            } else {
-              setCurrentView('login');
-            }
-          } else {
+      console.log('[App] Initializing auth...');
+      
+      try {
+        if (authService.isAuthenticated()) {
+          console.log('[App] Found existing session, validating...');
+          
+          const isValid = await authService.validateToken();
+          
+          if (isValid) {
+            const currentUser = authService.getCurrentUser();
+            console.log('[App] Session valid, user:', currentUser?.email);
             setUser(currentUser);
             setIsAuthenticated(true);
             setCurrentView('dashboard');
+          } else {
+            console.log('[App] Session invalid, showing login');
+            setUser(null);
+            setIsAuthenticated(false);
+            setCurrentView('login');
           }
+        } else {
+          console.log('[App] No session found, showing login');
+          setUser(null);
+          setIsAuthenticated(false);
+          setCurrentView('login');
         }
+      } catch (error) {
+        console.error('[App] Auth initialization error:', error);
+        setUser(null);
+        setIsAuthenticated(false);
+        setCurrentView('login');
       }
     };
 
@@ -64,13 +77,27 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      authService.logout();
+      console.log('[App] Logging out...');
+      
+      await authService.logout();
+      
+      // Clear all state
       setUser(null);
       setIsAuthenticated(false);
-      setCurrentView('login');
       setPredictionResult(null);
+      setSelectedDoctor(null);
+      setCurrentView('login');
+      
+      console.log('[App] Logout complete');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('[App] Logout error:', error);
+      
+      // Force clear state even if there's an error
+      setUser(null);
+      setIsAuthenticated(false);
+      setPredictionResult(null);
+      setSelectedDoctor(null);
+      setCurrentView('login');
     }
   };
 
@@ -196,6 +223,7 @@ function App() {
               setUser(updatedUser);
               localStorage.setItem('user_data', JSON.stringify(updatedUser));
             }}
+            onLogout={handleLogout}
           />
         )}
       </Container>
