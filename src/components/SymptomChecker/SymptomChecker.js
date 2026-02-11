@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Card, Form, Button, Badge, Alert, ListGroup } from 'react-bootstrap';
-import { predictDisease, allSymptoms } from '../../data/diseaseDatabase';
+import { predictDisease, allSymptoms, getFollowUpSymptoms } from '../../data/diseaseDatabase';
 import { supabase } from '../../config/supabase';
 
 function SymptomChecker({ onResult, user }) {
@@ -11,23 +11,46 @@ function SymptomChecker({ onResult, user }) {
   const [successMessage, setSuccessMessage] = useState('');
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
 
   const addSymptom = (symptom = null) => {
     const symptomToAdd = symptom || symptomInput.trim();
     if (symptomToAdd && !symptoms.includes(symptomToAdd)) {
-      setSymptoms([...symptoms, symptomToAdd]);
+      const newSymptoms = [...symptoms, symptomToAdd];
+      setSymptoms(newSymptoms);
       setSymptomInput('');
       setShowSuggestions(false);
       setError('');
       setSuccessMessage(`"${symptomToAdd}" added to symptoms list`);
       setTimeout(() => setSuccessMessage(''), 2000);
+      
+      // Get follow-up suggestions for the added symptom
+      const followUps = getFollowUpSymptoms(symptomToAdd);
+      if (followUps && followUps.length > 0) {
+        // Filter out already selected symptoms
+        const newFollowUps = followUps.filter(s => !newSymptoms.includes(s));
+        setFollowUpSuggestions(newFollowUps);
+      }
     }
   };
 
   const removeSymptom = (symptom) => {
-    setSymptoms(symptoms.filter(s => s !== symptom));
+    const newSymptoms = symptoms.filter(s => s !== symptom);
+    setSymptoms(newSymptoms);
+    
+    // Update follow-up suggestions
+    if (newSymptoms.length > 0) {
+      const lastSymptom = newSymptoms[newSymptoms.length - 1];
+      const followUps = getFollowUpSymptoms(lastSymptom);
+      if (followUps && followUps.length > 0) {
+        const newFollowUps = followUps.filter(s => !newSymptoms.includes(s));
+        setFollowUpSuggestions(newFollowUps);
+      }
+    } else {
+      setFollowUpSuggestions([]);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -214,6 +237,36 @@ function SymptomChecker({ onResult, user }) {
             </div>
           </Form.Group>
 
+          {/* Follow-up Suggestions - Show ABOVE selected symptoms */}
+          {followUpSuggestions.length > 0 && (
+            <Alert variant="info" className="mb-3">
+              <h6 className="mb-2">
+                <i className="bi bi-lightbulb me-2"></i>
+                Related Symptoms - Do you also have any of these?
+              </h6>
+              <p className="text-muted small mb-2">Based on your selected symptoms, you might also experience:</p>
+              <div className="d-flex flex-wrap gap-2">
+                {followUpSuggestions.slice(0, 8).map((suggestion) => (
+                  <Badge
+                    key={suggestion}
+                    bg="primary"
+                    className="p-2"
+                    style={{ cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      addSymptom(suggestion);
+                    }}
+                    title="Click to add"
+                  >
+                    <i className="bi bi-plus-circle me-1"></i>
+                    {suggestion}
+                  </Badge>
+                ))}
+              </div>
+            </Alert>
+          )}
+
           <div className="mb-3">
             <div className="d-flex justify-content-between align-items-center">
               <strong>Selected Symptoms ({symptoms.length}):</strong>
@@ -230,7 +283,7 @@ function SymptomChecker({ onResult, user }) {
                 symptoms.map((symptom, index) => (
                   <Badge 
                     key={index} 
-                    bg="primary" 
+                    bg="success" 
                     className="me-2 mb-2 p-2"
                     style={{ cursor: 'pointer' }}
                     onClick={() => removeSymptom(symptom)}
