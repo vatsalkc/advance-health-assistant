@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Row, Col, ListGroup, Badge, Alert } from 'react-bootstrap';
 import { medicinesAPI } from '../../utils/api';
+import notificationService from '../../services/notificationService';
 
 function MedicineReminder({ user }) {
   const [reminders, setReminders] = useState([]);
@@ -12,12 +13,52 @@ function MedicineReminder({ user }) {
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [notificationPermission, setNotificationPermission] = useState('default');
 
   useEffect(() => {
     if (user) {
       fetchMedicines();
+      checkNotificationPermission();
     }
   }, [user]);
+
+  useEffect(() => {
+    // Schedule notifications when reminders change
+    if (reminders.length > 0 && notificationPermission === 'granted') {
+      notificationService.scheduleMedicineReminders(reminders);
+    }
+
+    // Cleanup timers on unmount
+    return () => {
+      notificationService.clearAllTimers();
+    };
+  }, [reminders, notificationPermission]);
+
+  const checkNotificationPermission = () => {
+    const permission = notificationService.checkPermission();
+    setNotificationPermission(permission);
+  };
+
+  const requestNotificationPermission = async () => {
+    const granted = await notificationService.requestPermission();
+    setNotificationPermission(granted ? 'granted' : 'denied');
+    
+    if (granted) {
+      // Reschedule reminders with notifications enabled
+      notificationService.scheduleMedicineReminders(reminders);
+      alert('Notifications enabled! You will receive reminders for your medicines.');
+    } else {
+      alert('Notifications denied. You can enable them in your browser settings.');
+    }
+  };
+
+  const testNotification = () => {
+    if (notificationPermission === 'granted') {
+      notificationService.sendTestNotification();
+    } else {
+      alert('Please enable notifications first');
+    }
+  };
 
   const fetchMedicines = async () => {
     try {
@@ -45,7 +86,17 @@ function MedicineReminder({ user }) {
       setTimeout(() => setShowSuccess(false), 3000);
       
       // Refresh the list
-      fetchMedicines();
+      await fetchMedicines();
+      
+      // Show notification permission request if not granted
+      if (notificationPermission !== 'granted') {
+        const shouldEnable = window.confirm(
+          'Would you like to enable notifications for medicine reminders?'
+        );
+        if (shouldEnable) {
+          await requestNotificationPermission();
+        }
+      }
     } catch (err) {
       console.error('Error creating medicine:', err);
       alert('Failed to add medicine reminder. Please try again.');
@@ -75,7 +126,45 @@ function MedicineReminder({ user }) {
   };
 
   return (
-    <Row>
+    <div>
+      {/* Notification Permission Banner */}
+      {notificationPermission !== 'granted' && (
+        <Alert variant="warning" className="mb-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              <i className="bi bi-bell-slash me-2"></i>
+              <strong>Enable Notifications</strong> to receive medicine reminders
+            </div>
+            <Button 
+              variant="warning" 
+              size="sm"
+              onClick={requestNotificationPermission}
+            >
+              Enable Now
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {notificationPermission === 'granted' && (
+        <Alert variant="success" className="mb-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              <i className="bi bi-bell-fill me-2"></i>
+              Notifications are enabled! You'll receive reminders at scheduled times.
+            </div>
+            <Button 
+              variant="outline-success" 
+              size="sm"
+              onClick={testNotification}
+            >
+              Test Notification
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      <Row>
       <Col md={6}>
         <Card>
           <Card.Body>
@@ -188,6 +277,7 @@ function MedicineReminder({ user }) {
         </Card>
       </Col>
     </Row>
+    </div>
   );
 }
 

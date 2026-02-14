@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import authService from './services/authService';
+import doctorAuthService from './services/doctorAuthService';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -11,8 +12,10 @@ import MedicineReminder from './components/MedicineReminder/MedicineReminder';
 import UserHistory from './components/UserHistory/UserHistory';
 import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
+import DoctorApp from './DoctorApp';
 
 function App() {
+  const [appMode, setAppMode] = useState('patient'); // 'patient' or 'doctor'
   const [currentView, setCurrentView] = useState('login');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -29,6 +32,16 @@ function App() {
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
+
+  useEffect(() => {
+    // Check which mode to use based on stored data
+    const userRole = localStorage.getItem('user_role');
+    if (userRole === 'doctor') {
+      setAppMode('doctor');
+    } else {
+      setAppMode('patient');
+    }
+  }, []);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -112,6 +125,36 @@ function App() {
     setCurrentView('appointments');
   };
 
+  const handleSwitchToDoctor = () => {
+    // Clear patient auth
+    authService.logout();
+    setUser(null);
+    setIsAuthenticated(false);
+    setAppMode('doctor');
+    setCurrentView('login');
+  };
+
+  const handleSwitchToPatient = () => {
+    // Clear doctor auth
+    doctorAuthService.logout();
+    setUser(null);
+    setIsAuthenticated(false);
+    setAppMode('patient');
+    setCurrentView('login');
+  };
+
+  // If in doctor mode, render DoctorApp
+  if (appMode === 'doctor') {
+    return (
+      <DoctorApp 
+        onSwitchToPatient={handleSwitchToPatient}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
+    );
+  }
+
+  // Patient mode (default)
   return (
     <div className="App">
       <NetworkStatus />
@@ -174,11 +217,21 @@ function App() {
 
       <Container className="mt-4 mb-5">
         {!isAuthenticated && currentView === 'login' && (
-          <Login onLogin={handleLogin} onSwitchToRegister={() => setCurrentView('register')} darkMode={darkMode} />
+          <Login 
+            onLogin={handleLogin} 
+            onSwitchToRegister={() => setCurrentView('register')} 
+            onSwitchToDoctor={handleSwitchToDoctor}
+            darkMode={darkMode} 
+          />
         )}
         
         {!isAuthenticated && currentView === 'register' && (
-          <Register onRegister={handleLogin} onSwitchToLogin={() => setCurrentView('login')} darkMode={darkMode} />
+          <Register 
+            onRegister={handleLogin} 
+            onSwitchToLogin={() => setCurrentView('login')} 
+            onSwitchToDoctor={handleSwitchToDoctor}
+            darkMode={darkMode} 
+          />
         )}
 
         {isAuthenticated && currentView === 'dashboard' && (

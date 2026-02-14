@@ -32,6 +32,9 @@ function SymptomChecker({ onResult, user }) {
         // Filter out already selected symptoms
         const newFollowUps = followUps.filter(s => !newSymptoms.includes(s));
         setFollowUpSuggestions(newFollowUps);
+      } else {
+        // Clear follow-up suggestions if no follow-ups for this symptom
+        setFollowUpSuggestions([]);
       }
     }
   };
@@ -81,8 +84,19 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleCommonSymptomClick = (commonSymptom) => {
-    if (!symptoms.includes(commonSymptom)) {
-      addSymptom(commonSymptom);
+    // Check if this symptom has follow-up options
+    const followUps = getFollowUpSymptoms(commonSymptom);
+    
+    if (followUps && followUps.length > 0) {
+      // Don't add the generic symptom, show follow-up options instead
+      setFollowUpSuggestions(followUps);
+      setSuccessMessage(`Please select a specific type of ${commonSymptom}`);
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } else {
+      // No follow-ups, add directly
+      if (!symptoms.includes(commonSymptom)) {
+        addSymptom(commonSymptom);
+      }
     }
   };
 
@@ -309,30 +323,33 @@ function SymptomChecker({ onResult, user }) {
         {/* Common Symptoms Quick Add */}
         <div className="mt-4">
           <h6>Quick Add Common Symptoms:</h6>
-          <p className="text-muted small">Click to add to your symptoms list</p>
+          <p className="text-muted small">Click to add to your symptoms list (some will show more specific options)</p>
           <div className="d-flex flex-wrap gap-2">
-            {['fever', 'headache', 'cough', 'fatigue', 'nausea', 'dizziness', 'chest pain', 'shortness of breath', 'sore throat', 'muscle aches'].map((commonSymptom) => (
-              <Badge
-                key={commonSymptom}
-                bg={symptoms.includes(commonSymptom) ? "success" : "outline-secondary"}
-                className="p-2"
-                style={{ 
-                  cursor: symptoms.includes(commonSymptom) ? 'default' : 'pointer',
-                  border: symptoms.includes(commonSymptom) ? '1px solid #198754' : '1px solid #6c757d',
-                  color: symptoms.includes(commonSymptom) ? '#fff' : '#6c757d',
-                  opacity: symptoms.includes(commonSymptom) ? 0.7 : 1
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleCommonSymptomClick(commonSymptom);
-                }}
-                title={symptoms.includes(commonSymptom) ? 'Already added' : 'Click to add'}
-              >
-                <i className={`bi ${symptoms.includes(commonSymptom) ? 'bi-check' : 'bi-plus'} me-1`}></i>
-                {commonSymptom}
-              </Badge>
-            ))}
+            {['fever', 'headache', 'cough', 'fatigue', 'nausea', 'dizziness', 'chest pain', 'shortness of breath', 'sore throat', 'muscle aches'].map((commonSymptom) => {
+              const hasFollowUps = getFollowUpSymptoms(commonSymptom).length > 0;
+              return (
+                <Badge
+                  key={commonSymptom}
+                  bg={symptoms.includes(commonSymptom) ? "success" : "outline-secondary"}
+                  className="p-2"
+                  style={{ 
+                    cursor: symptoms.includes(commonSymptom) ? 'default' : 'pointer',
+                    border: symptoms.includes(commonSymptom) ? '1px solid #198754' : '1px solid #6c757d',
+                    color: symptoms.includes(commonSymptom) ? '#fff' : '#6c757d',
+                    opacity: symptoms.includes(commonSymptom) ? 0.7 : 1
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleCommonSymptomClick(commonSymptom);
+                  }}
+                  title={symptoms.includes(commonSymptom) ? 'Already added' : (hasFollowUps ? 'Click to see specific types' : 'Click to add')}
+                >
+                  <i className={`bi ${symptoms.includes(commonSymptom) ? 'bi-check' : (hasFollowUps ? 'bi-chevron-down' : 'bi-plus')} me-1`}></i>
+                  {commonSymptom}
+                </Badge>
+              );
+            })}
           </div>
         </div>
       </Card.Body>

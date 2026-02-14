@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
 import authService from '../../services/authService';
 
-function Login({ onLogin, onSwitchToRegister, darkMode }) {
+function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, darkMode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -74,8 +74,19 @@ function Login({ onLogin, onSwitchToRegister, darkMode }) {
           </Form>
 
           <div className="text-center">
-            <span>Don't have an account? </span>
-            <Button variant="link" onClick={onSwitchToRegister}>Register</Button>
+            <p className="mb-2">
+              Don't have an account?{' '}
+              <Button variant="link" onClick={onSwitchToRegister} className="p-0">
+                Register
+              </Button>
+            </p>
+            {onSwitchToDoctor && (
+              <p>
+                <Button variant="link" onClick={onSwitchToDoctor} className="p-0">
+                  Login as Doctor
+                </Button>
+              </p>
+            )}
           </div>
         </Card.Body>
       </Card>

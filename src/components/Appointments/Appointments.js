@@ -238,6 +238,8 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
                             bg={
                               a.status === 'Confirmed'
                                 ? 'success'
+                                : a.status === 'Rejected'
+                                ? 'danger'
                                 : 'warning'
                             }
                           >
@@ -248,18 +250,38 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
                         <p className="small mb-1">
                           {a.date} • {a.time}
                         </p>
-                        <p className="small text-muted">{a.reason}</p>
+                        <p className="small text-muted mb-1">{a.reason}</p>
+                        
+                        {a.status === 'Rejected' && a.rejected_reason && (
+                          <div className="alert alert-danger py-1 px-2 small mb-2">
+                            <strong>Rejection Reason:</strong> {a.rejected_reason}
+                          </div>
+                        )}
+                        
+                        {a.diagnosis && (
+                          <div className="alert alert-info py-1 px-2 small mb-2">
+                            <strong>Diagnosis:</strong> {a.diagnosis}
+                          </div>
+                        )}
+                        
+                        {a.prescription && (
+                          <div className="alert alert-success py-1 px-2 small mb-2">
+                            <strong>Prescription:</strong> {a.prescription}
+                          </div>
+                        )}
                       </div>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        className="w-100"
-                        onClick={() =>
-                          handleDeleteAppointment(a.id)
-                        }
-                      >
-                        Cancel Appointment
-                      </Button>
+                      {a.status !== 'Rejected' && (
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          className="w-100"
+                          onClick={() =>
+                            handleDeleteAppointment(a.id)
+                          }
+                        >
+                          Cancel Appointment
+                        </Button>
+                      )}
                     </ListGroup.Item>
                   ))
                 )}
