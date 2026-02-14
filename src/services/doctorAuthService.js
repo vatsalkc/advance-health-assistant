@@ -17,6 +17,13 @@ class DoctorAuthService {
     try {
       console.log('[DoctorAuth] Registering doctor...');
       
+      // Check if doctor profile already exists (from sample data)
+      const { data: existingDoctor, error: checkError } = await supabase
+        .from('doctors')
+        .select('*')
+        .eq('email', doctorData.email)
+        .maybeSingle();
+
       // Register doctor with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: doctorData.email,
@@ -34,30 +41,61 @@ class DoctorAuthService {
         throw new Error('Registration failed - no user returned');
       }
 
-      // Create doctor profile in doctors table
-      const { data: profile, error: profileError } = await supabase
-        .from('doctors')
-        .insert([
-          {
-            auth_id: authData.user.id,
-            name: doctorData.name,
-            email: doctorData.email,
-            phone: doctorData.phone || null,
-            specialization: doctorData.specialization,
-            qualification: doctorData.qualification || null,
-            license_number: doctorData.license_number || null,
-            experience: doctorData.experience || null,
-            rating: 4.5, // Default rating
-            is_verified: false, // Needs admin verification
-            is_active: true,
-          },
-        ])
-        .select()
-        .single();
+      let profile;
 
-      if (profileError) {
-        console.error('Doctor profile creation error:', profileError);
-        throw new Error('Failed to create doctor profile');
+      // If doctor profile exists, update it with auth_id
+      if (existingDoctor && !existingDoctor.auth_id) {
+        console.log('[DoctorAuth] Linking existing doctor profile...');
+        
+        const { data: updatedProfile, error: updateError } = await supabase
+          .from('doctors')
+          .update({
+            auth_id: authData.user.id,
+            name: doctorData.name || existingDoctor.name,
+            phone: doctorData.phone || existingDoctor.phone,
+            qualification: doctorData.qualification || existingDoctor.qualification,
+            license_number: doctorData.license_number || existingDoctor.license_number,
+            experience: doctorData.experience || existingDoctor.experience,
+            is_verified: true, // Auto-verify if from sample data
+          })
+          .eq('email', doctorData.email)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Doctor profile update error:', updateError);
+          throw new Error('Failed to link doctor profile');
+        }
+
+        profile = updatedProfile;
+      } else {
+        // Create new doctor profile
+        const { data: newProfile, error: profileError } = await supabase
+          .from('doctors')
+          .insert([
+            {
+              auth_id: authData.user.id,
+              name: doctorData.name,
+              email: doctorData.email,
+              phone: doctorData.phone || null,
+              specialization: doctorData.specialization,
+              qualification: doctorData.qualification || null,
+              license_number: doctorData.license_number || null,
+              experience: doctorData.experience || null,
+              rating: 4.5, // Default rating
+              is_verified: false, // Needs admin verification
+              is_active: true,
+            },
+          ])
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error('Doctor profile creation error:', profileError);
+          throw new Error('Failed to create doctor profile');
+        }
+
+        profile = newProfile;
       }
 
       // Store doctor data
