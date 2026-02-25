@@ -923,10 +923,21 @@ body {
   gap: 6px;
 }
 
+.symptom-followup-badge.base-symptom {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
 .symptom-followup-badge:hover {
   background: #2563eb;
   color: white;
   border-color: #2563eb;
+}
+
+.symptom-followup-badge.base-symptom:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 }
 
 /* Empty State */

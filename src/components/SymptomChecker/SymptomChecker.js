@@ -93,10 +93,21 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    // Ask for severity
-    setSelectedSymptom(suggestion);
-    setShowSeverityModal(true);
-    setShowSuggestions(false);
+    // Check if this symptom has follow-up options
+    const followUps = getFollowUpSymptoms(suggestion);
+    
+    if (followUps && followUps.length > 0) {
+      // Show both the base symptom AND follow-up options
+      setFollowUpSuggestions([suggestion, ...followUps]);
+      setSuccessMessage(`Select "${suggestion}" or choose a specific type`);
+      setTimeout(() => setSuccessMessage(''), 3000);
+      setShowSuggestions(false);
+    } else {
+      // No follow-ups, ask for severity directly
+      setSelectedSymptom(suggestion);
+      setShowSeverityModal(true);
+      setShowSuggestions(false);
+    }
   };
 
   const handleQuickAddClick = (commonSymptom) => {
@@ -104,9 +115,9 @@ function SymptomChecker({ onResult, user }) {
     const followUps = getFollowUpSymptoms(commonSymptom);
     
     if (followUps && followUps.length > 0) {
-      // Don't add the generic symptom, show follow-up options instead
-      setFollowUpSuggestions(followUps);
-      setSuccessMessage(`Please select a specific type of ${commonSymptom}`);
+      // Show both the base symptom AND follow-up options
+      setFollowUpSuggestions([commonSymptom, ...followUps]);
+      setSuccessMessage(`Select "${commonSymptom}" or choose a specific type`);
       setTimeout(() => setSuccessMessage(''), 3000);
     } else {
       // No follow-ups, ask for severity
@@ -284,23 +295,31 @@ function SymptomChecker({ onResult, user }) {
             <div className="symptom-followup-box">
               <h6>
                 <i className="bi bi-lightbulb-fill"></i>
-                Related Symptoms - Do you also have any of these?
+                {followUpSuggestions.length === 1 ? 'Add This Symptom' : 'Choose Symptom Type'}
               </h6>
-              <p className="text-muted small mb-3">Based on your selected symptoms, you might also experience:</p>
+              <p className="text-muted small mb-3">
+                {followUpSuggestions.length === 1 
+                  ? 'Click to add this symptom to your list'
+                  : 'Select the general symptom or choose a more specific type:'}
+              </p>
               <div className="d-flex flex-wrap gap-2">
-                {followUpSuggestions.slice(0, 8).map((suggestion) => (
+                {followUpSuggestions.map((suggestion, index) => (
                   <span
                     key={suggestion}
-                    className="symptom-followup-badge"
+                    className={`symptom-followup-badge ${index === 0 && followUpSuggestions.length > 1 ? 'base-symptom' : ''}`}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      addSymptom(suggestion);
+                      setSelectedSymptom(suggestion);
+                      setShowSeverityModal(true);
                     }}
-                    title="Click to add"
+                    title={index === 0 && followUpSuggestions.length > 1 ? 'General symptom' : 'Click to add'}
                   >
                     <i className="bi bi-plus-circle"></i>
                     {suggestion}
+                    {index === 0 && followUpSuggestions.length > 1 && (
+                      <Badge bg="light" text="dark" className="ms-2" style={{ fontSize: '10px', padding: '2px 6px' }}>General</Badge>
+                    )}
                   </span>
                 ))}
               </div>
