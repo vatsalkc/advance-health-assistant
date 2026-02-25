@@ -1,0 +1,328 @@
+@startuml Patient Registration and Login
+title Patient Registration and Login Flow
+
+actor Patient
+participant "React App" as App
+participant "Supabase Auth" as Auth
+participant "Database" as DB
+
+== Registration ==
+Patient -> App: Enter email, password, name
+App -> Auth: signUp(email, password, metadata)
+Auth -> DB: Create user record
+Auth -> Patient: Send verification email
+Auth --> App: Return user session
+App --> Patient: Show dashboard
+
+== Login ==
+Patient -> App: Enter email, password
+App -> Auth: signInWithPassword(email, password)
+Auth -> DB: Verify credentials
+Auth --> App: Return session token
+App -> DB: Fetch user profile
+DB --> App: Return user data
+App --> Patient: Show dashboard
+
+== Password Reset ==
+Patient -> App: Click "Forgot Password"
+App -> Auth: resetPasswordForEmail(email)
+Auth -> Patient: Send reset email
+Patient -> Auth: Click reset link
+Auth --> Patient: Show reset form
+Patient -> Auth: Submit new password
+Auth -> DB: Update password
+Auth --> Patient: Redirect to login
+
+@enduml
+
+@startuml Symptom Checker Flow
+title Symptom Checker and Disease Prediction
+
+actor Patient
+participant "Symptom Checker" as SC
+participant "Disease Database" as DDB
+participant "Prediction Engine" as PE
+participant "Supabase" as DB
+participant "Doctor List" as DL
+
+Patient -> SC: Type symptom (e.g., "fe")
+SC -> DDB: Filter symptoms by input
+DDB --> SC: Return matching symptoms
+SC --> Patient: Show suggestions dropdown
+
+Patient -> SC: Click symptom suggestion
+SC -> DDB: Get follow-up symptoms
+DDB --> SC: Return symptom types
+SC --> Patient: Show symptom type options
+
+Patient -> SC: Select symptom type
+SC --> Patient: Show severity modal
+Patient -> SC: Select severity (mild/moderate/severe)
+SC -> SC: Add symptom to list
+
+Patient -> SC: Click "Analyze Symptoms"
+SC -> PE: predictDisease(symptoms)
+PE -> DDB: Match symptoms with diseases
+DDB -> PE: Calculate confidence scores
+PE -> PE: Apply required symptoms filter
+PE -> PE: Sort by confidence
+PE --> SC: Return prediction results
+
+SC -> DB: Save symptom check record
+DB --> SC: Confirm saved
+
+SC -> DL: Get doctors by specialization
+DL --> SC: Return matching doctors
+SC --> Patient: Show diagnosis results page
+
+Patient -> SC: Click "Book Appointment"
+SC --> Patient: Open appointment modal
+
+@enduml
+
+@startuml Appointment Booking Flow
+title Patient Appointment Booking
+
+actor Patient
+participant "Appointments Page" as AP
+participant "Supabase API" as API
+participant "Database" as DB
+participant "Doctor Portal" as DP
+actor Doctor
+
+== View Doctors ==
+Patient -> AP: Navigate to Appointments
+AP -> API: GET /doctors
+API -> DB: SELECT * FROM doctors
+DB --> API: Return doctors list
+API --> AP: Return doctors data
+AP --> Patient: Display doctor cards
+
+== Filter by Specialization ==
+Patient -> AP: Click specialization filter
+AP -> AP: Filter doctors locally
+AP --> Patient: Show filtered doctors
+
+== Book Appointment ==
+Patient -> AP: Click "Book" on doctor card
+AP --> Patient: Show booking modal
+Patient -> AP: Enter date, time, reason
+AP -> API: POST /appointments
+API -> DB: INSERT appointment record
+DB --> API: Return appointment ID
+API --> AP: Confirm booking
+AP --> Patient: Show success message
+AP -> AP: Refresh appointments list
+
+== Doctor Reviews Appointment ==
+DP -> DB: Check new appointments
+DB --> DP: Return pending appointments
+Doctor -> DP: Review appointment details
+Doctor -> DP: Confirm/Reject appointment
+DP -> DB: UPDATE appointment status
+DB --> DP: Confirm update
+
+== Patient Views Status ==
+Patient -> AP: Check appointments
+AP -> API: GET /appointments
+API -> DB: SELECT appointments WHERE user_id
+DB --> API: Return appointments
+API --> AP: Return data
+AP --> Patient: Show appointment status
+
+@enduml
+
+@startuml Doctor Portal Flow
+title Doctor Portal - Appointment Management
+
+actor Doctor
+participant "Doctor Login" as DL
+participant "Supabase Auth" as Auth
+participant "Doctor Dashboard" as DD
+participant "Database" as DB
+participant "Patient" as Patient
+
+== Doctor Login ==
+Doctor -> DL: Enter email, password
+DL -> Auth: signInWithPassword(email, password)
+Auth -> DB: Verify doctor credentials
+DB --> Auth: Return doctor profile
+Auth --> DL: Return session
+DL --> Doctor: Show doctor dashboard
+
+== View Appointments ==
+Doctor -> DD: Navigate to Appointments
+DD -> DB: SELECT appointments WHERE doctor_id
+DB --> DD: Return appointments list
+DD --> Doctor: Display appointments
+
+== Manage Appointment ==
+Doctor -> DD: Click appointment
+DD --> Doctor: Show appointment details
+
+alt Confirm Appointment
+    Doctor -> DD: Click "Confirm"
+    DD -> DB: UPDATE status = 'Confirmed'
+    DB --> DD: Confirm update
+    DD --> Doctor: Show success message
+else Reject Appointment
+    Doctor -> DD: Click "Reject"
+    DD --> Doctor: Show rejection reason modal
+    Doctor -> DD: Enter rejection reason
+    DD -> DB: UPDATE status = 'Rejected', reason
+    DB --> DD: Confirm update
+    DD --> Doctor: Show success message
+end
+
+== Add Diagnosis ==
+Doctor -> DD: Enter diagnosis notes
+Doctor -> DD: Enter prescription
+DD -> DB: UPDATE appointment with diagnosis
+DB --> DD: Confirm update
+DD --> Doctor: Show success
+
+== View Patient History ==
+Doctor -> DD: Click patient name
+DD -> DB: SELECT symptom_checks WHERE user_id
+DB --> DD: Return patient history
+DD --> Doctor: Display patient records
+
+@enduml
+
+@startuml Medicine Reminder Flow
+title Medicine Reminder System
+
+actor Patient
+participant "Dashboard" as Dash
+participant "Medicine Form" as MF
+participant "Supabase" as DB
+participant "Local Storage" as LS
+participant "Notification Service" as NS
+
+== Add Medicine ==
+Patient -> Dash: Click "Add Medicine"
+Dash --> Patient: Show medicine form
+Patient -> MF: Enter name, dosage, frequency, time
+MF -> DB: INSERT medicine record
+DB --> MF: Return medicine ID
+MF -> LS: Store reminder settings
+LS --> MF: Confirm stored
+MF --> Patient: Show success message
+
+== View Medicines ==
+Patient -> Dash: View medicine list
+Dash -> DB: SELECT medicines WHERE user_id
+DB --> Dash: Return medicines
+Dash --> Patient: Display medicine cards
+
+== Mark as Taken ==
+Patient -> Dash: Click "Mark as Taken"
+Dash -> DB: UPDATE last_taken timestamp
+DB --> Dash: Confirm update
+Dash --> Patient: Update UI
+
+== Delete Medicine ==
+Patient -> Dash: Click delete
+Dash -> DB: DELETE medicine record
+DB --> Dash: Confirm deletion
+Dash -> LS: Remove reminder
+LS --> Dash: Confirm removed
+Dash --> Patient: Update list
+
+== Reminder Notification ==
+NS -> LS: Check scheduled reminders
+LS --> NS: Return due reminders
+NS -> NS: Create notification
+NS --> Patient: Show browser notification
+Patient -> NS: Click notification
+NS --> Dash: Open medicine list
+
+@enduml
+
+@startuml Complete System Architecture
+title Health Assistant System Architecture
+
+actor Patient
+actor Doctor
+participant "React Frontend" as React
+participant "Supabase Auth" as Auth
+participant "Supabase Database" as DB
+participant "Disease Prediction\nEngine (Client-side)" as Engine
+participant "Supabase Storage" as Storage
+
+== Patient Flow ==
+Patient -> React: Access application
+React -> Auth: Check session
+Auth --> React: Return auth state
+
+Patient -> React: Use symptom checker
+React -> Engine: Analyze symptoms
+Engine --> React: Return predictions
+React -> DB: Save symptom check
+React --> Patient: Show results
+
+Patient -> React: Book appointment
+React -> DB: Create appointment
+DB --> React: Confirm booking
+React --> Patient: Show confirmation
+
+== Doctor Flow ==
+Doctor -> React: Login to doctor portal
+React -> Auth: Authenticate doctor
+Auth -> DB: Verify doctor credentials
+DB --> Auth: Return doctor data
+Auth --> React: Return session
+React --> Doctor: Show dashboard
+
+Doctor -> React: View appointments
+React -> DB: Fetch appointments
+DB --> React: Return appointments
+React --> Doctor: Display list
+
+Doctor -> React: Update appointment
+React -> DB: Save changes
+DB --> React: Confirm update
+React --> Doctor: Show success
+
+== Data Storage ==
+React -> DB: Store user data
+React -> DB: Store appointments
+React -> DB: Store symptom checks
+React -> DB: Store medicines
+React -> Storage: Store files (future)
+
+@enduml
+
+@startuml Mobile Login Issue - Current vs Fixed
+title Mobile Login Issue Analysis
+
+actor "Mobile User" as Mobile
+participant "Login Form" as Form
+participant "Supabase Auth" as Auth
+participant "Session Manager" as Session
+
+== Current Issue ==
+Mobile -> Form: Enter credentials
+Form -> Auth: signInWithPassword()
+Auth --> Form: Return session
+Form -> Session: Store session
+note right: Issue: Session not persisting\non mobile browsers
+Session --> Form: Session lost
+Form --> Mobile: Redirect to login again
+
+== Fixed Flow ==
+Mobile -> Form: Enter credentials
+Form -> Auth: signInWithPassword()
+Auth --> Form: Return session
+Form -> Session: Store with localStorage
+Session -> Session: Set secure cookie
+Session -> Session: Verify persistence
+note right: Fix: Use localStorage + cookies\nwith proper mobile settings
+Session --> Form: Session confirmed
+Form --> Mobile: Redirect to dashboard
+Mobile -> Form: Refresh page
+Form -> Session: Check session
+Session --> Form: Session valid
+Form --> Mobile: Stay logged in
+
+@enduml

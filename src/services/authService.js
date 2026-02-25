@@ -1,9 +1,59 @@
-import { supabase } from '../config/supabase';
+import { supabase, ensureSessionPersistence } from '../config/supabase';
 
 class AuthService {
   constructor() {
     this.user = null;
     this.loadUserFromStorage();
+    this.setupAuthListener();
+  }
+
+  setupAuthListener() {
+    // Listen for auth state changes (important for mobile)
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[AuthService] Auth state changed:', event);
+      
+      if (event === 'SIGNED_IN' && session) {
+        await this.handleSignIn(session);
+      } else if (event === 'SIGNED_OUT') {
+        this.handleSignOut();
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        await this.handleTokenRefresh(session);
+      }
+    });
+  }
+
+  async handleSignIn(session) {
+    try {
+      // Get user profile
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (!error && profile) {
+        this.user = profile;
+        localStorage.setItem('user_data', JSON.stringify(profile));
+        localStorage.setItem('supabase_session', JSON.stringify(session));
+        
+        // Ensure session persists on mobile
+        await ensureSessionPersistence();
+      }
+    } catch (error) {
+      console.error('[AuthService] handleSignIn error:', error);
+    }
+  }
+
+  handleSignOut() {
+    this.user = null;
+    localStorage.removeItem('user_data');
+    localStorage.removeItem('supabase_session');
+  }
+
+  async handleTokenRefresh(session) {
+    localStorage.setItem('supabase_session', JSON.stringify(session));
+    localStorage.setItem('last_token_validation', Date.now().toString());
+    console.log('[AuthService] Token refreshed');
   }
 
   loadUserFromStorage() {
@@ -15,6 +65,8 @@ class AuthService {
 
   async register(userData) {
     try {
+      console.log('[AuthService] Attempting registration...');
+      
       // Register user with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: userData.email,
@@ -26,6 +78,8 @@ class AuthService {
       if (!authData.user) {
         throw new Error('Registration failed - no user returned');
       }
+
+      console.log('[AuthService] Registration successful');
 
       // Create user profile in users table
       const { data: profile, error: profileError } = await supabase
@@ -44,7 +98,7 @@ class AuthService {
         .single();
 
       if (profileError) {
-        console.error('Profile creation error:', profileError);
+        console.error('[AuthService] Profile creation error:', profileError);
         throw new Error('Failed to create user profile');
       }
 
@@ -52,10 +106,16 @@ class AuthService {
       this.user = profile;
       localStorage.setItem('user_data', JSON.stringify(profile));
       localStorage.setItem('supabase_session', JSON.stringify(authData.session));
+      localStorage.setItem('last_login', Date.now().toString());
+      
+      // Ensure session persists on mobile
+      await ensureSessionPersistence();
+      
+      console.log('[AuthService] User profile created, session persisted');
 
       return profile;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('[AuthService] Registration error:', error);
       if (error.message.includes('already registered')) {
         throw new Error('This email is already registered');
       }
@@ -65,12 +125,16 @@ class AuthService {
 
   async login(email, password) {
     try {
+      console.log('[AuthService] Attempting login...');
+      
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (authError) throw authError;
+
+      console.log('[AuthService] Login successful');
 
       // Get user profile
       const { data: profile, error: profileError } = await supabase
@@ -85,10 +149,16 @@ class AuthService {
       this.user = profile;
       localStorage.setItem('user_data', JSON.stringify(profile));
       localStorage.setItem('supabase_session', JSON.stringify(authData.session));
+      localStorage.setItem('last_login', Date.now().toString());
+      
+      // Ensure session persists on mobile
+      await ensureSessionPersistence();
+      
+      console.log('[AuthService] User data stored, session persisted');
 
       return profile;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('[AuthService] Login error:', error);
       if (error.message.includes('Invalid login credentials')) {
         throw new Error('Invalid email or password');
       }
