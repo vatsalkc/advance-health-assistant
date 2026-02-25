@@ -79,28 +79,28 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
     {
       title: 'Symptom Checker',
       icon: 'activity',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
       description: 'AI-powered diagnosis',
       action: () => onNavigate('symptomChecker')
     },
     {
       title: 'Find Doctors',
       icon: 'person-hearts',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      gradient: 'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)',
       description: 'Book appointments',
       action: () => onNavigate('appointments')
     },
     {
       title: 'Medications',
       icon: 'capsule-pill',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
       description: 'Manage reminders',
       action: () => onNavigate('medicineReminder')
     },
     {
       title: 'Health Records',
       icon: 'file-medical',
-      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      gradient: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)',
       description: 'View history',
       action: () => onNavigate('userHistory')
     }
