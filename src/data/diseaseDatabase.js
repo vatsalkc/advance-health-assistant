@@ -17,158 +17,180 @@ export const symptomFollowUps = {
   'urination': ['frequent urination', 'painful urination', 'burning urination', 'blood in urine', 'cloudy urine'],
 };
 
-// Comprehensive disease database with detailed symptoms
+// Enhanced disease database with more accurate symptom mapping
 export const diseaseDatabase = [
   {
     disease: 'Common Cold',
-    symptoms: ['runny nose', 'stuffy nose', 'sneezing', 'sore throat', 'mild cough', 'mild fever', 'fatigue', 'headache', 'watery eyes', 'post-nasal drip'],
+    symptoms: ['runny nose', 'sneezing', 'sore throat', 'mild cough', 'nasal congestion', 'mild fever'],
+    requiredSymptoms: ['runny nose', 'sneezing'], // Must have at least one
     specialization: 'General Physician',
     description: 'A viral infection of the upper respiratory tract.',
     precautions: ['Rest and stay hydrated', 'Use over-the-counter cold medications', 'Avoid close contact with others', 'Wash hands frequently']
   },
   {
     disease: 'Influenza (Flu)',
-    symptoms: ['high fever', 'body aches', 'extreme fatigue', 'dry cough', 'sore throat', 'severe headache', 'chills', 'sweating', 'muscle pain'],
+    symptoms: ['high fever', 'body aches', 'extreme fatigue', 'dry cough', 'severe headache', 'chills'],
+    requiredSymptoms: ['high fever', 'body aches'],
     specialization: 'General Physician',
     description: 'A contagious respiratory illness caused by influenza viruses.',
     precautions: ['Get plenty of rest', 'Stay hydrated', 'Take antiviral medications if prescribed', 'Avoid contact with others']
   },
   {
     disease: 'COVID-19',
-    symptoms: ['fever', 'dry cough', 'fatigue', 'loss of taste', 'loss of smell', 'difficulty breathing', 'body aches', 'sore throat', 'headache', 'chest pain'],
-    specialization: 'Infectious Disease Specialist',
+    symptoms: ['fever', 'dry cough', 'fatigue', 'loss of taste', 'loss of smell', 'difficulty breathing', 'body aches'],
+    requiredSymptoms: ['loss of taste', 'loss of smell', 'dry cough'],
+    specialization: 'General Physician',
     description: 'A respiratory illness caused by the SARS-CoV-2 virus.',
     precautions: ['Isolate yourself', 'Monitor oxygen levels', 'Seek medical attention if breathing worsens', 'Stay hydrated']
   },
   {
     disease: 'Migraine',
-    symptoms: ['severe headache', 'throbbing headache', 'nausea', 'vomiting', 'sensitivity to light', 'sensitivity to sound', 'visual disturbances', 'dizziness'],
+    symptoms: ['severe headache', 'throbbing headache', 'nausea', 'vomiting', 'sensitivity to light', 'sensitivity to sound'],
+    requiredSymptoms: ['severe headache', 'throbbing headache'],
     specialization: 'Neurologist',
     description: 'A neurological condition characterized by intense headaches.',
     precautions: ['Rest in a dark, quiet room', 'Apply cold compress', 'Take prescribed medications', 'Avoid triggers']
   },
   {
+    disease: 'Tension Headache',
+    symptoms: ['mild headache', 'headache', 'pressure around head', 'neck pain', 'fatigue'],
+    requiredSymptoms: ['headache'],
+    specialization: 'General Physician',
+    description: 'The most common type of headache caused by muscle tension.',
+    precautions: ['Rest and relax', 'Apply warm compress', 'Take over-the-counter pain relievers', 'Reduce stress']
+  },
+  {
     disease: 'Hypertension',
-    symptoms: ['headache', 'dizziness', 'blurred vision', 'chest pain', 'shortness of breath', 'nosebleeds', 'fatigue', 'irregular heartbeat'],
+    symptoms: ['headache', 'dizziness', 'blurred vision', 'chest pain', 'shortness of breath', 'nosebleeds'],
+    requiredSymptoms: ['headache', 'dizziness'],
     specialization: 'Cardiologist',
     description: 'High blood pressure that can lead to serious health complications.',
     precautions: ['Monitor blood pressure regularly', 'Reduce salt intake', 'Exercise regularly', 'Take prescribed medications']
   },
   {
     disease: 'Type 2 Diabetes',
-    symptoms: ['increased thirst', 'frequent urination', 'extreme fatigue', 'blurred vision', 'slow healing wounds', 'tingling in hands', 'tingling in feet', 'weight loss'],
+    symptoms: ['increased thirst', 'frequent urination', 'extreme fatigue', 'blurred vision', 'slow healing wounds'],
+    requiredSymptoms: ['increased thirst', 'frequent urination'],
     specialization: 'Endocrinologist',
     description: 'A chronic condition affecting how the body processes blood sugar.',
     precautions: ['Monitor blood sugar levels', 'Follow a healthy diet', 'Exercise regularly', 'Take medications as prescribed']
   },
   {
     disease: 'Asthma',
-    symptoms: ['wheezing', 'shortness of breath', 'chest tightness', 'persistent cough', 'difficulty breathing', 'rapid breathing', 'chest pain'],
+    symptoms: ['wheezing', 'shortness of breath', 'chest tightness', 'persistent cough', 'difficulty breathing'],
+    requiredSymptoms: ['wheezing', 'shortness of breath'],
     specialization: 'Pulmonologist',
     description: 'A condition causing airways to narrow and produce extra mucus.',
     precautions: ['Use inhaler as prescribed', 'Avoid triggers', 'Monitor symptoms', 'Keep rescue inhaler handy']
   },
   {
     disease: 'Gastritis',
-    symptoms: ['stomach pain', 'burning stomach', 'nausea', 'vomiting', 'bloating', 'loss of appetite', 'indigestion', 'feeling full quickly'],
+    symptoms: ['stomach pain', 'burning stomach', 'nausea', 'vomiting', 'bloating', 'loss of appetite'],
+    requiredSymptoms: ['stomach pain', 'burning stomach'],
     specialization: 'Gastroenterologist',
     description: 'Inflammation of the stomach lining.',
     precautions: ['Avoid spicy foods', 'Eat smaller meals', 'Avoid alcohol', 'Take antacids if needed']
   },
   {
+    disease: 'Food Poisoning',
+    symptoms: ['nausea', 'vomiting', 'diarrhea', 'stomach cramps', 'fever', 'weakness'],
+    requiredSymptoms: ['nausea', 'vomiting', 'diarrhea'],
+    specialization: 'General Physician',
+    description: 'Illness caused by eating contaminated food.',
+    precautions: ['Stay hydrated', 'Rest', 'Avoid solid foods initially', 'Seek medical help if severe']
+  },
+  {
     disease: 'Urinary Tract Infection',
-    symptoms: ['burning urination', 'frequent urination', 'urgent urination', 'cloudy urine', 'pelvic pain', 'strong-smelling urine', 'blood in urine', 'lower back pain'],
+    symptoms: ['burning urination', 'frequent urination', 'urgent urination', 'cloudy urine', 'pelvic pain', 'blood in urine'],
+    requiredSymptoms: ['burning urination', 'frequent urination'],
     specialization: 'Urologist',
     description: 'An infection in any part of the urinary system.',
     precautions: ['Drink plenty of water', 'Take antibiotics as prescribed', 'Avoid irritants', 'Practice good hygiene']
   },
   {
     disease: 'Arthritis',
-    symptoms: ['joint pain', 'joint stiffness', 'swelling', 'reduced range of motion', 'joint tenderness', 'morning stiffness', 'joint warmth', 'joint redness'],
+    symptoms: ['joint pain', 'joint stiffness', 'swelling', 'reduced range of motion', 'morning stiffness'],
+    requiredSymptoms: ['joint pain', 'joint stiffness'],
     specialization: 'Rheumatologist',
     description: 'Inflammation of one or more joints causing pain and stiffness.',
     precautions: ['Stay active with low-impact exercise', 'Maintain healthy weight', 'Use hot/cold therapy', 'Take anti-inflammatory medications']
   },
   {
     disease: 'Depression',
-    symptoms: ['persistent sadness', 'loss of interest', 'extreme fatigue', 'sleep problems', 'difficulty concentrating', 'appetite changes', 'feelings of worthlessness', 'thoughts of death'],
+    symptoms: ['persistent sadness', 'loss of interest', 'extreme fatigue', 'sleep problems', 'difficulty concentrating', 'appetite changes'],
+    requiredSymptoms: ['persistent sadness', 'loss of interest'],
     specialization: 'Psychiatrist',
     description: 'A mood disorder causing persistent feelings of sadness.',
     precautions: ['Seek professional help', 'Stay connected with others', 'Exercise regularly', 'Follow treatment plan']
   },
   {
     disease: 'Anxiety Disorder',
-    symptoms: ['excessive worry', 'restlessness', 'rapid heartbeat', 'sweating', 'difficulty concentrating', 'sleep problems', 'trembling', 'feeling nervous', 'panic attacks'],
+    symptoms: ['excessive worry', 'restlessness', 'rapid heartbeat', 'sweating', 'difficulty concentrating', 'panic attacks'],
+    requiredSymptoms: ['excessive worry', 'restlessness'],
     specialization: 'Psychiatrist',
     description: 'A mental health condition characterized by excessive worry.',
     precautions: ['Practice relaxation techniques', 'Exercise regularly', 'Limit caffeine', 'Seek therapy']
   },
   {
     disease: 'Eczema',
-    symptoms: ['itchy skin', 'red patches', 'dry skin', 'skin inflammation', 'skin rash', 'cracked skin', 'scaly skin', 'skin thickening'],
+    symptoms: ['itchy skin', 'red patches', 'dry skin', 'skin inflammation', 'skin rash', 'cracked skin'],
+    requiredSymptoms: ['itchy skin', 'red patches'],
     specialization: 'Dermatologist',
     description: 'A condition causing skin to become itchy and inflamed.',
     precautions: ['Moisturize regularly', 'Avoid triggers', 'Use prescribed creams', 'Take lukewarm baths']
   },
   {
     disease: 'Acne',
-    symptoms: ['pimples', 'blackheads', 'whiteheads', 'oily skin', 'skin inflammation', 'red bumps', 'painful lumps', 'scarring'],
+    symptoms: ['pimples', 'blackheads', 'whiteheads', 'oily skin', 'skin inflammation', 'red bumps'],
+    requiredSymptoms: ['pimples'],
     specialization: 'Dermatologist',
     description: 'A skin condition causing pimples and blemishes.',
     precautions: ['Cleanse face twice daily', 'Avoid touching face', 'Use non-comedogenic products', 'Consider prescribed treatments']
   },
   {
     disease: 'Anemia',
-    symptoms: ['extreme fatigue', 'weakness', 'pale skin', 'shortness of breath', 'dizziness', 'cold hands', 'cold feet', 'irregular heartbeat', 'chest pain'],
-    specialization: 'Hematologist',
+    symptoms: ['extreme fatigue', 'weakness', 'pale skin', 'shortness of breath', 'dizziness', 'cold hands', 'cold feet'],
+    requiredSymptoms: ['extreme fatigue', 'pale skin'],
+    specialization: 'General Physician',
     description: 'A condition where blood lacks adequate healthy red blood cells.',
     precautions: ['Eat iron-rich foods', 'Take iron supplements', 'Get adequate rest', 'Follow up with blood tests']
   },
   {
-    disease: 'Thyroid Disorder',
-    symptoms: ['fatigue', 'weight changes', 'mood changes', 'temperature sensitivity', 'hair loss', 'dry skin', 'muscle weakness', 'irregular heartbeat'],
-    specialization: 'Endocrinologist',
-    description: 'Abnormal functioning of the thyroid gland.',
-    precautions: ['Take thyroid medication as prescribed', 'Regular blood tests', 'Maintain healthy diet', 'Monitor symptoms']
-  },
-  {
     disease: 'Pneumonia',
-    symptoms: ['cough with phlegm', 'fever', 'chest pain', 'difficulty breathing', 'fatigue', 'sweating', 'chills', 'rapid breathing', 'confusion'],
+    symptoms: ['cough with phlegm', 'fever', 'chest pain', 'difficulty breathing', 'fatigue', 'sweating', 'chills'],
+    requiredSymptoms: ['cough with phlegm', 'fever', 'chest pain'],
     specialization: 'Pulmonologist',
     description: 'An infection that inflames air sacs in the lungs.',
     precautions: ['Take antibiotics as prescribed', 'Rest and stay hydrated', 'Use humidifier', 'Seek immediate care if breathing worsens']
   },
   {
-    disease: 'Kidney Stones',
-    symptoms: ['severe back pain', 'blood in urine', 'nausea', 'vomiting', 'frequent urination', 'painful urination', 'cloudy urine', 'fever', 'chills'],
-    specialization: 'Nephrologist',
-    description: 'Hard deposits of minerals and salts in the kidneys.',
-    precautions: ['Drink plenty of water', 'Take pain medication', 'Strain urine to catch stones', 'Follow dietary recommendations']
-  },
-  {
     disease: 'Sinusitis',
-    symptoms: ['facial pain', 'nasal congestion', 'thick nasal discharge', 'reduced sense of smell', 'headache', 'tooth pain', 'ear pressure', 'fever', 'bad breath'],
+    symptoms: ['facial pain', 'nasal congestion', 'thick nasal discharge', 'reduced sense of smell', 'headache', 'tooth pain'],
+    requiredSymptoms: ['facial pain', 'nasal congestion'],
     specialization: 'ENT Specialist',
     description: 'Inflammation of the sinuses.',
     precautions: ['Use saline nasal spray', 'Apply warm compress', 'Stay hydrated', 'Take decongestants if needed']
   },
   {
     disease: 'Conjunctivitis (Pink Eye)',
-    symptoms: ['red eyes', 'itchy eyes', 'watery eyes', 'eye discharge', 'sensitivity to light', 'gritty feeling', 'swollen eyelids', 'blurred vision'],
+    symptoms: ['red eyes', 'itchy eyes', 'watery eyes', 'eye discharge', 'sensitivity to light', 'gritty feeling'],
+    requiredSymptoms: ['red eyes', 'eye discharge'],
     specialization: 'Ophthalmologist',
     description: 'Inflammation of the conjunctiva.',
     precautions: ['Avoid touching eyes', 'Use prescribed eye drops', 'Wash hands frequently', 'Avoid sharing towels']
   },
   {
     disease: 'Allergic Rhinitis',
-    symptoms: ['sneezing', 'runny nose', 'itchy eyes', 'watery eyes', 'nasal congestion', 'itchy nose', 'post-nasal drip', 'cough'],
+    symptoms: ['sneezing', 'runny nose', 'itchy eyes', 'watery eyes', 'nasal congestion', 'itchy nose'],
+    requiredSymptoms: ['sneezing', 'itchy eyes'],
     specialization: 'Allergist',
     description: 'An allergic response causing cold-like symptoms.',
     precautions: ['Avoid allergens', 'Use antihistamines', 'Keep windows closed', 'Use air purifier']
   },
   {
     disease: 'Bronchitis',
-    symptoms: ['persistent cough', 'cough with phlegm', 'chest discomfort', 'fatigue', 'shortness of breath', 'mild fever', 'chills', 'wheezing'],
+    symptoms: ['persistent cough', 'cough with phlegm', 'chest discomfort', 'fatigue', 'shortness of breath', 'mild fever'],
+    requiredSymptoms: ['persistent cough', 'cough with phlegm'],
     specialization: 'Pulmonologist',
     description: 'Inflammation of the bronchial tubes.',
     precautions: ['Rest and stay hydrated', 'Use humidifier', 'Avoid smoke', 'Take prescribed medications']
@@ -237,7 +259,7 @@ export const getFollowUpSymptoms = (selectedSymptom) => {
   return [];
 };
 
-// Enhanced symptom matching algorithm with better accuracy
+// Improved prediction algorithm with required symptoms check
 export const predictDisease = (userSymptoms) => {
   if (!userSymptoms || userSymptoms.length === 0) {
     return null;
@@ -246,107 +268,118 @@ export const predictDisease = (userSymptoms) => {
   const normalizedUserSymptoms = userSymptoms.map(s => s.toLowerCase().trim());
   
   const matches = diseaseDatabase.map(disease => {
-    let matchScore = 0;
+    let exactMatches = 0;
+    let partialMatches = 0;
+    let requiredMatches = 0;
     let matchingSymptoms = [];
     
-    // Check each disease symptom against user symptoms
-    disease.symptoms.forEach(diseaseSymptom => {
-      const diseaseSymptomLower = diseaseSymptom.toLowerCase();
-      
-      normalizedUserSymptoms.forEach(userSymptom => {
-        // Exact match - highest score
+    // Check each user symptom against disease symptoms
+    normalizedUserSymptoms.forEach(userSymptom => {
+      disease.symptoms.forEach(diseaseSymptom => {
+        const diseaseSymptomLower = diseaseSymptom.toLowerCase();
+        
+        // Exact match
         if (userSymptom === diseaseSymptomLower) {
-          matchScore += 10;
+          exactMatches++;
           if (!matchingSymptoms.includes(diseaseSymptom)) {
             matchingSymptoms.push(diseaseSymptom);
           }
+          
+          // Check if it's a required symptom
+          if (disease.requiredSymptoms && disease.requiredSymptoms.some(req => req.toLowerCase() === userSymptom)) {
+            requiredMatches++;
+          }
         }
-        // Contains match - medium score
+        // Partial match (one contains the other)
         else if (userSymptom.includes(diseaseSymptomLower) || diseaseSymptomLower.includes(userSymptom)) {
-          matchScore += 7;
+          partialMatches++;
           if (!matchingSymptoms.includes(diseaseSymptom)) {
             matchingSymptoms.push(diseaseSymptom);
           }
-        }
-        // Partial word match - lower score
-        else {
-          const userWords = userSymptom.split(' ');
-          const diseaseWords = diseaseSymptomLower.split(' ');
-          const commonWords = userWords.filter(word => diseaseWords.includes(word) && word.length > 3);
-          if (commonWords.length > 0) {
-            matchScore += 3 * commonWords.length;
-            if (!matchingSymptoms.includes(diseaseSymptom)) {
-              matchingSymptoms.push(diseaseSymptom);
-            }
+          
+          // Check if it's a required symptom
+          if (disease.requiredSymptoms && disease.requiredSymptoms.some(req => 
+            req.toLowerCase().includes(userSymptom) || userSymptom.includes(req.toLowerCase())
+          )) {
+            requiredMatches++;
           }
         }
       });
     });
     
-    // Calculate confidence based on match score and symptom coverage
-    const maxPossibleScore = disease.symptoms.length * 10;
-    const scoreConfidence = (matchScore / maxPossibleScore) * 100;
+    // Calculate match score
+    const exactScore = exactMatches * 15;
+    const partialScore = partialMatches * 8;
+    const totalScore = exactScore + partialScore;
     
-    // Bonus for matching more symptoms
-    const symptomCoverage = (matchingSymptoms.length / Math.min(disease.symptoms.length, normalizedUserSymptoms.length)) * 100;
+    // Calculate confidence
+    const maxPossibleScore = disease.symptoms.length * 15;
+    let confidence = (totalScore / maxPossibleScore) * 100;
     
-    // Weighted average: 60% score confidence, 40% symptom coverage
-    const confidence = Math.min((scoreConfidence * 0.6 + symptomCoverage * 0.4), 100);
+    // Boost confidence if required symptoms are matched
+    if (disease.requiredSymptoms && requiredMatches > 0) {
+      const requiredBonus = (requiredMatches / disease.requiredSymptoms.length) * 30;
+      confidence += requiredBonus;
+    }
+    
+    // Cap confidence at 100%
+    confidence = Math.min(confidence, 100);
     
     return {
       disease: disease.disease,
       specialization: disease.specialization,
       description: disease.description,
       precautions: disease.precautions,
-      confidence: Math.round(confidence * 10) / 10, // Round to 1 decimal
+      confidence: Math.round(confidence * 10) / 10,
       matchingSymptoms: matchingSymptoms.length,
-      totalSymptoms: disease.symptoms.length,
-      matchScore: matchScore
+      exactMatches: exactMatches,
+      requiredMatches: requiredMatches,
+      hasRequiredSymptoms: disease.requiredSymptoms ? requiredMatches > 0 : true
     };
   });
 
-  // Sort by confidence and match score
-  const sortedMatches = matches
-    .filter(m => m.confidence > 15) // Only show matches with at least 15% confidence
+  // Filter and sort matches
+  const validMatches = matches
+    .filter(m => m.confidence >= 25 && m.hasRequiredSymptoms) // Only show if has required symptoms
     .sort((a, b) => {
-      if (Math.abs(b.confidence - a.confidence) < 5) {
-        return b.matchScore - a.matchScore; // If confidence is close, use match score
+      // Prioritize matches with required symptoms
+      if (a.requiredMatches !== b.requiredMatches) {
+        return b.requiredMatches - a.requiredMatches;
       }
-      return b.confidence - a.confidence;
+      // Then by confidence
+      if (Math.abs(b.confidence - a.confidence) > 5) {
+        return b.confidence - a.confidence;
+      }
+      // Then by exact matches
+      return b.exactMatches - a.exactMatches;
     });
 
-  // If no good matches found, return General Physician recommendation
-  if (sortedMatches.length === 0 || sortedMatches[0].confidence < 20) {
+  // If no good matches, return General Physician
+  if (validMatches.length === 0) {
     return {
-      disease: 'Unspecified Condition',
+      disease: 'General Health Concern',
       specialization: 'General Physician',
-      description: 'Based on your symptoms, we recommend consulting a General Physician for proper diagnosis and treatment.',
+      description: 'Based on your symptoms, we recommend consulting a General Physician for proper evaluation and diagnosis.',
       precautions: [
         'Schedule an appointment with a General Physician',
-        'Keep track of your symptoms and when they occur',
-        'Note any factors that make symptoms better or worse',
-        'Bring a list of current medications to your appointment'
+        'Keep a detailed record of your symptoms',
+        'Note when symptoms started and their severity',
+        'List any medications you are currently taking'
       ],
       confidence: 0,
       top_predictions: []
     };
   }
 
-  const topMatch = sortedMatches[0];
-  
-  // If specialization is not available or too specific, default to General Physician
-  let specialization = topMatch.specialization;
-  if (!specialization || specialization === 'Unknown' || topMatch.confidence < 40) {
-    specialization = 'General Physician';
-  }
+  const topMatch = validMatches[0];
   
   return {
     disease: topMatch.disease,
-    specialization: specialization,
+    specialization: topMatch.specialization || 'General Physician',
     description: topMatch.description,
     precautions: topMatch.precautions,
     confidence: topMatch.confidence,
-    top_predictions: sortedMatches.slice(0, 3).map(m => ({
+    top_predictions: validMatches.slice(0, 3).map(m => ({
       disease: m.disease,
       confidence: m.confidence,
       specialization: m.specialization || 'General Physician'

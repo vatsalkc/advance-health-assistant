@@ -286,11 +286,11 @@ function SymptomChecker({ onResult, user }) {
                 </small>
               )}
             </div>
-            <div className="symptom-selected-area">
+            <div className="symptom-selected-box">
               {symptoms.length === 0 ? (
                 <div className="symptom-empty-state">
                   <i className="bi bi-clipboard2-pulse"></i>
-                  <p className="mb-0">No symptoms added yet. Add symptoms above or use quick add below.</p>
+                  <p>No symptoms selected. Add symptoms above or use quick add below.</p>
                 </div>
               ) : (
                 <div className="d-flex flex-wrap gap-2">
@@ -314,28 +314,28 @@ function SymptomChecker({ onResult, user }) {
             variant="primary" 
             type="submit" 
             disabled={loading || symptoms.length === 0}
-            className="symptom-check-button w-100"
+            className="symptom-check-btn"
           >
             {loading ? (
               <>
                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Analyzing Symptoms...
+                Analyzing...
               </>
             ) : (
               <>
                 <i className="bi bi-search me-2"></i>
-                Check Symptoms
+                Analyze Symptoms
               </>
             )}
           </Button>
         </Form>
 
         {/* Common Symptoms Quick Add */}
-        <div className="symptom-quick-add-section">
-          <h6><i className="bi bi-lightning-fill me-2"></i>Quick Add Common Symptoms</h6>
-          <p className="text-muted small mb-3">Click to add to your symptoms list (some will show more specific options)</p>
+        <div className="symptom-quick-section">
+          <h6><i className="bi bi-lightning-fill me-2"></i>Quick Add</h6>
+          <p>Click to quickly add common symptoms</p>
           <div className="d-flex flex-wrap gap-2">
-            {['fever', 'headache', 'cough', 'fatigue', 'nausea', 'dizziness', 'chest pain', 'shortness of breath', 'sore throat', 'muscle aches'].map((commonSymptom) => {
+            {['fever', 'headache', 'cough', 'fatigue', 'nausea', 'dizziness', 'chest pain', 'shortness of breath', 'sore throat', 'stomach pain'].map((commonSymptom) => {
               const hasFollowUps = getFollowUpSymptoms(commonSymptom).length > 0;
               const isSelected = symptoms.includes(commonSymptom);
               return (
@@ -344,12 +344,11 @@ function SymptomChecker({ onResult, user }) {
                   className={`symptom-badge symptom-badge-quick ${isSelected ? 'disabled' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
                     if (!isSelected) {
                       handleCommonSymptomClick(commonSymptom);
                     }
                   }}
-                  title={isSelected ? 'Already added' : (hasFollowUps ? 'Click to see specific types' : 'Click to add')}
+                  title={isSelected ? 'Already added' : (hasFollowUps ? 'Click to see options' : 'Click to add')}
                 >
                   <i className={`bi ${isSelected ? 'bi-check-lg' : (hasFollowUps ? 'bi-chevron-down' : 'bi-plus-lg')}`}></i>
                   {commonSymptom}
