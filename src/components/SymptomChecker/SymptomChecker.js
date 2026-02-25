@@ -135,13 +135,9 @@ function SymptomChecker({ onResult, user }) {
     }
   };
 
-  const handleInputBlur = (e) => {
-    // Don't hide if clicking on suggestions
-    if (suggestionsRef.current && suggestionsRef.current.contains(e.relatedTarget)) {
-      return;
-    }
-    // Increase delay to allow click to register
-    setTimeout(() => setShowSuggestions(false), 300);
+  const handleInputBlur = () => {
+    // Use a longer delay to ensure click events register first
+    setTimeout(() => setShowSuggestions(false), 200);
   };
 
   const handleKeyPress = (e) => {
@@ -276,27 +272,20 @@ function SymptomChecker({ onResult, user }) {
                 <div 
                   ref={suggestionsRef}
                   className="symptom-suggestions-dropdown"
-                  onMouseDown={(e) => e.preventDefault()}
                 >
-                  <ListGroup variant="flush">
-                    {filteredSuggestions.map((suggestion, index) => (
-                      <ListGroup.Item
-                        key={index}
-                        action
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleSuggestionClick(suggestion);
-                        }}
-                        className="symptom-suggestion-item"
-                        style={{ cursor: 'pointer' }}
-                        tabIndex={0}
-                      >
-                        <i className="bi bi-plus-circle text-primary"></i>
-                        <span>{suggestion}</span>
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
+                  {filteredSuggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="symptom-suggestion-item"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSuggestionClick(suggestion);
+                      }}
+                    >
+                      <i className="bi bi-plus-circle text-primary"></i>
+                      <span>{suggestion}</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
