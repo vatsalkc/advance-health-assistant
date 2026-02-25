@@ -237,7 +237,7 @@ export const getFollowUpSymptoms = (selectedSymptom) => {
   return [];
 };
 
-// Enhanced symptom matching algorithm
+// Enhanced symptom matching algorithm with better accuracy
 export const predictDisease = (userSymptoms) => {
   if (!userSymptoms || userSymptoms.length === 0) {
     return null;
@@ -246,39 +246,87 @@ export const predictDisease = (userSymptoms) => {
   const normalizedUserSymptoms = userSymptoms.map(s => s.toLowerCase().trim());
   
   const matches = diseaseDatabase.map(disease => {
-    const matchingSymptoms = disease.symptoms.filter(symptom =>
-      normalizedUserSymptoms.some(userSymptom => 
-        userSymptom.includes(symptom) || symptom.includes(userSymptom)
-      )
-    );
+    let matchScore = 0;
+    let matchingSymptoms = [];
     
-    // Calculate confidence with bonus for more matching symptoms
-    const baseConfidence = (matchingSymptoms.length / disease.symptoms.length) * 100;
-    const matchBonus = Math.min(matchingSymptoms.length * 5, 20); // Up to 20% bonus
-    const confidence = Math.min(baseConfidence + matchBonus, 100);
+    // Check each disease symptom against user symptoms
+    disease.symptoms.forEach(diseaseSymptom => {
+      const diseaseSymptomLower = diseaseSymptom.toLowerCase();
+      
+      normalizedUserSymptoms.forEach(userSymptom => {
+        // Exact match - highest score
+        if (userSymptom === diseaseSymptomLower) {
+          matchScore += 10;
+          if (!matchingSymptoms.includes(diseaseSymptom)) {
+            matchingSymptoms.push(diseaseSymptom);
+          }
+        }
+        // Contains match - medium score
+        else if (userSymptom.includes(diseaseSymptomLower) || diseaseSymptomLower.includes(userSymptom)) {
+          matchScore += 7;
+          if (!matchingSymptoms.includes(diseaseSymptom)) {
+            matchingSymptoms.push(diseaseSymptom);
+          }
+        }
+        // Partial word match - lower score
+        else {
+          const userWords = userSymptom.split(' ');
+          const diseaseWords = diseaseSymptomLower.split(' ');
+          const commonWords = userWords.filter(word => diseaseWords.includes(word) && word.length > 3);
+          if (commonWords.length > 0) {
+            matchScore += 3 * commonWords.length;
+            if (!matchingSymptoms.includes(diseaseSymptom)) {
+              matchingSymptoms.push(diseaseSymptom);
+            }
+          }
+        }
+      });
+    });
+    
+    // Calculate confidence based on match score and symptom coverage
+    const maxPossibleScore = disease.symptoms.length * 10;
+    const scoreConfidence = (matchScore / maxPossibleScore) * 100;
+    
+    // Bonus for matching more symptoms
+    const symptomCoverage = (matchingSymptoms.length / Math.min(disease.symptoms.length, normalizedUserSymptoms.length)) * 100;
+    
+    // Weighted average: 60% score confidence, 40% symptom coverage
+    const confidence = Math.min((scoreConfidence * 0.6 + symptomCoverage * 0.4), 100);
     
     return {
       disease: disease.disease,
       specialization: disease.specialization,
       description: disease.description,
       precautions: disease.precautions,
-      confidence: confidence,
+      confidence: Math.round(confidence * 10) / 10, // Round to 1 decimal
       matchingSymptoms: matchingSymptoms.length,
-      totalSymptoms: disease.symptoms.length
+      totalSymptoms: disease.symptoms.length,
+      matchScore: matchScore
     };
   });
 
-  // Sort by confidence and return top matches
+  // Sort by confidence and match score
   const sortedMatches = matches
-    .filter(m => m.confidence > 0)
-    .sort((a, b) => b.confidence - a.confidence);
+    .filter(m => m.confidence > 15) // Only show matches with at least 15% confidence
+    .sort((a, b) => {
+      if (Math.abs(b.confidence - a.confidence) < 5) {
+        return b.matchScore - a.matchScore; // If confidence is close, use match score
+      }
+      return b.confidence - a.confidence;
+    });
 
-  if (sortedMatches.length === 0) {
+  // If no good matches found, return General Physician recommendation
+  if (sortedMatches.length === 0 || sortedMatches[0].confidence < 20) {
     return {
-      disease: 'Unknown Condition',
+      disease: 'Unspecified Condition',
       specialization: 'General Physician',
-      description: 'Unable to determine specific condition. Please consult a doctor.',
-      precautions: ['Consult a healthcare professional', 'Monitor your symptoms', 'Keep a symptom diary'],
+      description: 'Based on your symptoms, we recommend consulting a General Physician for proper diagnosis and treatment.',
+      precautions: [
+        'Schedule an appointment with a General Physician',
+        'Keep track of your symptoms and when they occur',
+        'Note any factors that make symptoms better or worse',
+        'Bring a list of current medications to your appointment'
+      ],
       confidence: 0,
       top_predictions: []
     };
@@ -286,15 +334,22 @@ export const predictDisease = (userSymptoms) => {
 
   const topMatch = sortedMatches[0];
   
+  // If specialization is not available or too specific, default to General Physician
+  let specialization = topMatch.specialization;
+  if (!specialization || specialization === 'Unknown' || topMatch.confidence < 40) {
+    specialization = 'General Physician';
+  }
+  
   return {
     disease: topMatch.disease,
-    specialization: topMatch.specialization,
+    specialization: specialization,
     description: topMatch.description,
     precautions: topMatch.precautions,
     confidence: topMatch.confidence,
     top_predictions: sortedMatches.slice(0, 3).map(m => ({
       disease: m.disease,
-      confidence: m.confidence
+      confidence: m.confidence,
+      specialization: m.specialization || 'General Physician'
     }))
   };
 };

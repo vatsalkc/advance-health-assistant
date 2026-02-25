@@ -189,33 +189,33 @@ function SymptomChecker({ onResult, user }) {
   };
 
   return (
-    <Card>
+    <Card className="symptom-checker-card">
       <Card.Body>
         <Card.Title>
-          <h4>Symptom Checker</h4>
-          <p className="text-muted">Enter your symptoms to get disease predictions</p>
+          <h4><i className="bi bi-activity me-2"></i>Symptom Checker</h4>
+          <p className="text-muted">Enter your symptoms to get AI-powered disease predictions</p>
         </Card.Title>
 
-        {error && <Alert variant="danger">{error}</Alert>}
-        {successMessage && <Alert variant="success">{successMessage}</Alert>}
+        {error && <Alert variant="danger"><i className="bi bi-exclamation-triangle me-2"></i>{error}</Alert>}
+        {successMessage && <Alert variant="success"><i className="bi bi-check-circle me-2"></i>{successMessage}</Alert>}
 
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label>Add Symptoms</Form.Label>
-            <div className="position-relative">
-              <div className="d-flex gap-2">
+            <Form.Label><strong>Add Symptoms</strong></Form.Label>
+            <div className="symptom-input-wrapper">
+              <div className="symptom-input-group">
                 <Form.Control
                   ref={inputRef}
                   type="text"
-                  placeholder="e.g., fever, headache, cough"
+                  placeholder="Type a symptom (e.g., fever, headache, cough)"
                   value={symptomInput}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
                   onFocus={() => symptomInput.length > 1 && setShowSuggestions(true)}
                   onBlur={handleInputBlur}
                 />
-                <Button variant="secondary" onClick={() => addSymptom()} type="button">
-                  Add
+                <Button variant="primary" onClick={() => addSymptom()} type="button">
+                  <i className="bi bi-plus-lg me-1"></i>Add
                 </Button>
               </div>
               
@@ -223,10 +223,9 @@ function SymptomChecker({ onResult, user }) {
               {showSuggestions && filteredSuggestions.length > 0 && (
                 <div 
                   ref={suggestionsRef}
-                  className="position-absolute w-100" 
-                  style={{ zIndex: 1000, top: '100%' }}
+                  className="symptom-suggestions-dropdown"
                 >
-                  <ListGroup>
+                  <ListGroup variant="flush">
                     {filteredSuggestions.map((suggestion, index) => (
                       <ListGroup.Item
                         key={index}
@@ -237,12 +236,11 @@ function SymptomChecker({ onResult, user }) {
                           e.stopPropagation();
                           handleSuggestionClick(suggestion);
                         }}
-                        className="py-2 px-3"
-                        style={{ cursor: 'pointer' }}
+                        className="symptom-suggestion-item"
                         tabIndex={0}
                       >
-                        <i className="bi bi-plus-circle me-2 text-primary"></i>
-                        {suggestion}
+                        <i className="bi bi-plus-circle text-primary"></i>
+                        <span>{suggestion}</span>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -253,19 +251,17 @@ function SymptomChecker({ onResult, user }) {
 
           {/* Follow-up Suggestions - Show ABOVE selected symptoms */}
           {followUpSuggestions.length > 0 && (
-            <Alert variant="info" className="mb-3">
-              <h6 className="mb-2">
-                <i className="bi bi-lightbulb me-2"></i>
+            <div className="symptom-followup-box">
+              <h6>
+                <i className="bi bi-lightbulb-fill"></i>
                 Related Symptoms - Do you also have any of these?
               </h6>
-              <p className="text-muted small mb-2">Based on your selected symptoms, you might also experience:</p>
+              <p className="text-muted small mb-3">Based on your selected symptoms, you might also experience:</p>
               <div className="d-flex flex-wrap gap-2">
                 {followUpSuggestions.slice(0, 8).map((suggestion) => (
-                  <Badge
+                  <span
                     key={suggestion}
-                    bg="primary"
-                    className="p-2"
-                    style={{ cursor: 'pointer' }}
+                    className="symptom-followup-badge"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -273,39 +269,43 @@ function SymptomChecker({ onResult, user }) {
                     }}
                     title="Click to add"
                   >
-                    <i className="bi bi-plus-circle me-1"></i>
+                    <i className="bi bi-plus-circle"></i>
                     {suggestion}
-                  </Badge>
+                  </span>
                 ))}
               </div>
-            </Alert>
+            </div>
           )}
 
           <div className="mb-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <strong>Selected Symptoms ({symptoms.length}):</strong>
+            <div className="symptom-selected-header">
+              <strong>Selected Symptoms ({symptoms.length})</strong>
               {symptoms.length > 0 && (
                 <small className="text-muted">
-                  Click "Check Symptoms" below to analyze
+                  <i className="bi bi-info-circle me-1"></i>Click to remove
                 </small>
               )}
             </div>
-            <div className="mt-2">
+            <div className="symptom-selected-area">
               {symptoms.length === 0 ? (
-                <p className="text-muted">No symptoms added yet. Add symptoms above or click on suggestions.</p>
+                <div className="symptom-empty-state">
+                  <i className="bi bi-clipboard2-pulse"></i>
+                  <p className="mb-0">No symptoms added yet. Add symptoms above or use quick add below.</p>
+                </div>
               ) : (
-                symptoms.map((symptom, index) => (
-                  <Badge 
-                    key={index} 
-                    bg="success" 
-                    className="me-2 mb-2 p-2"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => removeSymptom(symptom)}
-                    title="Click to remove"
-                  >
-                    {symptom} ×
-                  </Badge>
-                ))
+                <div className="d-flex flex-wrap gap-2">
+                  {symptoms.map((symptom, index) => (
+                    <span 
+                      key={index} 
+                      className="symptom-badge symptom-badge-selected"
+                      onClick={() => removeSymptom(symptom)}
+                      title="Click to remove"
+                    >
+                      {symptom}
+                      <i className="bi bi-x-lg"></i>
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -314,40 +314,46 @@ function SymptomChecker({ onResult, user }) {
             variant="primary" 
             type="submit" 
             disabled={loading || symptoms.length === 0}
-            className="w-100"
+            className="symptom-check-button w-100"
           >
-            {loading ? 'Analyzing...' : 'Check Symptoms'}
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Analyzing Symptoms...
+              </>
+            ) : (
+              <>
+                <i className="bi bi-search me-2"></i>
+                Check Symptoms
+              </>
+            )}
           </Button>
         </Form>
 
         {/* Common Symptoms Quick Add */}
-        <div className="mt-4">
-          <h6>Quick Add Common Symptoms:</h6>
-          <p className="text-muted small">Click to add to your symptoms list (some will show more specific options)</p>
+        <div className="symptom-quick-add-section">
+          <h6><i className="bi bi-lightning-fill me-2"></i>Quick Add Common Symptoms</h6>
+          <p className="text-muted small mb-3">Click to add to your symptoms list (some will show more specific options)</p>
           <div className="d-flex flex-wrap gap-2">
             {['fever', 'headache', 'cough', 'fatigue', 'nausea', 'dizziness', 'chest pain', 'shortness of breath', 'sore throat', 'muscle aches'].map((commonSymptom) => {
               const hasFollowUps = getFollowUpSymptoms(commonSymptom).length > 0;
+              const isSelected = symptoms.includes(commonSymptom);
               return (
-                <Badge
+                <span
                   key={commonSymptom}
-                  bg={symptoms.includes(commonSymptom) ? "success" : "outline-secondary"}
-                  className="p-2"
-                  style={{ 
-                    cursor: symptoms.includes(commonSymptom) ? 'default' : 'pointer',
-                    border: symptoms.includes(commonSymptom) ? '1px solid #198754' : '1px solid #6c757d',
-                    color: symptoms.includes(commonSymptom) ? '#fff' : '#6c757d',
-                    opacity: symptoms.includes(commonSymptom) ? 0.7 : 1
-                  }}
+                  className={`symptom-badge symptom-badge-quick ${isSelected ? 'disabled' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleCommonSymptomClick(commonSymptom);
+                    if (!isSelected) {
+                      handleCommonSymptomClick(commonSymptom);
+                    }
                   }}
-                  title={symptoms.includes(commonSymptom) ? 'Already added' : (hasFollowUps ? 'Click to see specific types' : 'Click to add')}
+                  title={isSelected ? 'Already added' : (hasFollowUps ? 'Click to see specific types' : 'Click to add')}
                 >
-                  <i className={`bi ${symptoms.includes(commonSymptom) ? 'bi-check' : (hasFollowUps ? 'bi-chevron-down' : 'bi-plus')} me-1`}></i>
+                  <i className={`bi ${isSelected ? 'bi-check-lg' : (hasFollowUps ? 'bi-chevron-down' : 'bi-plus-lg')}`}></i>
                   {commonSymptom}
-                </Badge>
+                </span>
               );
             })}
           </div>
