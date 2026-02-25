@@ -1910,3 +1910,364 @@ body {
     align-self: flex-end;
   }
 }
+
+
+/* ============================================
+   DIAGNOSIS RESULTS PAGE - CLEAN & MODERN
+   ============================================ */
+
+/* Results Container */
+.diagnosis-results-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .diagnosis-results-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+/* Result Header */
+.diagnosis-header {
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .diagnosis-header {
+  border-bottom-color: var(--border-color);
+}
+
+.diagnosis-header h4 {
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diagnosis-header h4 i {
+  color: #2563eb;
+  font-size: 28px;
+}
+
+/* Disease Name */
+.disease-name-box {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #93c5fd;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+[data-theme="dark"] .disease-name-box {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.disease-name-box h3 {
+  color: #1e40af;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+[data-theme="dark"] .disease-name-box h3 {
+  color: #93c5fd;
+}
+
+/* Confidence Bar */
+.confidence-section {
+  margin-bottom: 20px;
+}
+
+.confidence-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.confidence-bar-wrapper {
+  background: #f3f4f6;
+  border-radius: 12px;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme="dark"] .confidence-bar-wrapper {
+  background: var(--bg-tertiary);
+}
+
+.confidence-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  transition: width 0.5s ease;
+}
+
+/* Specialist Badge */
+.specialist-badge-large {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+
+/* Description Box */
+.description-box {
+  background: #f9fafb;
+  border-left: 4px solid #2563eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+[data-theme="dark"] .description-box {
+  background: var(--bg-tertiary);
+}
+
+.description-box p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Precautions List */
+.precautions-section {
+  margin-top: 24px;
+}
+
+.precautions-title {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.precaution-item {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+
+[data-theme="dark"] .precaution-item {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.precaution-item i {
+  color: #10b981;
+  font-size: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.precaution-item span {
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Alternative Predictions */
+.alternatives-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+[data-theme="dark"] .alternatives-section {
+  border-top-color: var(--border-color);
+}
+
+.alternatives-title {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.alternative-badge {
+  background: white;
+  border: 2px solid #e5e7eb;
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+[data-theme="dark"] .alternative-badge {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+/* Disclaimer */
+.diagnosis-disclaimer {
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+}
+
+[data-theme="dark"] .diagnosis-disclaimer {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.diagnosis-disclaimer i {
+  color: #d97706;
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.diagnosis-disclaimer-text {
+  color: #78350f;
+  line-height: 1.6;
+}
+
+[data-theme="dark"] .diagnosis-disclaimer-text {
+  color: #fbbf24;
+}
+
+.diagnosis-disclaimer-text strong {
+  font-weight: 700;
+}
+
+/* Doctor Cards Section */
+.doctors-section {
+  margin-top: 32px;
+}
+
+.doctors-section-header {
+  margin-bottom: 20px;
+}
+
+.doctors-section-header h4 {
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doctors-section-header p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Doctor Card */
+.doctor-card-result {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  transition: all 0.2s;
+}
+
+[data-theme="dark"] .doctor-card-result {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.doctor-card-result:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+
+.doctor-card-result h5 {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.doctor-specialization-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #93c5fd;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+[data-theme="dark"] .doctor-specialization-badge {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.doctor-info-item {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.doctor-info-item strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.doctor-rating {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.book-appointment-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  color: white;
+  width: 100%;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+
+.book-appointment-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}

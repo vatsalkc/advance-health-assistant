@@ -29,11 +29,27 @@ export const diseaseDatabase = [
   },
   {
     disease: 'Influenza (Flu)',
-    symptoms: ['high fever', 'body aches', 'extreme fatigue', 'dry cough', 'severe headache', 'chills'],
-    requiredSymptoms: ['high fever', 'body aches'],
+    symptoms: ['high fever', 'fever', 'body aches', 'extreme fatigue', 'dry cough', 'severe headache', 'chills', 'muscle pain', 'back pain'],
+    requiredSymptoms: ['fever', 'body aches', 'extreme fatigue'],
     specialization: 'General Physician',
     description: 'A contagious respiratory illness caused by influenza viruses.',
     precautions: ['Get plenty of rest', 'Stay hydrated', 'Take antiviral medications if prescribed', 'Avoid contact with others']
+  },
+  {
+    disease: 'Viral Fever',
+    symptoms: ['fever', 'headache', 'body aches', 'fatigue', 'weakness', 'chills', 'sweating'],
+    requiredSymptoms: ['fever'],
+    specialization: 'General Physician',
+    description: 'A common viral infection causing fever and general discomfort.',
+    precautions: ['Rest adequately', 'Stay hydrated', 'Take fever-reducing medication', 'Monitor temperature regularly']
+  },
+  {
+    disease: 'Back Pain / Muscle Strain',
+    symptoms: ['back pain', 'muscle pain', 'stiffness', 'limited mobility', 'pain when moving'],
+    requiredSymptoms: ['back pain'],
+    specialization: 'General Physician',
+    description: 'Muscle strain or injury causing back pain.',
+    precautions: ['Rest and avoid heavy lifting', 'Apply hot/cold compress', 'Take pain relievers', 'Gentle stretching exercises']
   },
   {
     disease: 'COVID-19',
@@ -165,8 +181,8 @@ export const diseaseDatabase = [
   },
   {
     disease: 'Sinusitis',
-    symptoms: ['facial pain', 'nasal congestion', 'thick nasal discharge', 'reduced sense of smell', 'headache', 'tooth pain'],
-    requiredSymptoms: ['facial pain', 'nasal congestion'],
+    symptoms: ['facial pain', 'nasal congestion', 'thick nasal discharge', 'reduced sense of smell', 'headache', 'tooth pain', 'pressure around nose', 'pressure around eyes'],
+    requiredSymptoms: ['facial pain', 'nasal congestion', 'thick nasal discharge'],
     specialization: 'ENT Specialist',
     description: 'Inflammation of the sinuses.',
     precautions: ['Use saline nasal spray', 'Apply warm compress', 'Stay hydrated', 'Take decongestants if needed']
@@ -259,7 +275,7 @@ export const getFollowUpSymptoms = (selectedSymptom) => {
   return [];
 };
 
-// Improved prediction algorithm with required symptoms check
+// Improved prediction algorithm with stricter matching
 export const predictDisease = (userSymptoms) => {
   if (!userSymptoms || userSymptoms.length === 0) {
     return null;
@@ -272,6 +288,7 @@ export const predictDisease = (userSymptoms) => {
     let partialMatches = 0;
     let requiredMatches = 0;
     let matchingSymptoms = [];
+    let matchedRequiredSymptoms = [];
     
     // Check each user symptom against disease symptoms
     normalizedUserSymptoms.forEach(userSymptom => {
@@ -288,6 +305,7 @@ export const predictDisease = (userSymptoms) => {
           // Check if it's a required symptom
           if (disease.requiredSymptoms && disease.requiredSymptoms.some(req => req.toLowerCase() === userSymptom)) {
             requiredMatches++;
+            matchedRequiredSymptoms.push(diseaseSymptom);
           }
         }
         // Partial match (one contains the other)
@@ -302,24 +320,35 @@ export const predictDisease = (userSymptoms) => {
             req.toLowerCase().includes(userSymptom) || userSymptom.includes(req.toLowerCase())
           )) {
             requiredMatches++;
+            if (!matchedRequiredSymptoms.includes(diseaseSymptom)) {
+              matchedRequiredSymptoms.push(diseaseSymptom);
+            }
           }
         }
       });
     });
     
     // Calculate match score
-    const exactScore = exactMatches * 15;
-    const partialScore = partialMatches * 8;
+    const exactScore = exactMatches * 20;
+    const partialScore = partialMatches * 10;
     const totalScore = exactScore + partialScore;
     
-    // Calculate confidence
-    const maxPossibleScore = disease.symptoms.length * 15;
+    // Calculate base confidence
+    const maxPossibleScore = disease.symptoms.length * 20;
     let confidence = (totalScore / maxPossibleScore) * 100;
     
-    // Boost confidence if required symptoms are matched
-    if (disease.requiredSymptoms && requiredMatches > 0) {
-      const requiredBonus = (requiredMatches / disease.requiredSymptoms.length) * 30;
+    // CRITICAL: Must have at least one required symptom
+    if (disease.requiredSymptoms && requiredMatches === 0) {
+      confidence = 0; // No match if required symptoms not present
+    } else if (disease.requiredSymptoms && requiredMatches > 0) {
+      // Boost confidence significantly if required symptoms are matched
+      const requiredBonus = (requiredMatches / disease.requiredSymptoms.length) * 40;
       confidence += requiredBonus;
+    }
+    
+    // Penalty for too few matching symptoms
+    if (matchingSymptoms.length < 2) {
+      confidence *= 0.5; // Reduce confidence by 50% if less than 2 symptoms match
     }
     
     // Cap confidence at 100%
@@ -334,20 +363,25 @@ export const predictDisease = (userSymptoms) => {
       matchingSymptoms: matchingSymptoms.length,
       exactMatches: exactMatches,
       requiredMatches: requiredMatches,
+      totalRequiredSymptoms: disease.requiredSymptoms ? disease.requiredSymptoms.length : 0,
       hasRequiredSymptoms: disease.requiredSymptoms ? requiredMatches > 0 : true
     };
   });
 
-  // Filter and sort matches
+  // Filter and sort matches - STRICTER CRITERIA
   const validMatches = matches
-    .filter(m => m.confidence >= 25 && m.hasRequiredSymptoms) // Only show if has required symptoms
+    .filter(m => 
+      m.confidence >= 30 && // Increased minimum confidence
+      m.hasRequiredSymptoms && // Must have required symptoms
+      m.matchingSymptoms >= 2 // Must match at least 2 symptoms
+    )
     .sort((a, b) => {
-      // Prioritize matches with required symptoms
+      // Prioritize matches with more required symptoms
       if (a.requiredMatches !== b.requiredMatches) {
         return b.requiredMatches - a.requiredMatches;
       }
       // Then by confidence
-      if (Math.abs(b.confidence - a.confidence) > 5) {
+      if (Math.abs(b.confidence - a.confidence) > 10) {
         return b.confidence - a.confidence;
       }
       // Then by exact matches
