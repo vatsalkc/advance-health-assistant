@@ -714,11 +714,25 @@ body {
 /* Input Section */
 .symptom-input-wrapper {
   position: relative;
+  margin-bottom: 16px;
 }
 
 .symptom-input-group {
   display: flex;
   gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Overlay to close dropdown when clicking outside */
+.symptom-suggestions-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: transparent;
 }
 
 .symptom-input-group .form-control {
@@ -745,33 +759,36 @@ body {
 /* Suggestions Dropdown */
 .symptom-suggestions-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: 100%;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 10000;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 2px solid #3b82f6;
   max-height: 280px;
   overflow-y: auto;
+  margin-top: 4px;
 }
 
 [data-theme="dark"] .symptom-suggestions-dropdown {
   background: var(--bg-tertiary);
-  border-color: var(--border-color);
+  border-color: #3b82f6;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .symptom-suggestion-item {
-  padding: 12px 16px;
+  padding: 14px 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
   border-bottom: 1px solid #f3f4f6;
-  transition: background 0.15s;
+  transition: background 0.1s;
   user-select: none;
   background: white;
+  pointer-events: auto;
 }
 
 [data-theme="dark"] .symptom-suggestion-item {
@@ -781,29 +798,37 @@ body {
 
 .symptom-suggestion-item:last-child {
   border-bottom: none;
+  border-radius: 0 0 6px 6px;
+}
+
+.symptom-suggestion-item:first-child {
+  border-radius: 6px 6px 0 0;
 }
 
 .symptom-suggestion-item:hover {
-  background: #f0f9ff;
+  background: #dbeafe !important;
 }
 
 [data-theme="dark"] .symptom-suggestion-item:hover {
-  background: var(--bg-secondary);
+  background: var(--bg-secondary) !important;
 }
 
 .symptom-suggestion-item:active {
-  background: #dbeafe;
+  background: #bfdbfe !important;
 }
 
 .symptom-suggestion-item i {
   color: #2563eb;
-  font-size: 16px;
+  font-size: 18px;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
 .symptom-suggestion-item span {
   flex: 1;
   color: var(--text-primary);
+  font-weight: 500;
+  pointer-events: none;
 }
 
 /* Selected Symptoms Area */

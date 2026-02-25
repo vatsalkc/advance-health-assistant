@@ -92,6 +92,7 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleSuggestionClick = (suggestion) => {
+    console.log('Suggestion clicked:', suggestion);
     setSymptomInput('');
     setShowSuggestions(false);
     
@@ -111,6 +112,8 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleQuickAddClick = (commonSymptom) => {
+    console.log('Quick add clicked:', commonSymptom);
+    
     // Check if this symptom has follow-up options
     const followUps = getFollowUpSymptoms(commonSymptom);
     
@@ -266,18 +269,33 @@ function SymptomChecker({ onResult, user }) {
               
               {/* Symptom Suggestions Dropdown */}
               {showSuggestions && filteredSuggestions.length > 0 && (
-                <div className="symptom-suggestions-dropdown">
-                  {filteredSuggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      className="symptom-suggestion-item"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      <i className="bi bi-plus-circle text-primary"></i>
-                      <span>{suggestion}</span>
-                    </div>
-                  ))}
-                </div>
+                <>
+                  <div 
+                    className="symptom-suggestions-overlay"
+                    onClick={() => setShowSuggestions(false)}
+                  />
+                  <div className="symptom-suggestions-dropdown">
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="symptom-suggestion-item"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSuggestionClick(suggestion);
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSuggestionClick(suggestion);
+                        }}
+                      >
+                        <i className="bi bi-plus-circle text-primary"></i>
+                        <span>{suggestion}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </Form.Group>
