@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Badge, Button, ListGroup } from 'react-bootstrap';
+import { Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import { supabase } from '../../config/supabase';
 
 function Dashboard({ user, onNavigate, onSymptomResult }) {
@@ -12,7 +12,6 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
     symptomsChecked: 0
   });
   const [loading, setLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -25,39 +24,23 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
       setLoading(true);
       console.log('[Dashboard] Fetching dashboard data...');
       
-      // Get current user session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (sessionError) {
+      if (sessionError || !session) {
         console.error('[Dashboard] Session error:', sessionError);
-        setLoading(false);
-        return;
-      }
-      
-      if (!session) {
-        console.log('[Dashboard] No session found');
         setLoading(false);
         return;
       }
 
       const userId = session.user.id;
-      console.log('[Dashboard] User ID:', userId);
 
-      // Fetch all data in parallel
       const [appointmentsResult, medicinesResult, symptomChecksResult] = await Promise.all([
         supabase.from('appointments').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
         supabase.from('medicines').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
         supabase.from('symptom_checks').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10)
       ]);
 
-      console.log('[Dashboard] Appointments result:', appointmentsResult);
-      console.log('[Dashboard] Medicines result:', medicinesResult);
-      console.log('[Dashboard] Symptom checks result:', symptomChecksResult);
-
-      // Handle appointments
-      if (appointmentsResult.error) {
-        console.error('[Dashboard] Appointments error:', appointmentsResult.error);
-      } else {
+      if (!appointmentsResult.error) {
         const appointments = appointmentsResult.data || [];
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -70,351 +53,346 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
           .sort((a, b) => new Date(a.date) - new Date(b.date));
         setUpcomingAppointments(upcoming);
         setStats(prev => ({ ...prev, totalAppointments: appointments.length }));
-        console.log('[Dashboard] Loaded', appointments.length, 'appointments');
       }
 
-      // Handle medicines
-      if (medicinesResult.error) {
-        console.error('[Dashboard] Medicines error:', medicinesResult.error);
-      } else {
+      if (!medicinesResult.error) {
         const medicines = medicinesResult.data || [];
         const activeMeds = medicines.filter(m => m.active);
         setTodayMedicines(activeMeds);
         setStats(prev => ({ ...prev, activeMedicines: activeMeds.length }));
-        console.log('[Dashboard] Loaded', activeMeds.length, 'active medicines');
       }
 
-      // Handle symptom checks
-      if (symptomChecksResult.error) {
-        console.error('[Dashboard] Symptom checks error:', symptomChecksResult.error);
-      } else {
+      if (!symptomChecksResult.error) {
         const checks = symptomChecksResult.data || [];
         setRecentSymptomChecks(checks);
         setStats(prev => ({ ...prev, symptomsChecked: checks.length }));
-        console.log('[Dashboard] Loaded', checks.length, 'symptom checks');
       }
 
-      // Set user profile
-      setUserProfile({
-        name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-        email: session.user.email,
-        created_at: session.user.created_at
-      });
-
-      console.log('[Dashboard] Dashboard data loaded successfully');
       setLoading(false);
     } catch (error) {
-      console.error('[Dashboard] Error fetching dashboard data:', error);
+      console.error('[Dashboard] Error:', error);
       setLoading(false);
     }
   };
 
   const quickActions = [
     {
-      title: 'Check Symptoms',
-      icon: 'clipboard2-pulse',
-      color: 'primary',
-      description: 'Analyze your symptoms',
+      title: 'Symptom Checker',
+      icon: 'activity',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      description: 'AI-powered diagnosis',
       action: () => onNavigate('symptomChecker')
     },
     {
-      title: 'Book Appointment',
-      icon: 'calendar-plus',
-      color: 'success',
-      description: 'Schedule with a doctor',
+      title: 'Find Doctors',
+      icon: 'person-hearts',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      description: 'Book appointments',
       action: () => onNavigate('appointments')
     },
     {
-      title: 'Medicine Reminder',
-      icon: 'alarm',
-      color: 'warning',
-      description: 'Manage your medications',
+      title: 'Medications',
+      icon: 'capsule-pill',
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      description: 'Manage reminders',
       action: () => onNavigate('medicineReminder')
     },
     {
-      title: 'View History',
-      icon: 'clock-history',
-      color: 'info',
-      description: 'See your medical history',
+      title: 'Health Records',
+      icon: 'file-medical',
+      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      description: 'View history',
       action: () => onNavigate('userHistory')
     }
   ];
 
   return (
-    <div>
-      <div className="mb-4">
-        <h2 className="mb-1">Welcome back, {user?.name}! 👋</h2>
-        <p className="text-muted">Here's your health overview for today</p>
+    <div className="modern-dashboard">
+      {/* Hero Section */}
+      <div className="dashboard-hero mb-4">
+        <div className="hero-content">
+          <h1 className="hero-title">Hello, {user?.name}! 👋</h1>
+          <p className="hero-subtitle">Your health journey starts here</p>
+        </div>
+        <div className="hero-decoration">
+          <div className="decoration-circle circle-1"></div>
+          <div className="decoration-circle circle-2"></div>
+          <div className="decoration-circle circle-3"></div>
+        </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-5">
+        <div className="loading-state">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="mt-3 text-muted">Loading your health data...</p>
+          <p className="mt-3">Loading your dashboard...</p>
         </div>
       ) : (
         <>
-          {/* Stats Cards */}
-          <Row className="mb-4">
-            <Col md={4}>
-              <Card className="stat-card primary">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <p className="text-muted mb-1">Total Appointments</p>
-                    <h3 className="mb-0">{stats.totalAppointments}</h3>
-                  </div>
-                  <i className="bi bi-calendar-check" style={{ fontSize: '2rem', color: 'var(--primary-color)' }}></i>
+          {/* Stats Overview */}
+          <Row className="g-4 mb-4">
+            <Col lg={4} md={6}>
+              <div className="stat-card-modern stat-purple">
+                <div className="stat-icon">
+                  <i className="bi bi-calendar-check-fill"></i>
                 </div>
-              </Card>
+                <div className="stat-content">
+                  <h3 className="stat-number">{stats.totalAppointments}</h3>
+                  <p className="stat-label">Appointments</p>
+                </div>
+                <div className="stat-trend">
+                  <i className="bi bi-graph-up"></i>
+                </div>
+              </div>
             </Col>
-            <Col md={4}>
-              <Card className="stat-card success">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <p className="text-muted mb-1">Active Medicines</p>
-                    <h3 className="mb-0">{stats.activeMedicines}</h3>
-                  </div>
-                  <i className="bi bi-capsule" style={{ fontSize: '2rem', color: 'var(--success-color)' }}></i>
+            <Col lg={4} md={6}>
+              <div className="stat-card-modern stat-blue">
+                <div className="stat-icon">
+                  <i className="bi bi-capsule-pill"></i>
                 </div>
-              </Card>
+                <div className="stat-content">
+                  <h3 className="stat-number">{stats.activeMedicines}</h3>
+                  <p className="stat-label">Active Medicines</p>
+                </div>
+                <div className="stat-trend">
+                  <i className="bi bi-graph-up"></i>
+                </div>
+              </div>
             </Col>
-            <Col md={4}>
-              <Card className="stat-card info">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <p className="text-muted mb-1">Symptoms Checked</p>
-                    <h3 className="mb-0">{stats.symptomsChecked}</h3>
-                  </div>
-                  <i className="bi bi-heart-pulse" style={{ fontSize: '2rem', color: 'var(--info-color)' }}></i>
+            <Col lg={4} md={6}>
+              <div className="stat-card-modern stat-green">
+                <div className="stat-icon">
+                  <i className="bi bi-heart-pulse-fill"></i>
                 </div>
-              </Card>
+                <div className="stat-content">
+                  <h3 className="stat-number">{stats.symptomsChecked}</h3>
+                  <p className="stat-label">Health Checks</p>
+                </div>
+                <div className="stat-trend">
+                  <i className="bi bi-graph-up"></i>
+                </div>
+              </div>
             </Col>
           </Row>
 
           {/* Quick Actions */}
-          <Row className="mb-4">
+          <div className="section-header mb-4">
+            <h4 className="section-title">Quick Actions</h4>
+            <p className="section-subtitle">What would you like to do today?</p>
+          </div>
+          
+          <Row className="g-4 mb-5">
             {quickActions.map((action, index) => (
-              <Col xl={3} lg={6} md={6} sm={12} key={index} className="mb-3">
-                <Card className="dashboard-card" onClick={action.action}>
-                  <div className={`icon-wrapper bg-${action.color} bg-opacity-10`}>
-                    <i className={`bi bi-${action.icon} text-${action.color}`}></i>
+              <Col xl={3} lg={6} md={6} key={index}>
+                <div className="action-card" onClick={action.action}>
+                  <div className="action-icon" style={{ background: action.gradient }}>
+                    <i className={`bi bi-${action.icon}`}></i>
                   </div>
-                  <h5>{action.title}</h5>
-                  <p className="text-muted mb-0">{action.description}</p>
-                </Card>
+                  <h5 className="action-title">{action.title}</h5>
+                  <p className="action-description">{action.description}</p>
+                  <div className="action-arrow">
+                    <i className="bi bi-arrow-right"></i>
+                  </div>
+                </div>
               </Col>
             ))}
           </Row>
 
-          <Row>
+          {/* Content Grid */}
+          <Row className="g-4">
             {/* Upcoming Appointments */}
-            <Col lg={4} md={6} sm={12} className="mb-4">
-              <Card>
+            <Col lg={6}>
+              <Card className="modern-card">
                 <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <Card.Title className="mb-0">
-                      <i className="bi bi-calendar-event me-2"></i>
-                      Upcoming Appointments
-                    </Card.Title>
-                    <Button variant="link" size="sm" onClick={() => onNavigate('appointments')}>
-                      View All
+                  <div className="card-header-modern">
+                    <div className="card-title-group">
+                      <div className="card-icon-wrapper purple">
+                        <i className="bi bi-calendar-event"></i>
+                      </div>
+                      <div>
+                        <h5 className="card-title-modern">Upcoming Appointments</h5>
+                        <p className="card-subtitle-modern">Your scheduled visits</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="link" 
+                      className="view-all-btn"
+                      onClick={() => onNavigate('appointments')}
+                    >
+                      View All <i className="bi bi-arrow-right ms-1"></i>
                     </Button>
                   </div>
-                  <ListGroup variant="flush">
+                  
+                  <div className="card-content-modern">
                     {upcomingAppointments.length === 0 ? (
-                      <p className="text-muted">No upcoming appointments</p>
+                      <div className="empty-state">
+                        <i className="bi bi-calendar-x"></i>
+                        <p>No upcoming appointments</p>
+                        <Button 
+                          variant="outline-primary" 
+                          size="sm"
+                          onClick={() => onNavigate('appointments')}
+                        >
+                          Book Now
+                        </Button>
+                      </div>
                     ) : (
-                      upcomingAppointments.slice(0, 3).map((appointment) => (
-                        <ListGroup.Item key={appointment.id}>
-                          <div className="d-flex justify-content-between align-items-start">
-                            <div>
-                              <h6 className="mb-1">{appointment.doctor_name}</h6>
-                              <small className="text-muted">
-                                <i className="bi bi-calendar3 me-1"></i>
-                                {appointment.date} at {appointment.time}
-                              </small>
-                              <br />
-                              <small className="text-muted">
-                                <i className="bi bi-person-badge me-1"></i>
-                                {appointment.specialization}
-                              </small>
+                      <div className="appointment-list">
+                        {upcomingAppointments.slice(0, 3).map((apt) => (
+                          <div key={apt.id} className="appointment-item-modern">
+                            <div className="appointment-date">
+                              <div className="date-day">{new Date(apt.date).getDate()}</div>
+                              <div className="date-month">{new Date(apt.date).toLocaleString('default', { month: 'short' })}</div>
                             </div>
-                            <Badge bg={appointment.status === 'Confirmed' ? 'success' : 'warning'}>
-                              {appointment.status}
-                            </Badge>
+                            <div className="appointment-details">
+                              <h6>{apt.doctor_name}</h6>
+                              <p className="text-muted mb-1">
+                                <i className="bi bi-clock me-1"></i>{apt.time}
+                              </p>
+                              <Badge bg={apt.status === 'Confirmed' ? 'success' : 'warning'}>
+                                {apt.status}
+                              </Badge>
+                            </div>
                           </div>
-                        </ListGroup.Item>
-                      ))
+                        ))}
+                      </div>
                     )}
-                  </ListGroup>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
 
-            {/* Today's Medicines */}
-            <Col lg={4} md={6} sm={12} className="mb-4">
-              <Card>
+            {/* Active Medicines */}
+            <Col lg={6}>
+              <Card className="modern-card">
                 <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <Card.Title className="mb-0">
-                      <i className="bi bi-alarm me-2"></i>
-                      Active Medicines
-                    </Card.Title>
-                    <Button variant="link" size="sm" onClick={() => onNavigate('medicineReminder')}>
-                      View All
+                  <div className="card-header-modern">
+                    <div className="card-title-group">
+                      <div className="card-icon-wrapper blue">
+                        <i className="bi bi-capsule"></i>
+                      </div>
+                      <div>
+                        <h5 className="card-title-modern">Active Medicines</h5>
+                        <p className="card-subtitle-modern">Your medication schedule</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="link" 
+                      className="view-all-btn"
+                      onClick={() => onNavigate('medicineReminder')}
+                    >
+                      View All <i className="bi bi-arrow-right ms-1"></i>
                     </Button>
                   </div>
-                  <ListGroup variant="flush">
+                  
+                  <div className="card-content-modern">
                     {todayMedicines.length === 0 ? (
-                      <p className="text-muted">No active medicines</p>
+                      <div className="empty-state">
+                        <i className="bi bi-capsule"></i>
+                        <p>No active medicines</p>
+                        <Button 
+                          variant="outline-primary" 
+                          size="sm"
+                          onClick={() => onNavigate('medicineReminder')}
+                        >
+                          Add Medicine
+                        </Button>
+                      </div>
                     ) : (
-                      todayMedicines.slice(0, 3).map((medicine) => (
-                        <ListGroup.Item key={medicine.id}>
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                              <h6 className="mb-1">{medicine.medicine_name}</h6>
-                              <small className="text-muted">
-                                <i className="bi bi-clock me-1"></i>
-                                {medicine.time} - {medicine.dosage}
-                              </small>
-                              <br />
-                              <Badge bg="info" className="mt-1">{medicine.frequency}</Badge>
+                      <div className="medicine-list">
+                        {todayMedicines.slice(0, 3).map((med) => (
+                          <div key={med.id} className="medicine-item-modern">
+                            <div className="medicine-icon">
+                              <i className="bi bi-capsule-pill"></i>
                             </div>
-                            <Badge bg={medicine.active ? 'success' : 'secondary'}>
-                              {medicine.active ? 'Active' : 'Inactive'}
-                            </Badge>
+                            <div className="medicine-details">
+                              <h6>{med.medicine_name}</h6>
+                              <p className="text-muted mb-1">
+                                <i className="bi bi-clock me-1"></i>{med.time} • {med.dosage}
+                              </p>
+                              <Badge bg="info">{med.frequency}</Badge>
+                            </div>
+                            <div className="medicine-status">
+                              <Badge bg="success">Active</Badge>
+                            </div>
                           </div>
-                        </ListGroup.Item>
-                      ))
+                        ))}
+                      </div>
                     )}
-                  </ListGroup>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
 
-            {/* Recent Symptom Checks */}
-            <Col lg={4} md={12} sm={12} className="mb-4">
-              <Card>
+            {/* Recent Health Checks */}
+            <Col lg={12}>
+              <Card className="modern-card">
                 <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <Card.Title className="mb-0">
-                      <i className="bi bi-clipboard2-pulse me-2"></i>
-                      Recent Symptom Checks
-                    </Card.Title>
-                    <Button variant="link" size="sm" onClick={() => onNavigate('symptomChecker')}>
-                      Check Now
+                  <div className="card-header-modern">
+                    <div className="card-title-group">
+                      <div className="card-icon-wrapper green">
+                        <i className="bi bi-activity"></i>
+                      </div>
+                      <div>
+                        <h5 className="card-title-modern">Recent Health Checks</h5>
+                        <p className="card-subtitle-modern">Your symptom analysis history</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="link" 
+                      className="view-all-btn"
+                      onClick={() => onNavigate('symptomChecker')}
+                    >
+                      Check Now <i className="bi bi-arrow-right ms-1"></i>
                     </Button>
                   </div>
-                  <ListGroup variant="flush">
+                  
+                  <div className="card-content-modern">
                     {recentSymptomChecks.length === 0 ? (
-                      <p className="text-muted">No symptom checks yet</p>
+                      <div className="empty-state">
+                        <i className="bi bi-clipboard2-pulse"></i>
+                        <p>No health checks yet</p>
+                        <Button 
+                          variant="outline-primary" 
+                          size="sm"
+                          onClick={() => onNavigate('symptomChecker')}
+                        >
+                          Start Check
+                        </Button>
+                      </div>
                     ) : (
-                      recentSymptomChecks.slice(0, 3).map((check) => (
-                        <ListGroup.Item key={check.id}>
-                          <div>
-                            <h6 className="mb-1">{check.predicted_disease}</h6>
-                            <small className="text-muted">
-                              <i className="bi bi-clock me-1"></i>
-                              {new Date(check.created_at).toLocaleDateString()}
-                            </small>
-                            <br />
-                            <small className="text-muted">
-                              <i className="bi bi-person-badge me-1"></i>
-                              {check.recommended_specialization}
-                            </small>
-                            <br />
-                            <div className="mt-1">
-                              {check.symptoms && Array.isArray(check.symptoms) && check.symptoms.slice(0, 3).map((symptom, index) => (
-                                <Badge key={index} bg="light" text="dark" className="me-1 mb-1">
-                                  {symptom}
-                                </Badge>
-                              ))}
-                              {check.symptoms && Array.isArray(check.symptoms) && check.symptoms.length > 3 && (
-                                <Badge bg="secondary" className="me-1 mb-1">
-                                  +{check.symptoms.length - 3} more
-                                </Badge>
-                              )}
+                      <Row className="g-3">
+                        {recentSymptomChecks.slice(0, 3).map((check) => (
+                          <Col lg={4} md={6} key={check.id}>
+                            <div className="health-check-card">
+                              <div className="check-header">
+                                <h6>{check.predicted_disease}</h6>
+                                <Badge bg="primary">{check.recommended_specialization}</Badge>
+                              </div>
+                              <p className="check-date">
+                                <i className="bi bi-calendar3 me-1"></i>
+                                {new Date(check.created_at).toLocaleDateString()}
+                              </p>
+                              <div className="check-symptoms">
+                                {check.symptoms && typeof check.symptoms === 'string' && 
+                                  check.symptoms.split(',').slice(0, 2).map((symptom, idx) => (
+                                    <Badge key={idx} bg="light" text="dark" className="me-1">
+                                      {symptom.trim()}
+                                    </Badge>
+                                  ))
+                                }
+                              </div>
                             </div>
-                          </div>
-                        </ListGroup.Item>
-                      ))
+                          </Col>
+                        ))}
+                      </Row>
                     )}
-                  </ListGroup>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
           </Row>
-
-          {/* User Profile Summary */}
-          {userProfile && (
-            <Row className="mt-4">
-              <Col md={12}>
-                <Card>
-                  <Card.Body>
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <Card.Title className="mb-0">
-                        <i className="bi bi-person-circle me-2"></i>
-                        Profile Summary
-                      </Card.Title>
-                      <Button variant="primary" size="sm" onClick={() => onNavigate('profile')}>
-                        <i className="bi bi-pencil-square me-1"></i>
-                        View Profile
-                      </Button>
-                    </div>
-                    <Row>
-                      <Col md={3} sm={12} className="text-center mb-3">
-                        <div>
-                          <i className="bi bi-person-circle" style={{ fontSize: '4rem', color: 'var(--primary-color)' }}></i>
-                          <h5 className="mt-2">{userProfile.name}</h5>
-                          <p className="text-muted">{userProfile.email}</p>
-                        </div>
-                      </Col>
-                      <Col md={9} sm={12}>
-                        <Row>
-                          <Col lg={6} md={6} sm={12} className="mb-3">
-                            <div>
-                              <strong>Health Activity</strong>
-                              <div className="mt-2">
-                                <p className="mb-1">
-                                  <i className="bi bi-calendar-check me-2"></i>
-                                  {stats.totalAppointments} Total Appointments
-                                </p>
-                                <p className="mb-1">
-                                  <i className="bi bi-capsule me-2"></i>
-                                  {stats.activeMedicines} Active Medicines
-                                </p>
-                                <p className="mb-1">
-                                  <i className="bi bi-heart-pulse me-2"></i>
-                                  {stats.symptomsChecked} Symptom Checks
-                                </p>
-                              </div>
-                            </div>
-                          </Col>
-                          <Col lg={6} md={6} sm={12} className="mb-3">
-                            <div>
-                              <strong>Account Information</strong>
-                              <div className="mt-2">
-                                <p className="mb-1">
-                                  <i className="bi bi-calendar-plus me-2"></i>
-                                  Member since: {new Date(userProfile.created_at).toLocaleDateString()}
-                                </p>
-                                <p className="mb-1">
-                                  <i className="bi bi-shield-check me-2"></i>
-                                  Account Status: Active
-                                </p>
-                              </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          )}
         </>
       )}
     </div>
