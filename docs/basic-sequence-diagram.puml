@@ -1,0 +1,404 @@
+@startuml Basic User Login
+' Simple login sequence diagram
+
+title Basic User Login Flow
+
+' Define participants
+actor User
+participant "Login Page" as Login
+participant "Backend API" as API
+participant Database
+
+' Sequence flow
+User -> Login: Enter email & password
+Login -> API: POST /login
+API -> Database: Check credentials
+Database --> API: Return user data
+API --> Login: Return success + token
+Login --> User: Show dashboard
+
+@enduml
+
+@startuml Basic Registration
+' Simple registration sequence diagram
+
+title Basic User Registration Flow
+
+actor User
+participant "Registration Form" as Form
+participant "Backend API" as API
+participant Database
+
+User -> Form: Fill registration form
+Form -> Form: Validate input
+Form -> API: POST /register
+API -> Database: Create new user
+Database --> API: User created
+API --> Form: Success response
+Form --> User: Show success message
+Form --> User: Redirect to login
+
+@enduml
+
+@startuml Basic CRUD Operations
+' Simple CRUD operations
+
+title Basic CRUD Operations
+
+actor User
+participant "Frontend" as UI
+participant "API" as API
+participant "Database" as DB
+
+== Create ==
+User -> UI: Click "Add New"
+UI -> API: POST /items
+API -> DB: INSERT INTO items
+DB --> API: Return new item
+API --> UI: Success
+UI --> User: Show new item
+
+== Read ==
+User -> UI: View list
+UI -> API: GET /items
+API -> DB: SELECT * FROM items
+DB --> API: Return items
+API --> UI: Items data
+UI --> User: Display list
+
+== Update ==
+User -> UI: Edit item
+UI -> API: PUT /items/:id
+API -> DB: UPDATE items
+DB --> API: Updated item
+API --> UI: Success
+UI --> User: Show updated item
+
+== Delete ==
+User -> UI: Click delete
+UI -> API: DELETE /items/:id
+API -> DB: DELETE FROM items
+DB --> API: Confirm deletion
+API --> UI: Success
+UI --> User: Remove from list
+
+@enduml
+
+@startuml Basic API Call
+' Simple API call with error handling
+
+title Basic API Call with Error Handling
+
+actor User
+participant "App" as App
+participant "API" as API
+
+User -> App: Click button
+App -> API: Send request
+
+alt Success
+    API --> App: 200 OK + data
+    App --> User: Show data
+else Error
+    API --> App: 400/500 Error
+    App --> User: Show error message
+end
+
+@enduml
+
+@startuml Basic Authentication Flow
+' Simple auth flow
+
+title Basic Authentication Flow
+
+actor User
+participant "App" as App
+participant "Auth Service" as Auth
+database "Storage" as Store
+
+== Login ==
+User -> App: Enter credentials
+App -> Auth: Authenticate
+Auth --> App: Return token
+App -> Store: Save token
+App --> User: Redirect to home
+
+== Access Protected Resource ==
+User -> App: Request data
+App -> Store: Get token
+App -> Auth: Validate token
+
+alt Token Valid
+    Auth --> App: Token OK
+    App --> User: Show data
+else Token Invalid
+    Auth --> App: Token expired
+    App --> User: Redirect to login
+end
+
+@enduml
+
+@startuml Basic Form Submission
+' Simple form submission
+
+title Basic Form Submission
+
+actor User
+participant "Form" as Form
+participant "Validation" as Valid
+participant "API" as API
+
+User -> Form: Fill form
+User -> Form: Click submit
+
+Form -> Valid: Validate fields
+
+alt Validation Success
+    Valid --> Form: All fields valid
+    Form -> API: Submit data
+    API --> Form: Success
+    Form --> User: Show success message
+else Validation Failed
+    Valid --> Form: Show errors
+    Form --> User: Display error messages
+end
+
+@enduml
+
+@startuml Basic Database Query
+' Simple database query
+
+title Basic Database Query Flow
+
+participant "Application" as App
+participant "Database" as DB
+
+App -> DB: Connect to database
+DB --> App: Connection established
+
+App -> DB: SELECT * FROM users WHERE id = 1
+DB -> DB: Execute query
+DB --> App: Return result set
+
+App -> App: Process data
+App -> DB: Close connection
+DB --> App: Connection closed
+
+@enduml
+
+@startuml Basic Shopping Cart
+' Simple shopping cart flow
+
+title Basic Shopping Cart Flow
+
+actor Customer
+participant "Product Page" as Product
+participant "Cart" as Cart
+participant "Checkout" as Checkout
+
+Customer -> Product: Browse products
+Customer -> Product: Click "Add to Cart"
+Product -> Cart: Add item
+Cart --> Customer: Show cart count
+
+Customer -> Cart: View cart
+Cart --> Customer: Show items
+
+Customer -> Cart: Update quantity
+Cart -> Cart: Recalculate total
+Cart --> Customer: Show new total
+
+Customer -> Checkout: Proceed to checkout
+Checkout --> Customer: Show payment form
+
+Customer -> Checkout: Submit payment
+Checkout --> Customer: Order confirmation
+
+@enduml
+
+@startuml Basic File Upload
+' Simple file upload
+
+title Basic File Upload Flow
+
+actor User
+participant "Upload Form" as Form
+participant "Server" as Server
+participant "Storage" as Storage
+
+User -> Form: Select file
+Form -> Form: Validate file type & size
+
+alt Valid File
+    Form -> Server: Upload file
+    Server -> Storage: Save file
+    Storage --> Server: File saved
+    Server --> Form: Success + file URL
+    Form --> User: Show success
+else Invalid File
+    Form --> User: Show error message
+end
+
+@enduml
+
+@startuml Basic Search Function
+' Simple search functionality
+
+title Basic Search Function
+
+actor User
+participant "Search Box" as Search
+participant "API" as API
+participant "Database" as DB
+
+User -> Search: Type search query
+Search -> Search: Wait for user to stop typing
+
+Search -> API: GET /search?q=query
+API -> DB: SELECT * WHERE name LIKE '%query%'
+DB --> API: Return matching results
+API --> Search: Results array
+Search --> User: Display results
+
+User -> Search: Click result
+Search --> User: Navigate to detail page
+
+@enduml
+
+@startuml Basic Notification System
+' Simple notification system
+
+title Basic Notification System
+
+participant "Event" as Event
+participant "Notification Service" as NS
+participant "User" as User
+
+Event -> NS: Trigger event (e.g., new message)
+NS -> NS: Create notification
+NS -> User: Send notification
+
+alt User Online
+    User --> NS: Notification received
+    User -> NS: Mark as read
+    NS --> User: Update status
+else User Offline
+    NS -> NS: Store notification
+    note right: Will be delivered\nwhen user comes online
+end
+
+@enduml
+
+@startuml Basic Payment Flow
+' Simple payment processing
+
+title Basic Payment Processing
+
+actor Customer
+participant "Checkout" as Checkout
+participant "Payment Gateway" as Gateway
+participant "Bank" as Bank
+
+Customer -> Checkout: Enter payment details
+Checkout -> Gateway: Process payment
+Gateway -> Bank: Authorize transaction
+
+alt Payment Approved
+    Bank --> Gateway: Approved
+    Gateway --> Checkout: Success
+    Checkout --> Customer: Order confirmed
+else Payment Declined
+    Bank --> Gateway: Declined
+    Gateway --> Checkout: Failed
+    Checkout --> Customer: Show error
+end
+
+@enduml
+
+@startuml Basic Cache System
+' Simple caching mechanism
+
+title Basic Cache System
+
+participant "App" as App
+participant "Cache" as Cache
+participant "Database" as DB
+
+App -> Cache: Check if data exists
+
+alt Cache Hit
+    Cache --> App: Return cached data
+    App -> App: Use cached data
+else Cache Miss
+    Cache --> App: Data not found
+    App -> DB: Query database
+    DB --> App: Return data
+    App -> Cache: Store in cache
+    Cache --> App: Cached
+    App -> App: Use data
+end
+
+@enduml
+
+@startuml Basic Email Sending
+' Simple email sending
+
+title Basic Email Sending Flow
+
+actor User
+participant "App" as App
+participant "Email Service" as Email
+participant "Recipient" as Recipient
+
+User -> App: Compose email
+User -> App: Click send
+
+App -> Email: Send email request
+Email -> Email: Validate email
+Email -> Recipient: Deliver email
+
+alt Email Delivered
+    Recipient --> Email: Received
+    Email --> App: Success
+    App --> User: Email sent
+else Email Failed
+    Email --> App: Failed
+    App --> User: Show error
+end
+
+@enduml
+
+@startuml Basic Session Management
+' Simple session management
+
+title Basic Session Management
+
+actor User
+participant "App" as App
+participant "Session Store" as Session
+
+== Create Session ==
+User -> App: Login
+App -> Session: Create session
+Session --> App: Session ID
+App --> User: Set cookie
+
+== Use Session ==
+User -> App: Make request
+App -> Session: Validate session ID
+
+alt Session Valid
+    Session --> App: Session data
+    App --> User: Process request
+else Session Invalid
+    Session --> App: Session expired
+    App --> User: Redirect to login
+end
+
+== Destroy Session ==
+User -> App: Logout
+App -> Session: Delete session
+Session --> App: Deleted
+App --> User: Clear cookie
+
+@enduml
