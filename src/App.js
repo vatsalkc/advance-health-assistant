@@ -159,55 +159,61 @@ function App() {
     <div className="App">
       <NetworkStatus />
       
-      <Navbar bg={darkMode ? 'dark' : 'primary'} variant="dark" expand="lg" className="navbar-custom">
+      <Navbar expand="lg" className="navbar-custom">
         <Container>
-          <Navbar.Brand href="#home" className="fw-bold">
-            <i className="bi bi-heart-pulse-fill me-2"></i>
+          <Navbar.Brand href="#home">
+            <i className="bi bi-heart-pulse-fill"></i>
             Health Assistant
           </Navbar.Brand>
           {isAuthenticated && (
             <>
-              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Toggle aria-controls="basic-navbar-nav">
+                <i className="bi bi-list" style={{ fontSize: '1.5rem', color: 'var(--text-primary)' }}></i>
+              </Navbar.Toggle>
               <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto">
+                <Nav className="me-auto ms-lg-4">
                   <Nav.Link onClick={() => setCurrentView('dashboard')} active={currentView === 'dashboard'}>
-                    <i className="bi bi-house-fill me-1"></i>Dashboard
+                    <i className="bi bi-grid-fill me-2"></i>Dashboard
                   </Nav.Link>
                   <Nav.Link onClick={() => setCurrentView('symptomChecker')} active={currentView === 'symptomChecker'}>
-                    <i className="bi bi-clipboard2-pulse me-1"></i>Symptom Checker
+                    <i className="bi bi-activity me-2"></i>Symptom Checker
                   </Nav.Link>
                   <Nav.Link onClick={() => setCurrentView('appointments')} active={currentView === 'appointments'}>
-                    <i className="bi bi-calendar-check me-1"></i>Appointments
+                    <i className="bi bi-calendar-check me-2"></i>Appointments
                   </Nav.Link>
                   <Nav.Link onClick={() => setCurrentView('medicineReminder')} active={currentView === 'medicineReminder'}>
-                    <i className="bi bi-alarm me-1"></i>Medicines
+                    <i className="bi bi-capsule me-2"></i>Medicines
                   </Nav.Link>
                   <Nav.Link onClick={() => setCurrentView('userHistory')} active={currentView === 'userHistory'}>
-                    <i className="bi bi-clock-history me-1"></i>History
+                    <i className="bi bi-clock-history me-2"></i>History
                   </Nav.Link>
                 </Nav>
-                <Nav>
+                <Nav className="align-items-lg-center">
                   <Button 
-                    variant="outline-light" 
-                    size="sm" 
-                    className="me-3"
+                    variant="link" 
+                    className="nav-theme-toggle"
                     onClick={() => setDarkMode(!darkMode)}
+                    title={darkMode ? 'Light Mode' : 'Dark Mode'}
                   >
                     <i className={`bi bi-${darkMode ? 'sun' : 'moon'}-fill`}></i>
                   </Button>
                   <Button
-                    variant="outline-light"
-                    size="sm"
-                    className="me-3"
+                    variant="link"
+                    className="nav-profile-btn"
                     onClick={() => setCurrentView('profile')}
                     title="View Profile"
                   >
-                    <i className="bi bi-person-circle me-1"></i>
-                    {user?.name}
+                    <i className="bi bi-person-circle me-2"></i>
+                    <span>{user?.name}</span>
                   </Button>
-                  <Nav.Link onClick={handleLogout}>
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    className="nav-logout-btn"
+                    onClick={handleLogout}
+                  >
                     <i className="bi bi-box-arrow-right me-1"></i>Logout
-                  </Nav.Link>
+                  </Button>
                 </Nav>
               </Navbar.Collapse>
             </>

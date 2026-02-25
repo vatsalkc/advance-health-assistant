@@ -114,11 +114,6 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
           <h1 className="hero-title">Hello, {user?.name}! 👋</h1>
           <p className="hero-subtitle">Your health journey starts here</p>
         </div>
-        <div className="hero-decoration">
-          <div className="decoration-circle circle-1"></div>
-          <div className="decoration-circle circle-2"></div>
-          <div className="decoration-circle circle-3"></div>
-        </div>
       </div>
 
       {loading ? (
