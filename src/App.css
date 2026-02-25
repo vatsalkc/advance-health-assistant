@@ -236,19 +236,22 @@ body {
 
 .card {
   border: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
+  background-color: white;
   color: var(--text-primary);
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   margin-bottom: var(--spacing-lg);
   border-radius: var(--radius-xl);
   transition: all var(--transition-base);
   overflow: hidden;
 }
 
+[data-theme="dark"] .card {
+  background-color: var(--bg-secondary);
+}
+
 .card:hover {
-  box-shadow: var(--card-hover-shadow);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
-  border-color: var(--border-hover);
 }
 
 .card-header {
@@ -345,12 +348,15 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
 }
 
 .btn-success {
@@ -372,11 +378,14 @@ body {
   border: 2px solid var(--primary-color);
   color: var(--primary-color);
   background-color: transparent;
+  font-weight: 600;
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: var(--primary-color);
   color: white;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 .btn-sm {
@@ -978,19 +987,20 @@ body {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Hero Section */
+/* Hero Section - Modern & Beautiful */
 .dashboard-hero {
   position: relative;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
   border-radius: var(--radius-xl);
   padding: 2.5rem 2rem;
-  color: white;
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
 }
 
 [data-theme="dark"] .dashboard-hero {
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  border-color: #1e40af;
 }
 
 .hero-content {
@@ -1002,28 +1012,49 @@ body {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  color: #1e40af;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="dark"] .hero-title {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
 }
 
 .hero-subtitle {
   font-size: 1rem;
-  opacity: 0.9;
+  color: #0369a1;
   margin-bottom: 0;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .hero-subtitle {
+  color: #bae6fd;
 }
 
 .hero-decoration {
   display: none;
 }
 
-/* Modern Stat Cards */
+/* Modern Stat Cards - Beautiful Design */
 .stat-card-modern {
   background: white;
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
+  gap: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+  transition: all var(--transition-base);
+}
+
+.stat-card-modern:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 [data-theme="dark"] .stat-card-modern {
@@ -1032,29 +1063,48 @@ body {
 }
 
 .stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-md);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .stat-purple .stat-icon {
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
 }
 
 .stat-blue .stat-icon {
-  background: rgba(14, 165, 233, 0.1);
-  color: #0ea5e9;
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
 }
 
 .stat-green .stat-icon {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.stat-purple {
+  border-color: #dbeafe;
+}
+
+.stat-blue {
+  border-color: #cffafe;
+}
+
+.stat-green {
+  border-color: #d1fae5;
+}
+
+[data-theme="dark"] .stat-purple,
+[data-theme="dark"] .stat-blue,
+[data-theme="dark"] .stat-green {
+  border-color: var(--border-color);
 }
 
 .stat-content {
@@ -1097,44 +1147,70 @@ body {
   margin: 0;
 }
 
-/* Action Cards */
+/* Action Cards - Beautiful & Modern */
 .action-card {
   background: white;
-  border-radius: var(--radius-lg);
-  padding: 1.75rem;
+  border-radius: var(--radius-xl);
+  padding: 2rem;
   cursor: pointer;
   transition: all var(--transition-base);
-  border: 1px solid var(--border-color);
+  border: 2px solid transparent;
   height: 100%;
   display: flex;
   flex-direction: column;
   user-select: none;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 [data-theme="dark"] .action-card {
   background: var(--bg-secondary);
+  border-color: var(--border-color);
 }
 
 .action-card:hover {
-  border-color: var(--primary-color);
-  box-shadow: var(--shadow-md);
+  border-color: #dbeafe;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+  transform: translateY(-4px);
+}
+
+.action-card:hover::before {
+  opacity: 1;
+}
+
+[data-theme="dark"] .action-card:hover {
+  border-color: #1e40af;
 }
 
 .action-card:active {
-  transform: scale(0.98);
+  transform: translateY(-2px);
 }
 
 .action-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-md);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
+  font-size: 2rem;
   color: white;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .action-title {
@@ -1157,18 +1233,23 @@ body {
   align-self: flex-end;
 }
 
-/* Modern Cards */
+/* Modern Cards - Beautiful Design */
 .modern-card {
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   transition: all var(--transition-base);
   height: 100%;
+  background: white;
+}
+
+[data-theme="dark"] .modern-card {
+  background: var(--bg-secondary);
 }
 
 .modern-card:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary-color);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .card-header-modern {
@@ -1199,18 +1280,21 @@ body {
 }
 
 .card-icon-wrapper.purple {
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 .card-icon-wrapper.blue {
-  background: rgba(14, 165, 233, 0.1);
-  color: #0ea5e9;
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.3);
 }
 
 .card-icon-wrapper.green {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
 }
 
 .card-title-modern {
@@ -1244,7 +1328,7 @@ body {
   min-height: 200px;
 }
 
-/* Empty State */
+/* Empty State - Beautiful Design */
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
@@ -1253,14 +1337,19 @@ body {
 
 .empty-state i {
   font-size: 4rem;
-  opacity: 0.3;
+  opacity: 0.2;
   margin-bottom: 1rem;
   display: block;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .empty-state p {
   margin-bottom: 1rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
 }
 
 /* Appointment List */
@@ -1274,33 +1363,43 @@ body {
   display: flex;
   gap: 1rem;
   padding: 1rem;
-  background: var(--bg-tertiary);
+  background: #f8fafc;
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
-  border: 2px solid transparent;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .appointment-item-modern {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
 }
 
 .appointment-item-modern:hover {
-  background: var(--bg-primary);
-  border-color: var(--primary-color);
-  transform: translateX(4px);
+  background: white;
+  border-color: #bae6fd;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="dark"] .appointment-item-modern:hover {
+  background: var(--bg-secondary);
+  border-color: #1e40af;
 }
 
 .appointment-date {
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
-  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-radius: var(--radius-lg);
   padding: 0.75rem;
   text-align: center;
   min-width: 70px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 [data-theme="dark"] .appointment-date {
-  background: rgba(37, 99, 235, 0.2);
-  color: #60a5fa;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
 }
 
 .date-day {
@@ -1337,34 +1436,44 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: var(--bg-tertiary);
+  background: #f0fdfa;
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
-  border: 2px solid transparent;
+  border: 1px solid #ccfbf1;
+}
+
+[data-theme="dark"] .medicine-item-modern {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
 }
 
 .medicine-item-modern:hover {
-  background: var(--bg-primary);
-  border-color: #3b82f6;
-  transform: translateX(4px);
+  background: white;
+  border-color: #99f6e4;
+  box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.1);
+}
+
+[data-theme="dark"] .medicine-item-modern:hover {
+  background: var(--bg-secondary);
+  border-color: #0e7490;
 }
 
 .medicine-icon {
   width: 50px;
   height: 50px;
-  border-radius: var(--radius-md);
-  background: rgba(14, 165, 233, 0.1);
-  color: #0ea5e9;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.3);
 }
 
 [data-theme="dark"] .medicine-icon {
-  background: rgba(14, 165, 233, 0.2);
-  color: #38bdf8;
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
 }
 
 .medicine-details {
@@ -1383,19 +1492,29 @@ body {
 
 /* Health Check Cards */
 .health-check-card {
-  background: var(--bg-tertiary);
+  background: #f0fdf4;
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   transition: all var(--transition-base);
-  border: 2px solid transparent;
+  border: 1px solid #dcfce7;
   height: 100%;
 }
 
+[data-theme="dark"] .health-check-card {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
 .health-check-card:hover {
-  background: var(--bg-primary);
-  border-color: #10b981;
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  background: white;
+  border-color: #bbf7d0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1);
+}
+
+[data-theme="dark"] .health-check-card:hover {
+  background: var(--bg-secondary);
+  border-color: #065f46;
 }
 
 .check-header {
