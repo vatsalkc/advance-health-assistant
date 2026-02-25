@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Card, Form, Button, Badge, Alert, ListGroup } from 'react-bootstrap';
+import { Card, Form, Button, Badge, Alert, ListGroup, Modal } from 'react-bootstrap';
 import { predictDisease, allSymptoms, getFollowUpSymptoms } from '../../data/diseaseDatabase';
 import { supabase } from '../../config/supabase';
 
@@ -12,29 +12,44 @@ function SymptomChecker({ onResult, user }) {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
+  const [showSeverityModal, setShowSeverityModal] = useState(false);
+  const [selectedSymptom, setSelectedSymptom] = useState('');
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
 
-  const addSymptom = (symptom = null) => {
+  const addSymptom = (symptom = null, severity = null) => {
     const symptomToAdd = symptom || symptomInput.trim();
-    if (symptomToAdd && !symptoms.includes(symptomToAdd)) {
-      const newSymptoms = [...symptoms, symptomToAdd];
-      setSymptoms(newSymptoms);
-      setSymptomInput('');
-      setShowSuggestions(false);
-      setError('');
-      setSuccessMessage(`"${symptomToAdd}" added to symptoms list`);
-      setTimeout(() => setSuccessMessage(''), 2000);
+    if (symptomToAdd) {
+      // Create symptom with severity if provided
+      const symptomWithSeverity = severity ? `${symptomToAdd} (${severity})` : symptomToAdd;
       
-      // Get follow-up suggestions for the added symptom
-      const followUps = getFollowUpSymptoms(symptomToAdd);
-      if (followUps && followUps.length > 0) {
-        // Filter out already selected symptoms
-        const newFollowUps = followUps.filter(s => !newSymptoms.includes(s));
-        setFollowUpSuggestions(newFollowUps);
+      // Check if base symptom already exists
+      const baseSymptomExists = symptoms.some(s => 
+        s.toLowerCase().startsWith(symptomToAdd.toLowerCase())
+      );
+      
+      if (!baseSymptomExists) {
+        const newSymptoms = [...symptoms, symptomWithSeverity];
+        setSymptoms(newSymptoms);
+        setSymptomInput('');
+        setShowSuggestions(false);
+        setError('');
+        setSuccessMessage(`"${symptomWithSeverity}" added to symptoms list`);
+        setTimeout(() => setSuccessMessage(''), 2000);
+        
+        // Get follow-up suggestions for the added symptom
+        const followUps = getFollowUpSymptoms(symptomToAdd);
+        if (followUps && followUps.length > 0) {
+          const newFollowUps = followUps.filter(s => !newSymptoms.some(existing => 
+            existing.toLowerCase().startsWith(s.toLowerCase())
+          ));
+          setFollowUpSuggestions(newFollowUps);
+        } else {
+          setFollowUpSuggestions([]);
+        }
       } else {
-        // Clear follow-up suggestions if no follow-ups for this symptom
-        setFollowUpSuggestions([]);
+        setError('This symptom is already in your list');
+        setTimeout(() => setError(''), 2000);
       }
     }
   };
@@ -45,10 +60,12 @@ function SymptomChecker({ onResult, user }) {
     
     // Update follow-up suggestions
     if (newSymptoms.length > 0) {
-      const lastSymptom = newSymptoms[newSymptoms.length - 1];
+      const lastSymptom = newSymptoms[newSymptoms.length - 1].split(' (')[0]; // Remove severity
       const followUps = getFollowUpSymptoms(lastSymptom);
       if (followUps && followUps.length > 0) {
-        const newFollowUps = followUps.filter(s => !newSymptoms.includes(s));
+        const newFollowUps = followUps.filter(s => !newSymptoms.some(existing => 
+          existing.toLowerCase().startsWith(s.toLowerCase())
+        ));
         setFollowUpSuggestions(newFollowUps);
       }
     } else {
@@ -60,13 +77,13 @@ function SymptomChecker({ onResult, user }) {
     const value = e.target.value;
     setSymptomInput(value);
     
-    if (value.trim().length > 1) {
+    if (value.trim().length > 0) {
       const filtered = allSymptoms
         .filter(symptom => 
           symptom.toLowerCase().includes(value.toLowerCase()) &&
-          !symptoms.includes(symptom)
+          !symptoms.some(s => s.toLowerCase().startsWith(symptom.toLowerCase()))
         )
-        .slice(0, 8);
+        .slice(0, 10);
       setFilteredSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
     } else {
@@ -76,14 +93,13 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    addSymptom(suggestion);
+    // Ask for severity
+    setSelectedSymptom(suggestion);
+    setShowSeverityModal(true);
     setShowSuggestions(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
 
-  const handleCommonSymptomClick = (commonSymptom) => {
+  const handleQuickAddClick = (commonSymptom) => {
     // Check if this symptom has follow-up options
     const followUps = getFollowUpSymptoms(commonSymptom);
     
@@ -93,10 +109,18 @@ function SymptomChecker({ onResult, user }) {
       setSuccessMessage(`Please select a specific type of ${commonSymptom}`);
       setTimeout(() => setSuccessMessage(''), 3000);
     } else {
-      // No follow-ups, add directly
-      if (!symptoms.includes(commonSymptom)) {
-        addSymptom(commonSymptom);
-      }
+      // No follow-ups, ask for severity
+      setSelectedSymptom(commonSymptom);
+      setShowSeverityModal(true);
+    }
+  };
+
+  const handleSeveritySelect = (severity) => {
+    addSymptom(selectedSymptom, severity);
+    setShowSeverityModal(false);
+    setSelectedSymptom('');
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
@@ -110,7 +134,10 @@ function SymptomChecker({ onResult, user }) {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addSymptom();
+      if (symptomInput.trim()) {
+        setSelectedSymptom(symptomInput.trim());
+        setShowSeverityModal(true);
+      }
     }
   };
 
@@ -129,8 +156,11 @@ function SymptomChecker({ onResult, user }) {
     try {
       console.log('[SymptomChecker] Checking symptoms:', symptoms);
       
+      // Remove severity indicators for prediction
+      const cleanSymptoms = symptoms.map(s => s.split(' (')[0].toLowerCase().trim());
+      
       // Predict disease using local algorithm
-      const prediction = predictDisease(symptoms);
+      const prediction = predictDisease(cleanSymptoms);
       console.log('[SymptomChecker] Prediction result:', prediction);
       
       if (!prediction) {
@@ -146,7 +176,7 @@ function SymptomChecker({ onResult, user }) {
           
           const checkData = {
             user_id: session.user.id,
-            symptoms: symptoms,
+            symptoms: cleanSymptoms,
             predicted_disease: prediction.disease,
             recommended_specialization: prediction.specialization,
             confidence: prediction.confidence,

@@ -2271,3 +2271,44 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
 }
+
+
+/* ============================================
+   SEVERITY MODAL STYLES
+   ============================================ */
+
+.severity-btn {
+  padding: 16px 20px;
+  text-align: left;
+  border-width: 2px;
+  transition: all 0.2s;
+  font-size: 15px;
+}
+
+.severity-btn:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.severity-btn strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.modal-content {
+  border-radius: 12px;
+}
+
+.modal-header {
+  border-bottom: 2px solid #e5e7eb;
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+.modal-title {
+  font-weight: 700;
+  font-size: 20px;
+}
