@@ -136,10 +136,12 @@ function SymptomChecker({ onResult, user }) {
   };
 
   const handleInputBlur = (e) => {
+    // Don't hide if clicking on suggestions
     if (suggestionsRef.current && suggestionsRef.current.contains(e.relatedTarget)) {
       return;
     }
-    setTimeout(() => setShowSuggestions(false), 150);
+    // Increase delay to allow click to register
+    setTimeout(() => setShowSuggestions(false), 300);
   };
 
   const handleKeyPress = (e) => {
@@ -274,19 +276,20 @@ function SymptomChecker({ onResult, user }) {
                 <div 
                   ref={suggestionsRef}
                   className="symptom-suggestions-dropdown"
+                  onMouseDown={(e) => e.preventDefault()}
                 >
                   <ListGroup variant="flush">
                     {filteredSuggestions.map((suggestion, index) => (
                       <ListGroup.Item
                         key={index}
                         action
-                        onMouseDown={(e) => e.preventDefault()}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           handleSuggestionClick(suggestion);
                         }}
                         className="symptom-suggestion-item"
+                        style={{ cursor: 'pointer' }}
                         tabIndex={0}
                       >
                         <i className="bi bi-plus-circle text-primary"></i>
