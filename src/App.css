@@ -844,6 +844,8 @@ body {
   background: white;
   color: #6b7280;
   border: 2px solid #d1d5db;
+  cursor: pointer;
+  user-select: none;
 }
 
 [data-theme="dark"] .symptom-badge-quick {
@@ -852,19 +854,21 @@ body {
   color: var(--text-secondary);
 }
 
-.symptom-badge-quick:hover {
+.symptom-badge-quick:hover:not(.disabled) {
   border-color: #2563eb;
   color: #2563eb;
   background: #f0f9ff;
+  transform: translateY(-1px);
 }
 
-[data-theme="dark"] .symptom-badge-quick:hover {
+[data-theme="dark"] .symptom-badge-quick:hover:not(.disabled) {
   background: var(--bg-secondary);
 }
 
 .symptom-badge-quick.disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  cursor: not-allowed !important;
+  pointer-events: none;
 }
 
 .symptom-badge-quick.disabled:hover {

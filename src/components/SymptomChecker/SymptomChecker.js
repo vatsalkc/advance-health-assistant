@@ -248,14 +248,23 @@ function SymptomChecker({ onResult, user }) {
                 <Form.Control
                   ref={inputRef}
                   type="text"
-                  placeholder="Type a symptom (e.g., fever, headache, cough)"
+                  placeholder="Start typing a symptom (e.g., fever, headache)"
                   value={symptomInput}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  onFocus={() => symptomInput.length > 1 && setShowSuggestions(true)}
+                  onFocus={() => symptomInput.length > 0 && setShowSuggestions(true)}
                   onBlur={handleInputBlur}
                 />
-                <Button variant="primary" onClick={() => addSymptom()} type="button">
+                <Button 
+                  variant="primary" 
+                  onClick={() => {
+                    if (symptomInput.trim()) {
+                      setSelectedSymptom(symptomInput.trim());
+                      setShowSeverityModal(true);
+                    }
+                  }} 
+                  type="button"
+                >
                   <i className="bi bi-plus-lg me-1"></i>Add
                 </Button>
               </div>
@@ -386,17 +395,19 @@ function SymptomChecker({ onResult, user }) {
           <div className="d-flex flex-wrap gap-2">
             {['fever', 'headache', 'cough', 'fatigue', 'nausea', 'dizziness', 'chest pain', 'shortness of breath', 'sore throat', 'stomach pain'].map((commonSymptom) => {
               const hasFollowUps = getFollowUpSymptoms(commonSymptom).length > 0;
-              const isSelected = symptoms.includes(commonSymptom);
+              const isSelected = symptoms.some(s => s.toLowerCase().startsWith(commonSymptom.toLowerCase()));
               return (
                 <span
                   key={commonSymptom}
                   className={`symptom-badge symptom-badge-quick ${isSelected ? 'disabled' : ''}`}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (!isSelected) {
-                      handleCommonSymptomClick(commonSymptom);
+                      handleQuickAddClick(commonSymptom);
                     }
                   }}
+                  style={{ cursor: isSelected ? 'not-allowed' : 'pointer' }}
                   title={isSelected ? 'Already added' : (hasFollowUps ? 'Click to see options' : 'Click to add')}
                 >
                   <i className={`bi ${isSelected ? 'bi-check-lg' : (hasFollowUps ? 'bi-chevron-down' : 'bi-plus-lg')}`}></i>
