@@ -1,3 +1,92 @@
+// Symptom weights - Critical symptoms have higher weights
+export const symptomWeights = {
+  // CRITICAL symptoms (weight: 3.0) - Life-threatening
+  'chest pain': 3.0,
+  'severe chest pain': 3.0,
+  'difficulty breathing': 3.0,
+  'shortness of breath': 3.0,
+  'coughing blood': 3.0,
+  'blood in urine': 3.0,
+  'severe headache': 3.0,
+  'confusion': 3.0,
+  'loss of consciousness': 3.0,
+  'severe abdominal pain': 3.0,
+  
+  // HIGH PRIORITY symptoms (weight: 2.5) - Serious conditions
+  'high fever': 2.5,
+  'persistent fever': 2.5,
+  'extreme fatigue': 2.5,
+  'severe weakness': 2.5,
+  'wheezing': 2.5,
+  'rapid heartbeat': 2.5,
+  'irregular heartbeat': 2.5,
+  'blurred vision': 2.5,
+  'loss of taste': 2.5,
+  'loss of smell': 2.5,
+  'severe pain': 2.5,
+  
+  // MODERATE symptoms (weight: 2.0) - Significant discomfort
+  'fever': 2.0,
+  'body aches': 2.0,
+  'persistent cough': 2.0,
+  'cough with phlegm': 2.0,
+  'burning urination': 2.0,
+  'frequent urination': 2.0,
+  'joint pain': 2.0,
+  'back pain': 2.0,
+  'stomach pain': 2.0,
+  'nausea': 2.0,
+  'vomiting': 2.0,
+  'diarrhea': 2.0,
+  'dizziness': 2.0,
+  'facial pain': 2.0,
+  
+  // COMMON symptoms (weight: 1.5) - Typical illness indicators
+  'fatigue': 1.5,
+  'headache': 1.5,
+  'sore throat': 1.5,
+  'runny nose': 1.5,
+  'nasal congestion': 1.5,
+  'sneezing': 1.5,
+  'dry cough': 1.5,
+  'mild cough': 1.5,
+  'muscle pain': 1.5,
+  'chills': 1.5,
+  'sweating': 1.5,
+  
+  // MILD symptoms (weight: 1.0) - Minor discomfort
+  'mild fever': 1.0,
+  'mild headache': 1.0,
+  'itchy eyes': 1.0,
+  'watery eyes': 1.0,
+  'dry skin': 1.0,
+  'itchy skin': 1.0,
+  'tiredness': 1.0,
+  'weakness': 1.0,
+  'loss of appetite': 1.0,
+  'bloating': 1.0
+};
+
+// Get weight for a symptom (default 1.0 if not specified)
+export const getSymptomWeight = (symptom) => {
+  const symptomLower = symptom.toLowerCase().trim();
+  
+  // Check for exact match first
+  if (symptomWeights[symptomLower]) {
+    return symptomWeights[symptomLower];
+  }
+  
+  // Check for partial match (e.g., "severe chest pain" contains "chest pain")
+  for (const [weightedSymptom, weight] of Object.entries(symptomWeights)) {
+    if (symptomLower.includes(weightedSymptom) || weightedSymptom.includes(symptomLower)) {
+      return weight;
+    }
+  }
+  
+  // Default weight for unspecified symptoms
+  return 1.0;
+};
+
 // Symptom follow-up questions - when user selects a symptom, suggest related symptoms
 export const symptomFollowUps = {
   'fever': ['high fever', 'mild fever', 'fever with chills', 'fever with sweating', 'persistent fever'],
@@ -275,7 +364,7 @@ export const getFollowUpSymptoms = (selectedSymptom) => {
   return [];
 };
 
-// Improved prediction algorithm with stricter matching
+// Improved prediction algorithm with weighted symptoms
 export const predictDisease = (userSymptoms) => {
   if (!userSymptoms || userSymptoms.length === 0) {
     return null;
@@ -284,22 +373,36 @@ export const predictDisease = (userSymptoms) => {
   const normalizedUserSymptoms = userSymptoms.map(s => s.toLowerCase().trim());
   
   const matches = diseaseDatabase.map(disease => {
+    let weightedScore = 0;
     let exactMatches = 0;
     let partialMatches = 0;
     let requiredMatches = 0;
     let matchingSymptoms = [];
     let matchedRequiredSymptoms = [];
+    let criticalSymptomMatches = 0;
     
     // Check each user symptom against disease symptoms
     normalizedUserSymptoms.forEach(userSymptom => {
+      const userSymptomWeight = getSymptomWeight(userSymptom);
+      
       disease.symptoms.forEach(diseaseSymptom => {
         const diseaseSymptomLower = diseaseSymptom.toLowerCase();
+        const diseaseSymptomWeight = getSymptomWeight(diseaseSymptom);
         
         // Exact match
         if (userSymptom === diseaseSymptomLower) {
           exactMatches++;
+          // Use the higher weight between user symptom and disease symptom
+          const matchWeight = Math.max(userSymptomWeight, diseaseSymptomWeight);
+          weightedScore += 20 * matchWeight;
+          
           if (!matchingSymptoms.includes(diseaseSymptom)) {
             matchingSymptoms.push(diseaseSymptom);
+          }
+          
+          // Track critical symptoms
+          if (matchWeight >= 2.5) {
+            criticalSymptomMatches++;
           }
           
           // Check if it's a required symptom
@@ -311,8 +414,16 @@ export const predictDisease = (userSymptoms) => {
         // Partial match (one contains the other)
         else if (userSymptom.includes(diseaseSymptomLower) || diseaseSymptomLower.includes(userSymptom)) {
           partialMatches++;
+          const matchWeight = Math.max(userSymptomWeight, diseaseSymptomWeight);
+          weightedScore += 10 * matchWeight;
+          
           if (!matchingSymptoms.includes(diseaseSymptom)) {
             matchingSymptoms.push(diseaseSymptom);
+          }
+          
+          // Track critical symptoms
+          if (matchWeight >= 2.5) {
+            criticalSymptomMatches++;
           }
           
           // Check if it's a required symptom
@@ -328,14 +439,15 @@ export const predictDisease = (userSymptoms) => {
       });
     });
     
-    // Calculate match score
-    const exactScore = exactMatches * 20;
-    const partialScore = partialMatches * 10;
-    const totalScore = exactScore + partialScore;
+    // Calculate max possible score with weights
+    let maxPossibleScore = 0;
+    disease.symptoms.forEach(symptom => {
+      const weight = getSymptomWeight(symptom);
+      maxPossibleScore += 20 * weight;
+    });
     
     // Calculate base confidence
-    const maxPossibleScore = disease.symptoms.length * 20;
-    let confidence = (totalScore / maxPossibleScore) * 100;
+    let confidence = (weightedScore / maxPossibleScore) * 100;
     
     // CRITICAL: Must have at least one required symptom
     if (disease.requiredSymptoms && requiredMatches === 0) {
@@ -344,6 +456,11 @@ export const predictDisease = (userSymptoms) => {
       // Boost confidence significantly if required symptoms are matched
       const requiredBonus = (requiredMatches / disease.requiredSymptoms.length) * 40;
       confidence += requiredBonus;
+    }
+    
+    // Bonus for critical symptom matches
+    if (criticalSymptomMatches > 0) {
+      confidence += criticalSymptomMatches * 15; // +15% per critical symptom
     }
     
     // Penalty for too few matching symptoms
@@ -363,20 +480,26 @@ export const predictDisease = (userSymptoms) => {
       matchingSymptoms: matchingSymptoms.length,
       exactMatches: exactMatches,
       requiredMatches: requiredMatches,
+      criticalSymptomMatches: criticalSymptomMatches,
+      weightedScore: Math.round(weightedScore * 10) / 10,
       totalRequiredSymptoms: disease.requiredSymptoms ? disease.requiredSymptoms.length : 0,
       hasRequiredSymptoms: disease.requiredSymptoms ? requiredMatches > 0 : true
     };
   });
 
-  // Filter and sort matches - STRICTER CRITERIA
+  // Filter and sort matches - STRICTER CRITERIA with weight consideration
   const validMatches = matches
     .filter(m => 
-      m.confidence >= 30 && // Increased minimum confidence
+      m.confidence >= 30 && // Minimum confidence
       m.hasRequiredSymptoms && // Must have required symptoms
       m.matchingSymptoms >= 2 // Must match at least 2 symptoms
     )
     .sort((a, b) => {
-      // Prioritize matches with more required symptoms
+      // Prioritize matches with critical symptoms
+      if (a.criticalSymptomMatches !== b.criticalSymptomMatches) {
+        return b.criticalSymptomMatches - a.criticalSymptomMatches;
+      }
+      // Then prioritize matches with more required symptoms
       if (a.requiredMatches !== b.requiredMatches) {
         return b.requiredMatches - a.requiredMatches;
       }
@@ -384,7 +507,11 @@ export const predictDisease = (userSymptoms) => {
       if (Math.abs(b.confidence - a.confidence) > 10) {
         return b.confidence - a.confidence;
       }
-      // Then by exact matches
+      // Then by weighted score
+      if (Math.abs(b.weightedScore - a.weightedScore) > 20) {
+        return b.weightedScore - a.weightedScore;
+      }
+      // Finally by exact matches
       return b.exactMatches - a.exactMatches;
     });
 
@@ -413,10 +540,12 @@ export const predictDisease = (userSymptoms) => {
     description: topMatch.description,
     precautions: topMatch.precautions,
     confidence: topMatch.confidence,
+    criticalSymptoms: topMatch.criticalSymptomMatches > 0,
     top_predictions: validMatches.slice(0, 3).map(m => ({
       disease: m.disease,
       confidence: m.confidence,
-      specialization: m.specialization || 'General Physician'
+      specialization: m.specialization || 'General Physician',
+      hasCriticalSymptoms: m.criticalSymptomMatches > 0
     }))
   };
 };
