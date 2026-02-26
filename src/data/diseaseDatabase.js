@@ -1,8 +1,12 @@
 // Symptom weights - Critical symptoms have higher weights
 export const symptomWeights = {
+  // CRITICAL symptoms (weight: 3.5) - CARDIAC EMERGENCY
+  'chest pain': 3.5,
+  'severe chest pain': 3.5,
+  'chest tightness': 3.5,
+  'chest pressure': 3.5,
+  
   // CRITICAL symptoms (weight: 3.0) - Life-threatening
-  'chest pain': 3.0,
-  'severe chest pain': 3.0,
   'difficulty breathing': 3.0,
   'shortness of breath': 3.0,
   'coughing blood': 3.0,
@@ -11,6 +15,8 @@ export const symptomWeights = {
   'confusion': 3.0,
   'loss of consciousness': 3.0,
   'severe abdominal pain': 3.0,
+  'feeling faint': 3.0,
+  'lightheadedness': 3.0,
   
   // HIGH PRIORITY symptoms (weight: 2.5) - Serious conditions
   'high fever': 2.5,
@@ -20,10 +26,15 @@ export const symptomWeights = {
   'wheezing': 2.5,
   'rapid heartbeat': 2.5,
   'irregular heartbeat': 2.5,
+  'palpitations': 2.5,
   'blurred vision': 2.5,
   'loss of taste': 2.5,
   'loss of smell': 2.5,
   'severe pain': 2.5,
+  'swelling in legs': 2.5,
+  'swelling in ankles': 2.5,
+  'pain in arms': 2.5,
+  'pain in jaw': 2.5,
   
   // MODERATE symptoms (weight: 2.0) - Significant discomfort
   'fever': 2.0,
@@ -40,6 +51,7 @@ export const symptomWeights = {
   'diarrhea': 2.0,
   'dizziness': 2.0,
   'facial pain': 2.0,
+  'sweating': 2.0,
   
   // COMMON symptoms (weight: 1.5) - Typical illness indicators
   'fatigue': 1.5,
@@ -52,7 +64,6 @@ export const symptomWeights = {
   'mild cough': 1.5,
   'muscle pain': 1.5,
   'chills': 1.5,
-  'sweating': 1.5,
   
   // MILD symptoms (weight: 1.0) - Minor discomfort
   'mild fever': 1.0,
@@ -95,8 +106,11 @@ export const symptomFollowUps = {
   'cough': ['dry cough', 'wet cough', 'cough with phlegm', 'persistent cough', 'coughing blood'],
   'headache': ['severe headache', 'mild headache', 'throbbing headache', 'tension headache', 'headache with nausea'],
   'pain': ['chest pain', 'stomach pain', 'back pain', 'joint pain', 'muscle pain', 'abdominal pain'],
-  'throat': ['sore throat', 'dry throat', 'scratchy throat', 'throat pain', 'difficulty swallowing'],
+  'chest': ['chest pain', 'chest tightness', 'chest pressure', 'chest discomfort'],
+  'heart': ['rapid heartbeat', 'irregular heartbeat', 'palpitations', 'slow heartbeat'],
+  'faint': ['feeling faint', 'lightheadedness', 'dizziness', 'vertigo', 'loss of consciousness'],
   'breathing': ['difficulty breathing', 'shortness of breath', 'rapid breathing', 'wheezing', 'chest tightness'],
+  'throat': ['sore throat', 'dry throat', 'scratchy throat', 'throat pain', 'difficulty swallowing'],
   'stomach': ['stomach pain', 'stomach cramps', 'upset stomach', 'bloating', 'nausea'],
   'skin': ['skin rash', 'itchy skin', 'red skin', 'dry skin', 'oily skin', 'skin inflammation', 'skin peeling'],
   'nose': ['runny nose', 'stuffy nose', 'bloody nose', 'nasal congestion', 'loss of smell'],
@@ -104,6 +118,7 @@ export const symptomFollowUps = {
   'fatigue': ['extreme fatigue', 'tiredness', 'weakness', 'lack of energy', 'exhaustion'],
   'dizziness': ['lightheadedness', 'vertigo', 'feeling faint', 'loss of balance'],
   'urination': ['frequent urination', 'painful urination', 'burning urination', 'blood in urine', 'cloudy urine'],
+  'swelling': ['swelling in legs', 'swelling in ankles', 'swelling in feet', 'swelling in hands'],
 };
 
 // Enhanced disease database with more accurate symptom mapping
@@ -165,12 +180,44 @@ export const diseaseDatabase = [
     precautions: ['Rest and relax', 'Apply warm compress', 'Take over-the-counter pain relievers', 'Reduce stress']
   },
   {
-    disease: 'Hypertension',
-    symptoms: ['headache', 'dizziness', 'blurred vision', 'chest pain', 'shortness of breath', 'nosebleeds'],
-    requiredSymptoms: ['headache', 'dizziness'],
+    disease: 'Hypertension (High Blood Pressure)',
+    symptoms: ['headache', 'dizziness', 'feeling faint', 'lightheadedness', 'blurred vision', 'chest pain', 'shortness of breath', 'nosebleeds', 'fatigue'],
+    requiredSymptoms: ['dizziness', 'headache', 'feeling faint'],
     specialization: 'Cardiologist',
-    description: 'High blood pressure that can lead to serious health complications.',
-    precautions: ['Monitor blood pressure regularly', 'Reduce salt intake', 'Exercise regularly', 'Take prescribed medications']
+    description: 'High blood pressure that can lead to serious heart complications and stroke.',
+    precautions: ['Monitor blood pressure regularly', 'Reduce salt intake', 'Exercise regularly', 'Take prescribed medications', 'Seek immediate care if severe']
+  },
+  {
+    disease: 'Heart Arrhythmia',
+    symptoms: ['rapid heartbeat', 'irregular heartbeat', 'palpitations', 'dizziness', 'feeling faint', 'lightheadedness', 'shortness of breath', 'chest discomfort', 'fatigue', 'weakness'],
+    requiredSymptoms: ['rapid heartbeat', 'irregular heartbeat', 'palpitations'],
+    specialization: 'Cardiologist',
+    description: 'Irregular heart rhythm that can cause various symptoms and complications.',
+    precautions: ['Seek immediate medical attention', 'Avoid caffeine and stimulants', 'Monitor heart rate', 'Take prescribed medications', 'Reduce stress']
+  },
+  {
+    disease: 'Angina (Chest Pain)',
+    symptoms: ['chest pain', 'chest tightness', 'chest pressure', 'shortness of breath', 'pain in arms', 'pain in neck', 'pain in jaw', 'fatigue', 'dizziness', 'sweating'],
+    requiredSymptoms: ['chest pain', 'chest tightness', 'chest pressure'],
+    specialization: 'Cardiologist',
+    description: 'Chest pain caused by reduced blood flow to the heart muscle.',
+    precautions: ['Seek immediate medical attention', 'Rest immediately', 'Take prescribed nitroglycerin', 'Call emergency services if pain persists', 'Avoid physical exertion']
+  },
+  {
+    disease: 'Heart Failure',
+    symptoms: ['shortness of breath', 'difficulty breathing', 'extreme fatigue', 'weakness', 'swelling in legs', 'swelling in ankles', 'rapid heartbeat', 'persistent cough', 'wheezing', 'chest pain'],
+    requiredSymptoms: ['shortness of breath', 'extreme fatigue', 'swelling in legs'],
+    specialization: 'Cardiologist',
+    description: 'A chronic condition where the heart cannot pump blood efficiently.',
+    precautions: ['Seek immediate medical care', 'Monitor weight daily', 'Limit fluid intake', 'Take prescribed medications', 'Reduce salt intake']
+  },
+  {
+    disease: 'Cardiac Syncope (Fainting)',
+    symptoms: ['feeling faint', 'lightheadedness', 'dizziness', 'loss of consciousness', 'rapid heartbeat', 'chest pain', 'shortness of breath', 'sweating', 'nausea', 'blurred vision'],
+    requiredSymptoms: ['feeling faint', 'dizziness', 'lightheadedness'],
+    specialization: 'Cardiologist',
+    description: 'Fainting caused by heart-related issues affecting blood flow to the brain.',
+    precautions: ['Seek immediate medical attention', 'Lie down with legs elevated', 'Stay hydrated', 'Avoid sudden position changes', 'Get cardiac evaluation']
   },
   {
     disease: 'Type 2 Diabetes',
@@ -342,6 +389,9 @@ export const allSymptoms = [
   
   // General symptoms
   'fatigue', 'extreme fatigue', 'tiredness', 'weakness', 'lack of energy', 'exhaustion', 'chills', 'sweating', 'loss of appetite', 'weight loss', 'weight gain', 'increased thirst',
+  
+  // Cardiac symptoms
+  'chest pain', 'chest tightness', 'chest pressure', 'chest discomfort', 'palpitations', 'rapid heartbeat', 'irregular heartbeat', 'slow heartbeat', 'feeling faint', 'lightheadedness', 'vertigo', 'loss of consciousness', 'fainting', 'swelling in legs', 'swelling in ankles', 'swelling in feet', 'pain in arms', 'pain in left arm', 'pain in jaw', 'pain in neck', 'pain in back', 'cold sweats',
   
   // Mental health
   'persistent sadness', 'loss of interest', 'excessive worry', 'restlessness', 'difficulty concentrating', 'sleep problems', 'mood changes', 'appetite changes', 'feelings of worthlessness', 'thoughts of death', 'trembling', 'feeling nervous', 'panic attacks',
