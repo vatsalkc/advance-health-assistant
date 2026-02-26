@@ -346,10 +346,6 @@ export const diseaseDatabase = [
     specialization: 'Pulmonologist',
     description: 'Inflammation of the lining of bronchial tubes carrying air to lungs.',
     precautions: ['Rest and stay hydrated', 'Use humidifier', 'Avoid smoke and irritants', 'Take prescribed medications', 'Use cough suppressants']
-  },
-    specialization: 'Pulmonologist',
-    description: 'Inflammation of the bronchial tubes.',
-    precautions: ['Rest and stay hydrated', 'Use humidifier', 'Avoid smoke', 'Take prescribed medications']
   }
 ];
 
