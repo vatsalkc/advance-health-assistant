@@ -4568,17 +4568,29 @@ body {
 .doctor-appointments-table tbody td {
   padding: 16px;
   vertical-align: middle;
-  color: var(--text-primary);
+  color: #1e293b !important;
+}
+
+[data-theme="dark"] .doctor-appointments-table tbody td {
+  color: #f1f5f9 !important;
 }
 
 .doctor-appointments-table tbody td strong {
-  color: var(--text-primary);
+  color: #0f172a !important;
   font-weight: 600;
 }
 
+[data-theme="dark"] .doctor-appointments-table tbody td strong {
+  color: #f8fafc !important;
+}
+
 .doctor-appointments-table tbody td small {
-  color: var(--text-secondary);
+  color: #64748b !important;
   font-size: 13px;
+}
+
+[data-theme="dark"] .doctor-appointments-table tbody td small {
+  color: #94a3b8 !important;
 }
 
 /* Patient Info in Table */
@@ -4608,13 +4620,23 @@ body {
 
 .patient-info-name {
   font-weight: 600;
-  color: var(--text-primary);
+  color: #1e293b !important;
   margin-bottom: 4px;
+  font-size: 15px;
+}
+
+[data-theme="dark"] .patient-info-name {
+  color: #f1f5f9 !important;
 }
 
 .patient-info-email {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #64748b !important;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .patient-info-email {
+  color: #94a3b8 !important;
 }
 
 /* Status Badges - Improved */

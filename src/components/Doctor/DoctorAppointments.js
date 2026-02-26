@@ -23,11 +23,17 @@ function DoctorAppointments() {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
+      console.log('Fetching appointments...');
       const response = await doctorAppointmentsAPI.getAll();
-      setAppointments(response.data.appointments);
+      console.log('Appointments response:', response);
+      console.log('Appointments data:', response.data.appointments);
+      setAppointments(response.data.appointments || []);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching appointments:', err);
+      console.error('Error details:', err.message);
+      alert('Failed to load appointments: ' + err.message);
+      setAppointments([]);
       setLoading(false);
     }
   };

@@ -20,19 +20,24 @@ function DoctorDashboard({ doctor, onNavigate }) {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      setError('');
+      console.log('Fetching dashboard data...');
       
       // Fetch stats
       const statsResponse = await doctorStatsAPI.get();
+      console.log('Stats response:', statsResponse);
       setStats(statsResponse.data);
 
       // Fetch pending appointments
       const pendingResponse = await doctorAppointmentsAPI.getAll('Pending');
-      setPendingAppointments(pendingResponse.data.appointments);
+      console.log('Pending appointments:', pendingResponse.data.appointments);
+      setPendingAppointments(pendingResponse.data.appointments || []);
 
       // Fetch upcoming confirmed appointments
       const confirmedResponse = await doctorAppointmentsAPI.getAll('Confirmed');
+      console.log('Confirmed appointments:', confirmedResponse.data.appointments);
       const today = new Date().toISOString().split('T')[0];
-      const upcoming = confirmedResponse.data.appointments.filter(
+      const upcoming = (confirmedResponse.data.appointments || []).filter(
         apt => apt.date >= today
       ).slice(0, 5);
       setUpcomingAppointments(upcoming);
@@ -40,7 +45,8 @@ function DoctorDashboard({ doctor, onNavigate }) {
       setLoading(false);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data');
+      console.error('Error details:', err.message);
+      setError('Failed to load dashboard data: ' + err.message);
       setLoading(false);
     }
   };
