@@ -1,0 +1,460 @@
+================================================================================
+        DATABASE QUICK REFERENCE GUIDE
+        Advanced Health Assistant System
+================================================================================
+
+DATABASE: Supabase (PostgreSQL)
+TOTAL TABLES: 7
+TOTAL COLUMNS: 85+
+RLS POLICIES: 30+
+INDEXES: 9
+
+================================================================================
+TABLE 1: USERS
+================================================================================
+Purpose: Store patient/user information
+Primary Key: id (UUID)
+RLS: Enabled (users can only access their own data)
+
+COLUMNS:
+┌─────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column      │ Type                 │ Constraints │ Description          │
+├─────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id          │ UUID                 │ PRIMARY KEY │ User unique ID       │
+│ name        │ TEXT                 │ NOT NULL    │ Full name            │
+│ email       │ TEXT                 │ UNIQUE      │ Email address        │
+│ phone       │ TEXT                 │ NULL        │ Phone number         │
+│ age         │ INTEGER              │ NULL        │ Age in years         │
+│ gender      │ TEXT                 │ NULL        │ Gender               │
+│ created_at  │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Registration date    │
+└─────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+RELATIONSHIPS:
+→ appointments (user_id)
+→ medicines (user_id)
+→ symptom_checks (user_id)
+→ medical_reports (patient_id)
+→ prescriptions (patient_id)
+
+================================================================================
+TABLE 2: DOCTORS
+================================================================================
+Purpose: Store doctor profiles and credentials
+Primary Key: id (SERIAL)
+RLS: Enabled (public can view verified doctors, doctors can manage own profile)
+
+COLUMNS:
+┌──────────────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column               │ Type                 │ Constraints │ Description          │
+├──────────────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id                   │ SERIAL               │ PRIMARY KEY │ Doctor unique ID     │
+│ auth_id              │ UUID                 │ FOREIGN KEY │ Auth user ID         │
+│ name                 │ TEXT                 │ NOT NULL    │ Doctor name          │
+│ email                │ TEXT                 │ UNIQUE      │ Email address        │
+│ phone                │ TEXT                 │ NULL        │ Phone number         │
+│ specialization       │ TEXT                 │ NOT NULL    │ Medical specialty    │
+│ experience           │ TEXT                 │ NOT NULL    │ Years of experience  │
+│ qualification        │ TEXT                 │ NULL        │ Degrees (MBBS, MD)   │
+│ license_number       │ TEXT                 │ NULL        │ Medical license      │
+│ rating               │ DECIMAL(2,1)         │ NOT NULL    │ Rating (0.0-5.0)     │
+│ is_verified          │ BOOLEAN              │ DEFAULT F   │ Admin verified       │
+│ is_active            │ BOOLEAN              │ DEFAULT T   │ Account active       │
+│ consultation_fee     │ DECIMAL(10,2)        │ NULL        │ Fee amount           │
+│ available_days       │ TEXT[]               │ NULL        │ Working days array   │
+│ available_time_start │ TIME                 │ NULL        │ Start time           │
+│ available_time_end   │ TIME                 │ NULL        │ End time             │
+│ bio                  │ TEXT                 │ NULL        │ Biography            │
+│ created_at           │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Registration date    │
+│ updated_at           │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Last update          │
+└──────────────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+RELATIONSHIPS:
+→ appointments (doctor_id)
+→ medical_reports (doctor_id)
+→ prescriptions (doctor_id)
+
+INDEXES:
+- idx_doctors_auth_id (auth_id)
+- idx_doctors_specialization (specialization)
+
+================================================================================
+TABLE 3: APPOINTMENTS
+================================================================================
+Purpose: Store appointment bookings between patients and doctors
+Primary Key: id (SERIAL)
+RLS: Enabled (users see own, doctors see their appointments)
+
+COLUMNS:
+┌──────────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column           │ Type                 │ Constraints │ Description          │
+├──────────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id               │ SERIAL               │ PRIMARY KEY │ Appointment ID       │
+│ user_id          │ UUID                 │ FOREIGN KEY │ Patient ID           │
+│ doctor_id        │ INTEGER              │ FOREIGN KEY │ Doctor ID            │
+│ doctor_name      │ TEXT                 │ NOT NULL    │ Doctor name          │
+│ specialization   │ TEXT                 │ NOT NULL    │ Specialty            │
+│ date             │ DATE                 │ NOT NULL    │ Appointment date     │
+│ time             │ TIME                 │ NOT NULL    │ Appointment time     │
+│ reason           │ TEXT                 │ NOT NULL    │ Visit reason         │
+│ status           │ TEXT                 │ DEFAULT P   │ Status (P/C/R/Co)    │
+│ notes            │ TEXT                 │ NULL        │ Doctor notes         │
+│ prescription     │ TEXT                 │ NULL        │ Prescription text    │
+│ diagnosis        │ TEXT                 │ NULL        │ Diagnosis            │
+│ rejected_reason  │ TEXT                 │ NULL        │ Rejection reason     │
+│ created_at       │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Booking time         │
+│ updated_at       │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Last update          │
+└──────────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+STATUS VALUES:
+- Pending: Waiting for doctor confirmation
+- Confirmed: Doctor accepted appointment
+- Rejected: Doctor rejected appointment
+- Completed: Appointment finished
+
+RELATIONSHIPS:
+← users (user_id)
+← doctors (doctor_id)
+→ medical_reports (appointment_id)
+→ prescriptions (appointment_id)
+
+INDEXES:
+- idx_appointments_doctor_id (doctor_id)
+- idx_appointments_user_id (user_id)
+- idx_appointments_status (status)
+
+================================================================================
+TABLE 4: MEDICINES
+================================================================================
+Purpose: Store medicine reminders for patients
+Primary Key: id (SERIAL)
+RLS: Enabled (users can only access their own medicines)
+
+COLUMNS:
+┌───────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column        │ Type                 │ Constraints │ Description          │
+├───────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id            │ SERIAL               │ PRIMARY KEY │ Medicine reminder ID │
+│ user_id       │ UUID                 │ FOREIGN KEY │ Patient ID           │
+│ medicine_name │ TEXT                 │ NOT NULL    │ Medicine name        │
+│ dosage        │ TEXT                 │ NOT NULL    │ Dosage (e.g., 500mg) │
+│ time          │ TIME                 │ NOT NULL    │ Reminder time        │
+│ frequency     │ TEXT                 │ NOT NULL    │ Frequency            │
+│ active        │ BOOLEAN              │ DEFAULT T   │ Reminder active      │
+│ created_at    │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Creation time        │
+└───────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+FREQUENCY VALUES:
+- Daily
+- Twice a day
+- Three times a day
+- Weekly
+- As needed
+
+RELATIONSHIPS:
+← users (user_id)
+
+================================================================================
+TABLE 5: SYMPTOM_CHECKS
+================================================================================
+Purpose: Store symptom checker results and AI predictions
+Primary Key: id (SERIAL)
+RLS: Enabled (users can only access their own checks)
+
+COLUMNS:
+┌────────────────────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column                     │ Type                 │ Constraints │ Description          │
+├────────────────────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id                         │ SERIAL               │ PRIMARY KEY │ Check ID             │
+│ user_id                    │ UUID                 │ FOREIGN KEY │ Patient ID           │
+│ symptoms                   │ TEXT[]               │ NOT NULL    │ Symptoms array       │
+│ predicted_disease          │ TEXT                 │ NOT NULL    │ Predicted disease    │
+│ recommended_specialization │ TEXT                 │ NOT NULL    │ Specialist type      │
+│ confidence                 │ DECIMAL(5,2)         │ NULL        │ Confidence (0-100)   │
+│ description                │ TEXT                 │ NULL        │ Disease description  │
+│ precautions                │ TEXT[]               │ NULL        │ Precautions array    │
+│ created_at                 │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Check time           │
+└────────────────────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+DISEASE COVERAGE:
+- Total Diseases: 34
+- Specializations: 16
+- Symptoms per Disease: 8-15
+- Weighted Symptoms: 5 priority tiers
+
+RELATIONSHIPS:
+← users (user_id)
+
+================================================================================
+TABLE 6: MEDICAL_REPORTS
+================================================================================
+Purpose: Store medical reports created by doctors
+Primary Key: id (SERIAL)
+RLS: Enabled (patients see own, doctors see their reports)
+
+COLUMNS:
+┌────────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column         │ Type                 │ Constraints │ Description          │
+├────────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id             │ SERIAL               │ PRIMARY KEY │ Report ID            │
+│ patient_id     │ UUID                 │ FOREIGN KEY │ Patient ID           │
+│ doctor_id      │ INTEGER              │ FOREIGN KEY │ Doctor ID            │
+│ appointment_id │ INTEGER              │ FOREIGN KEY │ Appointment ID       │
+│ report_type    │ TEXT                 │ NOT NULL    │ Report type          │
+│ report_title   │ TEXT                 │ NOT NULL    │ Report title         │
+│ report_content │ TEXT                 │ NOT NULL    │ Report content       │
+│ report_date    │ DATE                 │ NOT NULL    │ Report date          │
+│ attachments    │ TEXT[]               │ NULL        │ Attachment URLs      │
+│ created_at     │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Creation time        │
+│ updated_at     │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Last update          │
+└────────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+REPORT TYPES:
+- Lab Test
+- Diagnosis
+- Follow-up
+- Consultation Summary
+- Medical Certificate
+
+RELATIONSHIPS:
+← users (patient_id)
+← doctors (doctor_id)
+← appointments (appointment_id)
+
+INDEXES:
+- idx_medical_reports_patient_id (patient_id)
+- idx_medical_reports_doctor_id (doctor_id)
+
+================================================================================
+TABLE 7: PRESCRIPTIONS
+================================================================================
+Purpose: Store digital prescriptions issued by doctors
+Primary Key: id (SERIAL)
+RLS: Enabled (patients see own, doctors see their prescriptions)
+
+COLUMNS:
+┌────────────────┬──────────────────────┬─────────────┬──────────────────────┐
+│ Column         │ Type                 │ Constraints │ Description          │
+├────────────────┼──────────────────────┼─────────────┼──────────────────────┤
+│ id             │ SERIAL               │ PRIMARY KEY │ Prescription ID      │
+│ patient_id     │ UUID                 │ FOREIGN KEY │ Patient ID           │
+│ doctor_id      │ INTEGER              │ FOREIGN KEY │ Doctor ID            │
+│ appointment_id │ INTEGER              │ FOREIGN KEY │ Appointment ID       │
+│ medicines      │ JSONB                │ NOT NULL    │ Medicines JSON       │
+│ instructions   │ TEXT                 │ NULL        │ Instructions         │
+│ valid_until    │ DATE                 │ NULL        │ Validity date        │
+│ created_at     │ TIMESTAMP WITH TZ    │ DEFAULT NOW │ Creation time        │
+└────────────────┴──────────────────────┴─────────────┴──────────────────────┘
+
+MEDICINES JSONB FORMAT:
+[
+  {
+    "name": "Medicine Name",
+    "dosage": "500mg",
+    "frequency": "Twice daily",
+    "duration": "7 days",
+    "instructions": "After meals"
+  }
+]
+
+RELATIONSHIPS:
+← users (patient_id)
+← doctors (doctor_id)
+← appointments (appointment_id)
+
+INDEXES:
+- idx_prescriptions_patient_id (patient_id)
+- idx_prescriptions_doctor_id (doctor_id)
+
+================================================================================
+DATABASE RELATIONSHIPS DIAGRAM
+================================================================================
+
+                    ┌──────────────┐
+                    │ auth.users   │
+                    │ (Supabase)   │
+                    └──────┬───────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+              ▼                         ▼
+        ┌──────────┐            ┌──────────────┐
+        │  users   │            │   doctors    │
+        │  (UUID)  │            │   (SERIAL)   │
+        └────┬─────┘            └──────┬───────┘
+             │                         │
+             │                         │
+    ┌────────┼─────────────────────────┼────────┐
+    │        │                         │        │
+    ▼        ▼                         ▼        ▼
+┌─────────┐ ┌──────────────┐  ┌──────────────┐ ┌──────────────┐
+│medicines│ │ appointments │  │medical_reports│ │prescriptions │
+└─────────┘ └──────┬───────┘  └──────────────┘ └──────────────┘
+┌─────────┐        │
+│symptom_ │        │
+│ checks  │        │
+└─────────┘        │
+                   │
+          ┌────────┴────────┐
+          │                 │
+          ▼                 ▼
+   ┌──────────────┐  ┌──────────────┐
+   │medical_reports│  │prescriptions │
+   └──────────────┘  └──────────────┘
+
+================================================================================
+ROW LEVEL SECURITY (RLS) POLICIES
+================================================================================
+
+USERS TABLE:
+✓ Users can view own profile
+✓ Users can update own profile
+✓ Users can insert own profile
+
+DOCTORS TABLE:
+✓ Anyone can view active verified doctors
+✓ Doctors can view own profile
+✓ Doctors can update own profile
+✓ Doctors can insert own profile
+
+APPOINTMENTS TABLE:
+✓ Users can view own appointments
+✓ Users can create own appointments
+✓ Users can update own appointments
+✓ Users can delete own appointments
+✓ Doctors can view their appointments
+✓ Doctors can update their appointments
+
+MEDICINES TABLE:
+✓ Users can view own medicines
+✓ Users can create own medicines
+✓ Users can update own medicines
+✓ Users can delete own medicines
+
+SYMPTOM_CHECKS TABLE:
+✓ Users can view own symptom checks
+✓ Users can create own symptom checks
+
+MEDICAL_REPORTS TABLE:
+✓ Patients can view own reports
+✓ Doctors can view their patients' reports
+✓ Doctors can create reports
+✓ Doctors can update own reports
+
+PRESCRIPTIONS TABLE:
+✓ Patients can view own prescriptions
+✓ Doctors can view their prescriptions
+✓ Doctors can create prescriptions
+✓ Doctors can update own prescriptions
+
+================================================================================
+DATABASE INDEXES
+================================================================================
+
+Performance indexes for frequently queried columns:
+
+1. idx_doctors_auth_id (doctors.auth_id)
+   - Fast doctor authentication lookup
+
+2. idx_doctors_specialization (doctors.specialization)
+   - Filter doctors by specialty
+
+3. idx_appointments_doctor_id (appointments.doctor_id)
+   - Doctor's appointment queries
+
+4. idx_appointments_user_id (appointments.user_id)
+   - User's appointment queries
+
+5. idx_appointments_status (appointments.status)
+   - Filter by appointment status
+
+6. idx_medical_reports_patient_id (medical_reports.patient_id)
+   - Patient's reports lookup
+
+7. idx_medical_reports_doctor_id (medical_reports.doctor_id)
+   - Doctor's reports lookup
+
+8. idx_prescriptions_patient_id (prescriptions.patient_id)
+   - Patient's prescriptions lookup
+
+9. idx_prescriptions_doctor_id (prescriptions.doctor_id)
+   - Doctor's prescriptions lookup
+
+================================================================================
+TRIGGERS & FUNCTIONS
+================================================================================
+
+FUNCTION: update_updated_at_column()
+- Automatically updates 'updated_at' timestamp on record modification
+
+TRIGGERS:
+1. update_doctors_updated_at (doctors table)
+2. update_appointments_updated_at (appointments table)
+3. update_medical_reports_updated_at (medical_reports table)
+
+================================================================================
+DATA TYPES REFERENCE
+================================================================================
+
+UUID: Universally Unique Identifier (128-bit)
+SERIAL: Auto-incrementing integer (4 bytes)
+TEXT: Variable-length character string
+INTEGER: Signed 4-byte integer
+DECIMAL(p,s): Exact numeric with precision and scale
+BOOLEAN: True/false value
+DATE: Calendar date (year, month, day)
+TIME: Time of day (no time zone)
+TIMESTAMP WITH TIME ZONE: Date and time with timezone
+TEXT[]: Array of text values
+JSONB: Binary JSON data (indexed)
+
+================================================================================
+SAMPLE DATA
+================================================================================
+
+DOCTORS: 36 pre-loaded sample doctors
+SPECIALIZATIONS: 16 different specialties
+- General Physician, Cardiologist, Dermatologist, Neurologist,
+  Orthopedic, Psychiatrist, Pulmonologist, Endocrinologist,
+  Gastroenterologist, Urologist, Gynecologist, Ophthalmologist,
+  ENT Specialist, Rheumatologist, Oncologist, Nephrologist,
+  Infectious Disease Specialist, Hematologist
+
+DISEASES: 34 diseases with symptoms
+SYMPTOMS: 8-15 per disease
+SYMPTOM WEIGHTS: 5 priority tiers (1.0x to 3.5x)
+
+================================================================================
+BACKUP & MAINTENANCE
+================================================================================
+
+BACKUP STRATEGY:
+- Supabase automatic daily backups
+- Point-in-time recovery available
+- Export data regularly for local backup
+
+MAINTENANCE:
+- Monitor database size and performance
+- Review and optimize slow queries
+- Update indexes as needed
+- Clean up old data periodically
+- Review RLS policies regularly
+
+MONITORING:
+- Track query performance
+- Monitor connection pool usage
+- Check for slow queries
+- Review error logs
+- Monitor storage usage
+
+================================================================================
+END OF QUICK REFERENCE
+================================================================================
+
+Document Version: 1.0
+Last Updated: February 26, 2026
+Database System: Supabase (PostgreSQL)
+
+For detailed information, refer to:
+- DATA_DICTIONARY.md (Complete documentation)
+- supabase_schema.sql (Database schema)
+- supabase_doctor_schema.sql (Doctor portal schema)
