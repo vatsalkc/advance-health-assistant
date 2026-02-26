@@ -37,15 +37,14 @@ const customStorage = {
   }
 };
 
-// Create Supabase client with mobile-optimized configuration
+// Create Supabase client with simplified configuration
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
     storage: customStorage,
-    storageKey: 'sb-mklbffjqlcvowdardqkb-auth-token',
-    flowType: 'pkce'
+    storageKey: 'sb-mklbffjqlcvowdardqkb-auth-token'
   },
   db: {
     schema: 'public'
@@ -54,40 +53,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     headers: {
       'x-application-name': 'health-assistant'
     }
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
   }
 });
-
-// Session persistence helper for mobile
-export const ensureSessionPersistence = async () => {
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      console.error('[Supabase] Session check error:', error);
-      return false;
-    }
-    
-    if (session) {
-      // Force save session to localStorage for mobile
-      customStorage.setItem(
-        'sb-mklbffjqlcvowdardqkb-auth-token',
-        JSON.stringify(session)
-      );
-      console.log('[Supabase] Session persisted for mobile');
-      return true;
-    }
-    
-    return false;
-  } catch (error) {
-    console.error('[Supabase] Session persistence error:', error);
-    return false;
-  }
-};
 
 // Test connection function
 export const testSupabaseConnection = async () => {

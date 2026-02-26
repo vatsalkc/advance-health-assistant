@@ -1,65 +1,20 @@
-import { supabase, ensureSessionPersistence } from '../config/supabase';
+import { supabase } from '../config/supabase';
 
 class AuthService {
   constructor() {
     this.user = null;
     this.loadUserFromStorage();
-    this.setupAuthListener();
-  }
-
-  setupAuthListener() {
-    // Listen for auth state changes (important for mobile)
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AuthService] Auth state changed:', event);
-      
-      if (event === 'SIGNED_IN' && session) {
-        await this.handleSignIn(session);
-      } else if (event === 'SIGNED_OUT') {
-        this.handleSignOut();
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        await this.handleTokenRefresh(session);
-      }
-    });
-  }
-
-  async handleSignIn(session) {
-    try {
-      // Get user profile
-      const { data: profile, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (!error && profile) {
-        this.user = profile;
-        localStorage.setItem('user_data', JSON.stringify(profile));
-        localStorage.setItem('supabase_session', JSON.stringify(session));
-        
-        // Ensure session persists on mobile
-        await ensureSessionPersistence();
-      }
-    } catch (error) {
-      console.error('[AuthService] handleSignIn error:', error);
-    }
-  }
-
-  handleSignOut() {
-    this.user = null;
-    localStorage.removeItem('user_data');
-    localStorage.removeItem('supabase_session');
-  }
-
-  async handleTokenRefresh(session) {
-    localStorage.setItem('supabase_session', JSON.stringify(session));
-    localStorage.setItem('last_token_validation', Date.now().toString());
-    console.log('[AuthService] Token refreshed');
   }
 
   loadUserFromStorage() {
     const userData = localStorage.getItem('user_data');
     if (userData) {
-      this.user = JSON.parse(userData);
+      try {
+        this.user = JSON.parse(userData);
+      } catch (error) {
+        console.error('[AuthService] Error parsing user data:', error);
+        localStorage.removeItem('user_data');
+      }
     }
   }
 
@@ -105,13 +60,8 @@ class AuthService {
       // Store user data
       this.user = profile;
       localStorage.setItem('user_data', JSON.stringify(profile));
-      localStorage.setItem('supabase_session', JSON.stringify(authData.session));
-      localStorage.setItem('last_login', Date.now().toString());
       
-      // Ensure session persists on mobile
-      await ensureSessionPersistence();
-      
-      console.log('[AuthService] User profile created, session persisted');
+      console.log('[AuthService] User profile created');
 
       return profile;
     } catch (error) {
@@ -132,9 +82,16 @@ class AuthService {
         password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('[AuthService] Login error:', authError);
+        throw authError;
+      }
 
-      console.log('[AuthService] Login successful');
+      if (!authData.user || !authData.session) {
+        throw new Error('Login failed - no session returned');
+      }
+
+      console.log('[AuthService] Login successful, user ID:', authData.user.id);
 
       // Get user profile
       const { data: profile, error: profileError } = await supabase
@@ -143,11 +100,30 @@ class AuthService {
         .eq('id', authData.user.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('[AuthService] Profile fetch error:', profileError);
+        throw new Error('Failed to fetch user profile');
+      }
+
+      if (!profile) {
+        throw new Error('User profile not found');
+      }
 
       // Store user data
       this.user = profile;
       localStorage.setItem('user_data', JSON.stringify(profile));
+      
+      console.log('[AuthService] User data stored successfully');
+
+      return profile;
+    } catch (error) {
+      console.error('[AuthService] Login error:', error);
+      if (error.message.includes('Invalid login credentials')) {
+        throw new Error('Invalid email or password');
+      }
+      throw new Error(error.message || 'Login failed. Please try again.');
+    }
+  }
       localStorage.setItem('supabase_session', JSON.stringify(authData.session));
       localStorage.setItem('last_login', Date.now().toString());
       
@@ -208,31 +184,27 @@ class AuthService {
 
   isAuthenticated() {
     try {
-      // Check if we have a valid session
-      const session = localStorage.getItem('supabase_session');
+      // Simple check - just verify we have user data
       const userData = localStorage.getItem('user_data');
       
-      if (!session || !userData) {
+      if (!userData) {
         return false;
       }
 
-      // Parse and validate session
-      const sessionData = JSON.parse(session);
-      if (!sessionData.access_token) {
-        return false;
-      }
-
-      // Check if session is expired
-      if (sessionData.expires_at) {
-        const expiresAt = sessionData.expires_at * 1000; // Convert to milliseconds
-        if (Date.now() >= expiresAt) {
-          console.log('[AuthService] Session expired');
-          this.logout();
-          return false;
+      // Try to parse user data
+      try {
+        const user = JSON.parse(userData);
+        if (user && user.id) {
+          this.user = user;
+          return true;
         }
+      } catch (parseError) {
+        console.error('[AuthService] Error parsing user data:', parseError);
+        localStorage.removeItem('user_data');
+        return false;
       }
 
-      return true;
+      return false;
     } catch (error) {
       console.error('[AuthService] isAuthenticated error:', error);
       return false;
@@ -247,13 +219,11 @@ class AuthService {
       
       if (error) {
         console.error('[AuthService] Session error:', error);
-        await this.logout();
         return false;
       }
       
       if (!session) {
         console.log('[AuthService] No active session');
-        await this.logout();
         return false;
       }
 
@@ -266,12 +236,20 @@ class AuthService {
 
       if (profileError || !profile) {
         console.error('[AuthService] Profile error:', profileError);
-        await this.logout();
         return false;
       }
 
       // Update stored data
       this.user = profile;
+      localStorage.setItem('user_data', JSON.stringify(profile));
+      
+      console.log('[AuthService] Token validated successfully');
+      return true;
+    } catch (error) {
+      console.error('[AuthService] Token validation error:', error);
+      return false;
+    }
+  }
       localStorage.setItem('user_data', JSON.stringify(profile));
       localStorage.setItem('supabase_session', JSON.stringify(session));
       localStorage.setItem('last_token_validation', Date.now().toString());
@@ -286,39 +264,33 @@ class AuthService {
   }
 
   shouldValidateToken() {
-    // Check if we should validate the token (e.g., every hour)
-    const lastValidation = localStorage.getItem('last_token_validation');
-    if (!lastValidation) return true;
-
-    const oneHour = 60 * 60 * 1000;
-    return Date.now() - parseInt(lastValidation) > oneHour;
+    // Simplified - validate less frequently
+    return false; // Disable automatic validation for now
   }
 
   async refreshToken() {
     try {
       const { data, error } = await supabase.auth.refreshSession();
-      if (error) throw error;
+      if (error) {
+        console.error('[AuthService] Token refresh error:', error);
+        return false;
+      }
 
       if (data.session) {
-        localStorage.setItem('supabase_session', JSON.stringify(data.session));
-        localStorage.setItem('last_token_validation', Date.now().toString());
+        console.log('[AuthService] Token refreshed successfully');
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error('Token refresh error:', error);
+      console.error('[AuthService] Token refresh error:', error);
       return false;
     }
   }
 
   getToken() {
-    const session = localStorage.getItem('supabase_session');
-    if (session) {
-      const sessionData = JSON.parse(session);
-      return sessionData.access_token;
-    }
-    return null;
+    // Get token from Supabase session
+    return null; // Not needed for current implementation
   }
 }
 
