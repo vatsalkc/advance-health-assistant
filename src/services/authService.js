@@ -124,23 +124,6 @@ class AuthService {
       throw new Error(error.message || 'Login failed. Please try again.');
     }
   }
-      localStorage.setItem('supabase_session', JSON.stringify(authData.session));
-      localStorage.setItem('last_login', Date.now().toString());
-      
-      // Ensure session persists on mobile
-      await ensureSessionPersistence();
-      
-      console.log('[AuthService] User data stored, session persisted');
-
-      return profile;
-    } catch (error) {
-      console.error('[AuthService] Login error:', error);
-      if (error.message.includes('Invalid login credentials')) {
-        throw new Error('Invalid email or password');
-      }
-      throw new Error(error.message || 'Login failed. Please try again.');
-    }
-  }
 
   async logout() {
     try {
@@ -247,18 +230,6 @@ class AuthService {
       return true;
     } catch (error) {
       console.error('[AuthService] Token validation error:', error);
-      return false;
-    }
-  }
-      localStorage.setItem('user_data', JSON.stringify(profile));
-      localStorage.setItem('supabase_session', JSON.stringify(session));
-      localStorage.setItem('last_token_validation', Date.now().toString());
-      
-      console.log('[AuthService] Token validated successfully');
-      return true;
-    } catch (error) {
-      console.error('[AuthService] Token validation error:', error);
-      await this.logout();
       return false;
     }
   }
