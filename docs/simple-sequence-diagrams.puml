@@ -1,0 +1,567 @@
+@startuml 1. User Registration
+title 1. User Registration
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: POST /register\n(name, email, password)
+Controller -> Middleware: Validate input
+Middleware --> Controller: Validation passed
+Controller -> Middleware: Hash password
+Middleware --> Controller: Hashed password
+Controller -> Database: INSERT user
+Database --> Controller: User created
+Controller --> User: 201 Created\n(user data)
+
+@enduml
+
+@startuml 2. User Login
+title 2. User Login
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: POST /login\n(email, password)
+Controller -> Middleware: Validate credentials
+Middleware --> Controller: Valid format
+Controller -> Database: SELECT user WHERE email
+Database --> Controller: User found
+Controller -> Middleware: Verify password
+Middleware --> Controller: Password correct
+Controller -> Middleware: Generate JWT token
+Middleware --> Controller: Token created
+Controller --> User: 200 OK\n(token, user data)
+
+@enduml
+
+@startuml 3. User Logout
+title 3. User Logout
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: POST /logout\n(token)
+Controller -> Middleware: Verify token
+Middleware --> Controller: Token valid
+Controller -> Database: DELETE session
+Database --> Controller: Session deleted
+Controller -> Middleware: Clear token
+Middleware --> Controller: Token cleared
+Controller --> User: 200 OK\n(logged out)
+
+@enduml
+
+@startuml 4. Get User Profile
+title 4. Get User Profile
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: GET /profile\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT user WHERE id
+Database --> Controller: User data
+Controller --> User: 200 OK\n(profile data)
+
+@enduml
+
+@startuml 5. Update User Profile
+title 5. Update User Profile
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: PUT /profile\n(token, data)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Validate input
+Middleware --> Controller: Valid data
+Controller -> Database: UPDATE user SET data
+Database --> Controller: User updated
+Controller --> User: 200 OK\n(updated profile)
+
+@enduml
+
+@startuml 6. Add Symptoms
+title 6. Add Symptoms (Symptom Checker)
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: POST /symptoms\n(token, symptoms)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Validate symptoms
+Middleware --> Controller: Valid symptoms
+Controller -> Middleware: Predict disease
+Middleware --> Controller: Prediction result
+Controller -> Database: INSERT symptom_check
+Database --> Controller: Record saved
+Controller --> Patient: 200 OK\n(prediction, doctors)
+
+@enduml
+
+@startuml 7. Get Symptom History
+title 7. Get Symptom History
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /symptoms/history\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT symptom_checks\nWHERE user_id
+Database --> Controller: Symptom records
+Controller --> Patient: 200 OK\n(symptom history)
+
+@enduml
+
+@startuml 8. Get All Doctors
+title 8. Get All Doctors
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /doctors\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT * FROM doctors
+Database --> Controller: Doctors list
+Controller -> Middleware: Format response
+Middleware --> Controller: Formatted data
+Controller --> Patient: 200 OK\n(doctors list)
+
+@enduml
+
+@startuml 9. Get Doctors by Specialization
+title 9. Get Doctors by Specialization
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /doctors?spec=Cardiology\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Validate specialization
+Middleware --> Controller: Valid parameter
+Controller -> Database: SELECT doctors\nWHERE specialization
+Database --> Controller: Filtered doctors
+Controller --> Patient: 200 OK\n(filtered list)
+
+@enduml
+
+@startuml 10. Book Appointment
+title 10. Book Appointment
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: POST /appointments\n(token, doctor_id, date, time)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Validate appointment data
+Middleware --> Controller: Valid data
+Controller -> Database: CHECK doctor availability
+Database --> Controller: Doctor available
+Controller -> Database: INSERT appointment
+Database --> Controller: Appointment created
+Controller --> Patient: 201 Created\n(appointment details)
+
+@enduml
+
+@startuml 11. Get Patient Appointments
+title 11. Get Patient Appointments
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /appointments\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT appointments\nWHERE user_id
+Database --> Controller: Appointments list
+Controller --> Patient: 200 OK\n(appointments)
+
+@enduml
+
+@startuml 12. Cancel Appointment
+title 12. Cancel Appointment
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: DELETE /appointments/:id\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Check ownership
+Middleware --> Controller: User owns appointment
+Controller -> Database: DELETE appointment\nWHERE id AND user_id
+Database --> Controller: Appointment deleted
+Controller --> Patient: 200 OK\n(deleted)
+
+@enduml
+
+@startuml 13. Doctor Login
+title 13. Doctor Login
+
+actor Doctor
+participant Controller
+participant Middleware
+database Database
+
+Doctor -> Controller: POST /doctor/login\n(email, password)
+Controller -> Middleware: Validate credentials
+Middleware --> Controller: Valid format
+Controller -> Database: SELECT doctor WHERE email
+Database --> Controller: Doctor found
+Controller -> Middleware: Verify password
+Middleware --> Controller: Password correct
+Controller -> Middleware: Generate JWT token
+Middleware --> Controller: Token created
+Controller --> Doctor: 200 OK\n(token, doctor data)
+
+@enduml
+
+@startuml 14. Doctor Get Appointments
+title 14. Doctor Get Appointments
+
+actor Doctor
+participant Controller
+participant Middleware
+database Database
+
+Doctor -> Controller: GET /doctor/appointments\n(token)
+Controller -> Middleware: Authenticate doctor token
+Middleware --> Controller: Doctor authenticated
+Controller -> Database: SELECT appointments\nWHERE doctor_id
+Database --> Controller: Appointments list
+Controller --> Doctor: 200 OK\n(appointments)
+
+@enduml
+
+@startuml 15. Doctor Confirm Appointment
+title 15. Doctor Confirm Appointment
+
+actor Doctor
+participant Controller
+participant Middleware
+database Database
+
+Doctor -> Controller: PUT /doctor/appointments/:id/confirm\n(token)
+Controller -> Middleware: Authenticate doctor token
+Middleware --> Controller: Doctor authenticated
+Controller -> Middleware: Check appointment ownership
+Middleware --> Controller: Doctor owns appointment
+Controller -> Database: UPDATE appointment\nSET status = 'Confirmed'
+Database --> Controller: Appointment updated
+Controller --> Doctor: 200 OK\n(confirmed)
+
+@enduml
+
+@startuml 16. Doctor Reject Appointment
+title 16. Doctor Reject Appointment
+
+actor Doctor
+participant Controller
+participant Middleware
+database Database
+
+Doctor -> Controller: PUT /doctor/appointments/:id/reject\n(token, reason)
+Controller -> Middleware: Authenticate doctor token
+Middleware --> Controller: Doctor authenticated
+Controller -> Middleware: Validate reason
+Middleware --> Controller: Valid reason
+Controller -> Database: UPDATE appointment\nSET status = 'Rejected',\nreason = reason
+Database --> Controller: Appointment updated
+Controller --> Doctor: 200 OK\n(rejected)
+
+@enduml
+
+@startuml 17. Doctor Add Diagnosis
+title 17. Doctor Add Diagnosis
+
+actor Doctor
+participant Controller
+participant Middleware
+database Database
+
+Doctor -> Controller: PUT /doctor/appointments/:id/diagnosis\n(token, diagnosis, prescription)
+Controller -> Middleware: Authenticate doctor token
+Middleware --> Controller: Doctor authenticated
+Controller -> Middleware: Validate diagnosis data
+Middleware --> Controller: Valid data
+Controller -> Database: UPDATE appointment\nSET diagnosis, prescription
+Database --> Controller: Appointment updated
+Controller --> Doctor: 200 OK\n(updated)
+
+@enduml
+
+@startuml 18. Add Medicine Reminder
+title 18. Add Medicine Reminder
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: POST /medicines\n(token, name, dosage, frequency)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Validate medicine data
+Middleware --> Controller: Valid data
+Controller -> Database: INSERT medicine
+Database --> Controller: Medicine created
+Controller --> Patient: 201 Created\n(medicine details)
+
+@enduml
+
+@startuml 19. Get All Medicines
+title 19. Get All Medicines
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /medicines\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT medicines\nWHERE user_id
+Database --> Controller: Medicines list
+Controller --> Patient: 200 OK\n(medicines)
+
+@enduml
+
+@startuml 20. Mark Medicine as Taken
+title 20. Mark Medicine as Taken
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: PUT /medicines/:id/taken\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Check ownership
+Middleware --> Controller: User owns medicine
+Controller -> Database: UPDATE medicine\nSET last_taken = NOW()
+Database --> Controller: Medicine updated
+Controller --> Patient: 200 OK\n(updated)
+
+@enduml
+
+@startuml 21. Delete Medicine
+title 21. Delete Medicine
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: DELETE /medicines/:id\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Check ownership
+Middleware --> Controller: User owns medicine
+Controller -> Database: DELETE medicine\nWHERE id AND user_id
+Database --> Controller: Medicine deleted
+Controller --> Patient: 200 OK\n(deleted)
+
+@enduml
+
+@startuml 22. Password Reset Request
+title 22. Password Reset Request
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: POST /password-reset\n(email)
+Controller -> Middleware: Validate email
+Middleware --> Controller: Valid email
+Controller -> Database: SELECT user WHERE email
+Database --> Controller: User found
+Controller -> Middleware: Generate reset token
+Middleware --> Controller: Token created
+Controller -> Database: INSERT reset_token
+Database --> Controller: Token saved
+Controller -> Middleware: Send reset email
+Middleware --> Controller: Email sent
+Controller --> User: 200 OK\n(email sent)
+
+@enduml
+
+@startuml 23. Password Reset Confirm
+title 23. Password Reset Confirm
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: POST /password-reset/confirm\n(token, new_password)
+Controller -> Middleware: Validate token
+Middleware --> Controller: Token valid
+Controller -> Database: SELECT reset_token
+Database --> Controller: Token found
+Controller -> Middleware: Hash new password
+Middleware --> Controller: Password hashed
+Controller -> Database: UPDATE user SET password
+Database --> Controller: Password updated
+Controller -> Database: DELETE reset_token
+Database --> Controller: Token deleted
+Controller --> User: 200 OK\n(password changed)
+
+@enduml
+
+@startuml 24. Get Dashboard Stats
+title 24. Get Dashboard Stats
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /dashboard/stats\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: COUNT appointments
+Database --> Controller: Appointment count
+Controller -> Database: COUNT symptom_checks
+Database --> Controller: Symptom count
+Controller -> Database: COUNT medicines
+Database --> Controller: Medicine count
+Controller -> Middleware: Aggregate stats
+Middleware --> Controller: Stats compiled
+Controller --> Patient: 200 OK\n(dashboard stats)
+
+@enduml
+
+@startuml 25. Search Doctors
+title 25. Search Doctors
+
+actor Patient
+participant Controller
+participant Middleware
+database Database
+
+Patient -> Controller: GET /doctors/search?q=cardio\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Sanitize search query
+Middleware --> Controller: Safe query
+Controller -> Database: SELECT doctors\nWHERE name LIKE '%cardio%'\nOR specialization LIKE '%cardio%'
+Database --> Controller: Search results
+Controller --> Patient: 200 OK\n(matching doctors)
+
+@enduml
+
+@startuml 26. Error Handling - Invalid Token
+title 26. Error Handling - Invalid Token
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: GET /profile\n(invalid_token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: Token invalid
+Controller --> User: 401 Unauthorized\n(Invalid token)
+
+@enduml
+
+@startuml 27. Error Handling - Validation Failed
+title 27. Error Handling - Validation Failed
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: POST /register\n(invalid email)
+Controller -> Middleware: Validate input
+Middleware --> Controller: Validation failed
+Controller --> User: 400 Bad Request\n(Validation errors)
+
+@enduml
+
+@startuml 28. Error Handling - Not Found
+title 28. Error Handling - Not Found
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: GET /appointments/999\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT appointment\nWHERE id = 999
+Database --> Controller: Not found
+Controller --> User: 404 Not Found\n(Appointment not found)
+
+@enduml
+
+@startuml 29. Error Handling - Unauthorized Access
+title 29. Error Handling - Unauthorized Access
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: DELETE /appointments/123\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Middleware: Check ownership
+Middleware --> Controller: User does not own
+Controller --> User: 403 Forbidden\n(Not authorized)
+
+@enduml
+
+@startuml 30. Error Handling - Server Error
+title 30. Error Handling - Server Error
+
+actor User
+participant Controller
+participant Middleware
+database Database
+
+User -> Controller: GET /appointments\n(token)
+Controller -> Middleware: Authenticate token
+Middleware --> Controller: User authenticated
+Controller -> Database: SELECT appointments
+Database --> Controller: Database error
+Controller -> Middleware: Log error
+Middleware --> Controller: Error logged
+Controller --> User: 500 Internal Server Error\n(Something went wrong)
+
+@enduml
