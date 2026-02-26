@@ -70,27 +70,27 @@ function DoctorDashboard({ doctor, onNavigate }) {
 
   if (loading) {
     return (
-      <div className="text-center py-5">
+      <div className="doctor-loading">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p className="mt-3">Loading dashboard...</p>
+        <p>Loading dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="doctor-dashboard">
       {error && <Alert variant="danger">{error}</Alert>}
 
       {/* Welcome Section */}
-      <Card className="mb-4">
+      <Card className="doctor-welcome-card mb-4">
         <Card.Body>
           <h3>Welcome, Dr. {doctor.name}</h3>
           <p className="text-muted mb-0">
-            <Badge bg="primary">{doctor.specialization}</Badge>
+            <Badge bg="primary" className="me-2">{doctor.specialization}</Badge>
             {!doctor.is_verified && (
-              <Badge bg="warning" className="ms-2">Pending Verification</Badge>
+              <Badge bg="warning">Pending Verification</Badge>
             )}
           </p>
         </Card.Body>
@@ -98,34 +98,28 @@ function DoctorDashboard({ doctor, onNavigate }) {
 
       {/* Stats Cards */}
       <Row className="mb-4">
-        <Col md={4}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <i className="bi bi-people-fill" style={{ fontSize: '2.5rem', color: '#0d6efd' }}></i>
-              <h2 className="mt-3">{stats.totalPatients}</h2>
-              <p className="text-muted">Total Patients</p>
-            </Card.Body>
-          </Card>
+        <Col md={4} className="mb-3">
+          <div className="doctor-stat-card">
+            <i className="bi bi-people-fill" style={{ color: '#3b82f6' }}></i>
+            <h2>{stats.totalPatients}</h2>
+            <p>Total Patients</p>
+          </div>
         </Col>
 
-        <Col md={4}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <i className="bi bi-calendar-check" style={{ fontSize: '2.5rem', color: '#198754' }}></i>
-              <h2 className="mt-3">{stats.todayAppointments}</h2>
-              <p className="text-muted">Appointments Today</p>
-            </Card.Body>
-          </Card>
+        <Col md={4} className="mb-3">
+          <div className="doctor-stat-card">
+            <i className="bi bi-calendar-check" style={{ color: '#10b981' }}></i>
+            <h2>{stats.todayAppointments}</h2>
+            <p>Appointments Today</p>
+          </div>
         </Col>
 
-        <Col md={4}>
-          <Card className="text-center h-100">
-            <Card.Body>
-              <i className="bi bi-clock-history" style={{ fontSize: '2.5rem', color: '#ffc107' }}></i>
-              <h2 className="mt-3">{stats.pendingAppointments}</h2>
-              <p className="text-muted">Pending Requests</p>
-            </Card.Body>
-          </Card>
+        <Col md={4} className="mb-3">
+          <div className="doctor-stat-card">
+            <i className="bi bi-clock-history" style={{ color: '#f59e0b' }}></i>
+            <h2>{stats.pendingAppointments}</h2>
+            <p>Pending Requests</p>
+          </div>
         </Col>
       </Row>
 
@@ -145,26 +139,63 @@ function DoctorDashboard({ doctor, onNavigate }) {
             </Card.Header>
             <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {pendingAppointments.length === 0 ? (
-                <p className="text-muted text-center py-4">No pending appointments</p>
+                <div className="doctor-empty-state">
+                  <i className="bi bi-calendar-x"></i>
+                  <p>No pending appointments</p>
+                </div>
               ) : (
                 <ListGroup variant="flush">
                   {pendingAppointments.map(apt => (
-                    <ListGroup.Item key={apt.id}>
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                          <strong>{apt.users?.name || 'Unknown Patient'}</strong>
-                          <p className="small text-muted mb-1">
-                            {apt.date} • {apt.time}
-                          </p>
-                          <p className="small mb-2">{apt.reason}</p>
+                    <ListGroup.Item key={apt.id} className="doctor-appointment-item">
+                      <div className="d-flex justify-content-between align-items-start mb-3">
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center mb-2">
+                            <div className="patient-avatar me-3">
+                              {apt.users?.name?.charAt(0) || 'P'}
+                            </div>
+                            <div>
+                              <h6 className="mb-1">{apt.users?.name || 'Unknown Patient'}</h6>
+                              <div className="patient-details">
+                                {apt.users?.email && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-envelope"></i> {apt.users.email}
+                                  </span>
+                                )}
+                                {apt.users?.phone && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-telephone"></i> {apt.users.phone}
+                                  </span>
+                                )}
+                                {apt.users?.age && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-person"></i> {apt.users.age} years
+                                  </span>
+                                )}
+                                {apt.users?.gender && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-gender-ambiguous"></i> {apt.users.gender}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="appointment-info">
+                            <p className="mb-1">
+                              <i className="bi bi-calendar3"></i> {apt.date} • <i className="bi bi-clock"></i> {apt.time}
+                            </p>
+                            <p className="mb-0 reason-text">
+                              <i className="bi bi-file-text"></i> <strong>Reason:</strong> {apt.reason}
+                            </p>
+                          </div>
                         </div>
-                        <Badge bg="warning">Pending</Badge>
+                        <Badge bg="warning" className="status-badge">Pending</Badge>
                       </div>
                       <div className="d-flex gap-2">
                         <Button
                           size="sm"
                           variant="success"
                           onClick={() => handleAcceptAppointment(apt.id)}
+                          className="action-btn"
                         >
                           <i className="bi bi-check-circle me-1"></i>
                           Accept
@@ -173,6 +204,7 @@ function DoctorDashboard({ doctor, onNavigate }) {
                           size="sm"
                           variant="danger"
                           onClick={() => handleRejectAppointment(apt.id)}
+                          className="action-btn"
                         >
                           <i className="bi bi-x-circle me-1"></i>
                           Reject
@@ -201,20 +233,56 @@ function DoctorDashboard({ doctor, onNavigate }) {
             </Card.Header>
             <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {upcomingAppointments.length === 0 ? (
-                <p className="text-muted text-center py-4">No upcoming appointments</p>
+                <div className="doctor-empty-state">
+                  <i className="bi bi-calendar-check"></i>
+                  <p>No upcoming appointments</p>
+                </div>
               ) : (
                 <ListGroup variant="flush">
                   {upcomingAppointments.map(apt => (
-                    <ListGroup.Item key={apt.id}>
+                    <ListGroup.Item key={apt.id} className="doctor-appointment-item">
                       <div className="d-flex justify-content-between align-items-start">
-                        <div>
-                          <strong>{apt.users?.name || 'Unknown Patient'}</strong>
-                          <p className="small text-muted mb-1">
-                            {apt.date} • {apt.time}
-                          </p>
-                          <p className="small mb-0">{apt.reason}</p>
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center mb-2">
+                            <div className="patient-avatar me-3">
+                              {apt.users?.name?.charAt(0) || 'P'}
+                            </div>
+                            <div>
+                              <h6 className="mb-1">{apt.users?.name || 'Unknown Patient'}</h6>
+                              <div className="patient-details">
+                                {apt.users?.email && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-envelope"></i> {apt.users.email}
+                                  </span>
+                                )}
+                                {apt.users?.phone && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-telephone"></i> {apt.users.phone}
+                                  </span>
+                                )}
+                                {apt.users?.age && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-person"></i> {apt.users.age} years
+                                  </span>
+                                )}
+                                {apt.users?.gender && (
+                                  <span className="detail-item">
+                                    <i className="bi bi-gender-ambiguous"></i> {apt.users.gender}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="appointment-info">
+                            <p className="mb-1">
+                              <i className="bi bi-calendar3"></i> {apt.date} • <i className="bi bi-clock"></i> {apt.time}
+                            </p>
+                            <p className="mb-0 reason-text">
+                              <i className="bi bi-file-text"></i> <strong>Reason:</strong> {apt.reason}
+                            </p>
+                          </div>
                         </div>
-                        <Badge bg="success">Confirmed</Badge>
+                        <Badge bg="success" className="status-badge">Confirmed</Badge>
                       </div>
                     </ListGroup.Item>
                   ))}
@@ -230,7 +298,7 @@ function DoctorDashboard({ doctor, onNavigate }) {
         <Card.Header>
           <h5 className="mb-0">Quick Actions</h5>
         </Card.Header>
-        <Card.Body>
+        <Card.Body className="doctor-quick-actions">
           <Row>
             <Col md={3} className="mb-3">
               <Button 
@@ -238,8 +306,8 @@ function DoctorDashboard({ doctor, onNavigate }) {
                 className="w-100"
                 onClick={() => onNavigate('appointments')}
               >
-                <i className="bi bi-calendar-check d-block mb-2" style={{ fontSize: '2rem' }}></i>
-                Manage Appointments
+                <i className="bi bi-calendar-check"></i>
+                <span>Manage Appointments</span>
               </Button>
             </Col>
             <Col md={3} className="mb-3">
@@ -248,8 +316,8 @@ function DoctorDashboard({ doctor, onNavigate }) {
                 className="w-100"
                 onClick={() => onNavigate('patients')}
               >
-                <i className="bi bi-people d-block mb-2" style={{ fontSize: '2rem' }}></i>
-                View Patients
+                <i className="bi bi-people"></i>
+                <span>View Patients</span>
               </Button>
             </Col>
             <Col md={3} className="mb-3">
@@ -258,8 +326,8 @@ function DoctorDashboard({ doctor, onNavigate }) {
                 className="w-100"
                 onClick={() => onNavigate('profile')}
               >
-                <i className="bi bi-person-circle d-block mb-2" style={{ fontSize: '2rem' }}></i>
-                My Profile
+                <i className="bi bi-person-circle"></i>
+                <span>My Profile</span>
               </Button>
             </Col>
             <Col md={3} className="mb-3">
@@ -268,8 +336,8 @@ function DoctorDashboard({ doctor, onNavigate }) {
                 className="w-100"
                 onClick={() => window.location.reload()}
               >
-                <i className="bi bi-arrow-clockwise d-block mb-2" style={{ fontSize: '2rem' }}></i>
-                Refresh
+                <i className="bi bi-arrow-clockwise"></i>
+                <span>Refresh</span>
               </Button>
             </Col>
           </Row>

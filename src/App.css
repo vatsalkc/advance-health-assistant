@@ -4137,3 +4137,333 @@ body {
     padding: 14px;
   }
 }
+
+
+/* ============================================
+   DOCTOR PORTAL DASHBOARD - MODERN & CLEAN
+   ============================================ */
+
+/* Doctor Appointment Items */
+.doctor-appointment-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.doctor-appointment-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Patient Avatar */
+.patient-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Patient Details */
+.patient-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.detail-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.detail-item i {
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+/* Appointment Info */
+.appointment-info {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.appointment-info p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.appointment-info i {
+  color: var(--primary-color);
+}
+
+.reason-text {
+  background: var(--bg-secondary);
+  padding: 10px;
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+  margin-top: 8px;
+}
+
+.reason-text strong {
+  color: var(--text-primary);
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+/* Action Buttons */
+.action-btn {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 8px 16px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Doctor Dashboard Stats Cards */
+.doctor-dashboard .card {
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
+}
+
+.doctor-dashboard .card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  transform: translateY(-4px);
+}
+
+.doctor-dashboard .card-header {
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border-color);
+  padding: 16px 20px;
+  border-radius: 16px 16px 0 0;
+}
+
+.doctor-dashboard .card-header h5 {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Welcome Card */
+.doctor-welcome-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .doctor-welcome-card {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  border-color: #1e40af;
+}
+
+.doctor-welcome-card h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 8px;
+}
+
+[data-theme="dark"] .doctor-welcome-card h3 {
+  color: #ffffff;
+}
+
+/* Stats Cards */
+.doctor-stat-card {
+  text-align: center;
+  padding: 24px;
+  border-radius: 16px;
+  background: white;
+  border: 2px solid var(--border-color);
+  transition: all 0.2s;
+  height: 100%;
+}
+
+[data-theme="dark"] .doctor-stat-card {
+  background: var(--bg-secondary);
+}
+
+.doctor-stat-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+}
+
+.doctor-stat-card i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.doctor-stat-card h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 12px 0;
+  color: var(--text-primary);
+}
+
+.doctor-stat-card p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Quick Actions */
+.doctor-quick-actions .btn {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.doctor-quick-actions .btn:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-secondary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+}
+
+.doctor-quick-actions .btn i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+}
+
+/* Empty State */
+.doctor-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.doctor-empty-state i {
+  font-size: 64px;
+  opacity: 0.3;
+  margin-bottom: 16px;
+  display: block;
+  color: var(--text-tertiary);
+}
+
+.doctor-empty-state p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Loading State */
+.doctor-loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.doctor-loading .spinner-border {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+.doctor-loading p {
+  color: var(--text-secondary);
+  margin-top: 16px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .patient-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .patient-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .detail-item {
+    font-size: 12px;
+  }
+  
+  .doctor-stat-card h2 {
+    font-size: 2rem;
+  }
+  
+  .doctor-stat-card i {
+    font-size: 2.5rem;
+  }
+  
+  .doctor-appointment-item {
+    padding: 16px;
+  }
+  
+  .status-badge {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .doctor-welcome-card h3 {
+    font-size: 22px;
+  }
+  
+  .action-btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .doctor-quick-actions .btn {
+    padding: 16px;
+  }
+  
+  .doctor-quick-actions .btn i {
+    font-size: 2rem;
+  }
+}
