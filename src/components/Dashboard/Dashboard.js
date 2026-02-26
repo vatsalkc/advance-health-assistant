@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import { supabase } from '../../config/supabase';
 
-function Dashboard({ user, onNavigate, onSymptomResult }) {
+function Dashboard({ user, onNavigate, onSymptomResult, symptomCheckTrigger }) {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [todayMedicines, setTodayMedicines] = useState([]);
   const [recentSymptomChecks, setRecentSymptomChecks] = useState([]);
@@ -17,7 +17,7 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
     if (user) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, symptomCheckTrigger]); // Re-fetch when symptomCheckTrigger changes
 
   const fetchDashboardData = async () => {
     try {
@@ -34,10 +34,11 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
 
       const userId = session.user.id;
 
-      const [appointmentsResult, medicinesResult, symptomChecksResult] = await Promise.all([
+      const [appointmentsResult, medicinesResult, symptomChecksResult, symptomChecksCountResult] = await Promise.all([
         supabase.from('appointments').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
         supabase.from('medicines').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
-        supabase.from('symptom_checks').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10)
+        supabase.from('symptom_checks').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10),
+        supabase.from('symptom_checks').select('id', { count: 'exact', head: false }).eq('user_id', userId)
       ]);
 
       if (!appointmentsResult.error) {
@@ -65,7 +66,10 @@ function Dashboard({ user, onNavigate, onSymptomResult }) {
       if (!symptomChecksResult.error) {
         const checks = symptomChecksResult.data || [];
         setRecentSymptomChecks(checks);
-        setStats(prev => ({ ...prev, symptomsChecked: checks.length }));
+        
+        // Get total count from the count query
+        const totalCount = symptomChecksCountResult.data?.length || checks.length;
+        setStats(prev => ({ ...prev, symptomsChecked: totalCount }));
       }
 
       setLoading(false);

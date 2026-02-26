@@ -12,6 +12,7 @@ import MedicineReminder from './components/MedicineReminder/MedicineReminder';
 import UserHistory from './components/UserHistory/UserHistory';
 import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
+import AIChatbot from './components/AIChatbot/AIChatbot';
 import DoctorApp from './DoctorApp';
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [symptomCheckTrigger, setSymptomCheckTrigger] = useState(0);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     // Load dark mode preference from localStorage
     const savedMode = localStorage.getItem('darkMode');
@@ -117,6 +120,7 @@ function App() {
   const handleSymptomResult = (disease, specialization, fullResult) => {
     const result = fullResult || { disease, specialization };
     setPredictionResult(result);
+    setSymptomCheckTrigger(prev => prev + 1); // Trigger dashboard refresh
     setCurrentView('doctorRecommendation');
   };
 
@@ -197,6 +201,14 @@ function App() {
                   >
                     <i className={`bi bi-${darkMode ? 'sun' : 'moon'}-fill`}></i>
                   </Button>
+                  <Button 
+                    variant="link" 
+                    className="nav-ai-chatbot"
+                    onClick={() => setChatbotOpen(true)}
+                    title="AI Health Assistant"
+                  >
+                    <i className="bi bi-robot"></i>
+                  </Button>
                   <Button
                     variant="link"
                     className="nav-profile-btn"
@@ -245,6 +257,7 @@ function App() {
             user={user}
             onNavigate={setCurrentView}
             onSymptomResult={handleSymptomResult}
+            symptomCheckTrigger={symptomCheckTrigger}
           />
         )}
 
@@ -286,6 +299,15 @@ function App() {
           />
         )}
       </Container>
+
+      {/* AI Chatbot - Full Screen */}
+      {isAuthenticated && (
+        <AIChatbot 
+          user={user} 
+          isOpen={chatbotOpen}
+          onClose={() => setChatbotOpen(false)}
+        />
+      )}
     </div>
   );
 }

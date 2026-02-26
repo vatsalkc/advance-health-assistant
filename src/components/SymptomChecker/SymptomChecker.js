@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Card, Form, Button, Badge, Alert, Modal } from 'react-bootstrap';
+import { Card, Form, Button, Badge, Alert } from 'react-bootstrap';
 import { predictDisease, allSymptoms, getFollowUpSymptoms } from '../../data/diseaseDatabase';
 import { supabase } from '../../config/supabase';
 
@@ -12,34 +12,28 @@ function SymptomChecker({ onResult, user }) {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
-  const [showSeverityModal, setShowSeverityModal] = useState(false);
-  const [selectedSymptom, setSelectedSymptom] = useState('');
   const inputRef = useRef(null);
 
-  const addSymptom = (symptom = null, severity = null) => {
-    const symptomToAdd = symptom || symptomInput.trim();
+  const addSymptom = (symptom) => {
+    const symptomToAdd = (symptom || symptomInput).trim();
     if (symptomToAdd) {
-      // Create symptom with severity if provided
-      const symptomWithSeverity = severity ? `${symptomToAdd} (${severity})` : symptomToAdd;
-      
-      // Check if base symptom already exists
-      const baseSymptomExists = symptoms.some(s => 
+      const baseSymptomExists = symptoms.some(s =>
         s.toLowerCase().startsWith(symptomToAdd.toLowerCase())
       );
-      
+
       if (!baseSymptomExists) {
-        const newSymptoms = [...symptoms, symptomWithSeverity];
+        const newSymptoms = [...symptoms, symptomToAdd];
         setSymptoms(newSymptoms);
         setSymptomInput('');
         setShowSuggestions(false);
         setError('');
-        setSuccessMessage(`"${symptomWithSeverity}" added to symptoms list`);
+        setSuccessMessage(`"${symptomToAdd}" added to symptoms list`);
         setTimeout(() => setSuccessMessage(''), 2000);
-        
+
         // Get follow-up suggestions for the added symptom
         const followUps = getFollowUpSymptoms(symptomToAdd);
         if (followUps && followUps.length > 0) {
-          const newFollowUps = followUps.filter(s => !newSymptoms.some(existing => 
+          const newFollowUps = followUps.filter(s => !newSymptoms.some(existing =>
             existing.toLowerCase().startsWith(s.toLowerCase())
           ));
           setFollowUpSuggestions(newFollowUps);
@@ -98,16 +92,15 @@ function SymptomChecker({ onResult, user }) {
     
     // Check if this symptom has follow-up options
     const followUps = getFollowUpSymptoms(suggestion);
-    
+
     if (followUps && followUps.length > 0) {
       // Show both the base symptom AND follow-up options
       setFollowUpSuggestions([suggestion, ...followUps]);
       setSuccessMessage(`Select "${suggestion}" or choose a specific type`);
       setTimeout(() => setSuccessMessage(''), 3000);
     } else {
-      // No follow-ups, ask for severity directly
-      setSelectedSymptom(suggestion);
-      setShowSeverityModal(true);
+      // No follow-ups; just add the symptom directly
+      addSymptom(suggestion);
     }
   };
 
@@ -116,37 +109,27 @@ function SymptomChecker({ onResult, user }) {
     
     // Check if this symptom has follow-up options
     const followUps = getFollowUpSymptoms(commonSymptom);
-    
+
     if (followUps && followUps.length > 0) {
       // Show both the base symptom AND follow-up options
       setFollowUpSuggestions([commonSymptom, ...followUps]);
       setSuccessMessage(`Select "${commonSymptom}" or choose a specific type`);
       setTimeout(() => setSuccessMessage(''), 3000);
     } else {
-      // No follow-ups, ask for severity
-      setSelectedSymptom(commonSymptom);
-      setShowSeverityModal(true);
-    }
-  };
-
-  const handleSeveritySelect = (severity) => {
-    addSymptom(selectedSymptom, severity);
-    setShowSeverityModal(false);
-    setSelectedSymptom('');
-    if (inputRef.current) {
-      inputRef.current.focus();
+      // No follow-ups; just add the symptom directly
+      addSymptom(commonSymptom);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (symptomInput.trim()) {
-        setSelectedSymptom(symptomInput.trim());
-        setShowSeverityModal(true);
-        setSymptomInput('');
-        setShowSuggestions(false);
-      }
+      const value = symptomInput.trim();
+      if (!value) return;
+
+      addSymptom(value);
+      setSymptomInput('');
+      setShowSuggestions(false);
     }
   };
 
@@ -165,8 +148,8 @@ function SymptomChecker({ onResult, user }) {
     try {
       console.log('[SymptomChecker] Checking symptoms:', symptoms);
       
-      // Remove severity indicators for prediction
-      const cleanSymptoms = symptoms.map(s => s.split(' (')[0].toLowerCase().trim());
+      // Normalize symptoms for prediction
+      const cleanSymptoms = symptoms.map(s => s.toLowerCase().trim());
       
       // Predict disease using local algorithm
       const prediction = predictDisease(cleanSymptoms);
@@ -254,12 +237,12 @@ function SymptomChecker({ onResult, user }) {
                 <Button 
                   variant="primary" 
                   onClick={() => {
-                    if (symptomInput.trim()) {
-                      setSelectedSymptom(symptomInput.trim());
-                      setShowSeverityModal(true);
-                      setSymptomInput('');
-                      setShowSuggestions(false);
-                    }
+                    const value = symptomInput.trim();
+                    if (!value) return;
+
+                    addSymptom(value);
+                    setSymptomInput('');
+                    setShowSuggestions(false);
                   }} 
                   type="button"
                 >
@@ -318,16 +301,20 @@ function SymptomChecker({ onResult, user }) {
                     key={suggestion}
                     type="button"
                     className={`symptom-followup-badge ${index === 0 && followUpSuggestions.length > 1 ? 'base-symptom' : ''}`}
-                    onClick={() => {
-                      setSelectedSymptom(suggestion);
-                      setShowSeverityModal(true);
-                    }}
+                    onClick={() => addSymptom(suggestion)}
                     title={index === 0 && followUpSuggestions.length > 1 ? 'General symptom' : 'Click to add'}
                   >
                     <i className="bi bi-plus-circle"></i>
                     {suggestion}
                     {index === 0 && followUpSuggestions.length > 1 && (
-                      <Badge bg="light" text="dark" className="ms-2" style={{ fontSize: '10px', padding: '2px 6px' }}>General</Badge>
+                      <Badge
+                        bg="light"
+                        text="dark"
+                        className="ms-2"
+                        style={{ fontSize: '10px', padding: '2px 6px' }}
+                      >
+                        General
+                      </Badge>
                     )}
                   </button>
                 ))}
@@ -417,42 +404,6 @@ function SymptomChecker({ onResult, user }) {
           </div>
         </div>
       </Card.Body>
-
-      {/* Severity Selection Modal */}
-      <Modal show={showSeverityModal} onHide={() => setShowSeverityModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Select Severity</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p className="mb-3">How severe is your <strong>{selectedSymptom}</strong>?</p>
-          <div className="d-grid gap-2">
-            <Button 
-              variant="outline-success" 
-              className="severity-btn"
-              onClick={() => handleSeveritySelect('mild')}
-            >
-              <strong>Mild</strong>
-              <small className="text-muted">Barely noticeable, doesn't affect daily activities</small>
-            </Button>
-            <Button 
-              variant="outline-warning" 
-              className="severity-btn"
-              onClick={() => handleSeveritySelect('moderate')}
-            >
-              <strong>Moderate</strong>
-              <small className="text-muted">Noticeable discomfort, some impact on activities</small>
-            </Button>
-            <Button 
-              variant="outline-danger" 
-              className="severity-btn"
-              onClick={() => handleSeveritySelect('severe')}
-            >
-              <strong>Severe</strong>
-              <small className="text-muted">Significant pain/discomfort, major impact on life</small>
-            </Button>
-          </div>
-        </Modal.Body>
-      </Modal>
     </Card>
   );
 }

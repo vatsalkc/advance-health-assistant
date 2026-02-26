@@ -43,6 +43,8 @@ export const symptomWeights = {
   'cough with phlegm': 2.0,
   'burning urination': 2.0,
   'frequent urination': 2.0,
+  'decreased urination': 2.0,
+  'painful urination': 2.0,
   'joint pain': 2.0,
   'back pain': 2.0,
   'stomach pain': 2.0,
@@ -52,6 +54,12 @@ export const symptomWeights = {
   'dizziness': 2.0,
   'facial pain': 2.0,
   'sweating': 2.0,
+  'swelling in feet': 2.0,
+  'swelling in legs': 2.0,
+  'swelling in ankles': 2.0,
+  'foamy urine': 2.0,
+  'blood in urine': 2.0,
+  'cloudy urine': 2.0,
   
   // COMMON symptoms (weight: 1.5) - Typical illness indicators
   'fatigue': 1.5,
@@ -258,6 +266,38 @@ export const diseaseDatabase = [
     specialization: 'Urologist',
     description: 'An infection in any part of the urinary system (kidneys, bladder, urethra).',
     precautions: ['Drink plenty of water', 'Take antibiotics as prescribed', 'Avoid irritants (caffeine, alcohol)', 'Practice good hygiene', 'Urinate frequently']
+  },
+  {
+    disease: 'Chronic Kidney Disease',
+    symptoms: ['frequent urination', 'swelling in feet', 'swelling in ankles', 'swelling in legs', 'fatigue', 'weakness', 'loss of appetite', 'nausea', 'vomiting', 'difficulty concentrating', 'sleep problems', 'muscle cramps', 'itchy skin', 'high blood pressure'],
+    requiredSymptoms: ['frequent urination', 'swelling in feet', 'swelling in ankles'],
+    specialization: 'Nephrologist',
+    description: 'Gradual loss of kidney function over time, affecting waste removal from blood.',
+    precautions: ['Monitor kidney function regularly', 'Control blood pressure', 'Manage blood sugar', 'Follow low-sodium diet', 'Limit protein intake', 'Take prescribed medications']
+  },
+  {
+    disease: 'Acute Kidney Injury',
+    symptoms: ['decreased urination', 'swelling in legs', 'swelling in ankles', 'swelling in feet', 'fatigue', 'confusion', 'nausea', 'weakness', 'irregular heartbeat', 'chest pain', 'shortness of breath'],
+    requiredSymptoms: ['decreased urination', 'swelling in legs'],
+    specialization: 'Nephrologist',
+    description: 'Sudden loss of kidney function requiring immediate medical attention.',
+    precautions: ['Seek immediate medical care', 'Stay hydrated', 'Avoid nephrotoxic drugs', 'Monitor urine output', 'Follow medical treatment plan']
+  },
+  {
+    disease: 'Kidney Stones',
+    symptoms: ['severe pain in side', 'severe pain in back', 'pain radiating to lower abdomen', 'painful urination', 'blood in urine', 'frequent urination', 'nausea', 'vomiting', 'fever', 'chills', 'cloudy urine'],
+    requiredSymptoms: ['severe pain in side', 'painful urination', 'blood in urine'],
+    specialization: 'Urologist',
+    description: 'Hard deposits of minerals and salts that form inside kidneys.',
+    precautions: ['Drink plenty of water', 'Take pain medication', 'Seek medical care for large stones', 'Limit sodium intake', 'Reduce animal protein']
+  },
+  {
+    disease: 'Nephrotic Syndrome',
+    symptoms: ['severe swelling in feet', 'swelling in ankles', 'swelling around eyes', 'foamy urine', 'weight gain', 'fatigue', 'loss of appetite', 'high cholesterol'],
+    requiredSymptoms: ['severe swelling in feet', 'foamy urine'],
+    specialization: 'Nephrologist',
+    description: 'Kidney disorder causing body to excrete too much protein in urine.',
+    precautions: ['Follow low-sodium diet', 'Take prescribed medications', 'Monitor protein levels', 'Control blood pressure', 'Regular kidney function tests']
   },
   {
     disease: 'Arthritis',

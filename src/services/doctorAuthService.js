@@ -70,6 +70,8 @@ class DoctorAuthService {
         profile = updatedProfile;
       } else {
         // Create new doctor profile
+        console.log('[DoctorAuth] Creating new doctor profile...');
+        
         const { data: newProfile, error: profileError } = await supabase
           .from('doctors')
           .insert([
@@ -92,10 +94,25 @@ class DoctorAuthService {
 
         if (profileError) {
           console.error('Doctor profile creation error:', profileError);
-          throw new Error('Failed to create doctor profile');
+          console.error('Error details:', {
+            code: profileError.code,
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint
+          });
+          
+          // Provide helpful error message
+          if (profileError.code === '42501') {
+            throw new Error('Registration failed: Database permission error. Please contact support or try again later.');
+          } else if (profileError.code === '23505') {
+            throw new Error('This email is already registered as a doctor.');
+          } else {
+            throw new Error(`Failed to create doctor profile: ${profileError.message}`);
+          }
         }
 
         profile = newProfile;
+        console.log('[DoctorAuth] Profile created successfully:', profile.id);
       }
 
       // Store doctor data
@@ -127,14 +144,66 @@ class DoctorAuthService {
       if (authError) throw authError;
 
       // Get doctor profile
-      const { data: profile, error: profileError } = await supabase
+      let { data: profile, error: profileError } = await supabase
         .from('doctors')
         .select('*')
         .eq('auth_id', authData.user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError || !profile) {
-        throw new Error('Doctor profile not found. Please register as a doctor.');
+      // If profile not found by auth_id, try by email
+      if (!profile) {
+        console.log('[DoctorAuth] Profile not found by auth_id, trying email...');
+        const { data: emailProfile, error: emailError } = await supabase
+          .from('doctors')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+        
+        if (emailProfile) {
+          console.log('[DoctorAuth] Found profile by email, linking auth_id...');
+          // Update profile with auth_id
+          const { data: updated, error: updateError } = await supabase
+            .from('doctors')
+            .update({ auth_id: authData.user.id, is_active: true })
+            .eq('email', email)
+            .select()
+            .single();
+          
+          if (!updateError && updated) {
+            profile = updated;
+            console.log('[DoctorAuth] Profile linked successfully');
+          }
+        }
+      }
+
+      // If still no profile, create one from auth data
+      if (!profile) {
+        console.log('[DoctorAuth] No profile found, creating from auth data...');
+        
+        // Get user metadata
+        const userName = authData.user.user_metadata?.name || email.split('@')[0];
+        
+        const { data: newProfile, error: createError } = await supabase
+          .from('doctors')
+          .insert([{
+            auth_id: authData.user.id,
+            name: userName,
+            email: email,
+            specialization: 'General Physician', // Default
+            rating: 4.5,
+            is_verified: false,
+            is_active: true,
+          }])
+          .select()
+          .single();
+        
+        if (createError) {
+          console.error('[DoctorAuth] Failed to create profile:', createError);
+          throw new Error('Doctor profile not found. Please complete your registration.');
+        }
+        
+        profile = newProfile;
+        console.log('[DoctorAuth] Profile created successfully');
       }
 
       // Store doctor data

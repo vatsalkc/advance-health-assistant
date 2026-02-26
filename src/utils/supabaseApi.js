@@ -11,7 +11,11 @@ const getCurrentUserId = async () => {
 // Doctors API
 export const doctorsAPI = {
   async getAll(specialization = null) {
-    let query = supabase.from('doctors').select('*');
+    let query = supabase
+      .from('doctors')
+      .select('*')
+      .eq('is_active', true) // Only show active doctors
+      .order('created_at', { ascending: false }); // Show newest first
     
     if (specialization) {
       query = query.eq('specialization', specialization);
@@ -19,7 +23,30 @@ export const doctorsAPI = {
 
     const { data, error } = await query;
     if (error) throw error;
-    return { data: { doctors: data } };
+    
+    // Format the data to ensure all fields are present
+    const formattedDoctors = (data || []).map(doctor => ({
+      ...doctor,
+      rating: doctor.rating || 4.5,
+      experience: doctor.experience || 'Not specified',
+      qualification: doctor.qualification || 'Not specified',
+      license_number: doctor.license_number || 'Not specified',
+      phone: doctor.phone || 'Not specified',
+      is_verified: doctor.is_verified || false
+    }));
+    
+    return { data: { doctors: formattedDoctors } };
+  },
+  
+  async getById(id) {
+    const { data, error } = await supabase
+      .from('doctors')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) throw error;
+    return { data: { doctor: data } };
   },
 };
 

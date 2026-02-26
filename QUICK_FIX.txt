@@ -1,0 +1,99 @@
+═══════════════════════════════════════════════════════════════
+  QUICK FIX: Doctor "ducho" Not Showing in Patient Appointments
+═══════════════════════════════════════════════════════════════
+
+PROBLEM:
+✗ Doctor "ducho" can log in but doesn't appear in patient's appointment tab
+✗ Doctor profile missing from database
+
+SOLUTION:
+Run SQL in Supabase to create the profile
+
+═══════════════════════════════════════════════════════════════
+STEP 1: Open Supabase
+═══════════════════════════════════════════════════════════════
+
+1. Go to: https://supabase.com
+2. Open project: mklbffjqlcvowdardqkb
+3. Click: SQL Editor (left sidebar)
+4. Click: New Query
+
+═══════════════════════════════════════════════════════════════
+STEP 2: Copy & Paste This SQL
+═══════════════════════════════════════════════════════════════
+
+INSERT INTO doctors (
+  auth_id, name, email, phone, specialization, 
+  qualification, license_number, experience, 
+  rating, is_verified, is_active, created_at, updated_at
+)
+SELECT 
+  id, 'ducho', 'duchopatel@gmail.com', '7894561230',
+  'General Physician', 'MBBS', 'ESWP232XC', 'Not specified',
+  4.5, true, true, NOW(), NOW()
+FROM auth.users 
+WHERE email = 'duchopatel@gmail.com'
+ON CONFLICT (email) DO UPDATE SET
+  auth_id = EXCLUDED.auth_id,
+  is_active = true,
+  is_verified = true,
+  updated_at = NOW();
+
+SELECT * FROM doctors WHERE email = 'duchopatel@gmail.com';
+
+═══════════════════════════════════════════════════════════════
+STEP 3: Click "Run" Button
+═══════════════════════════════════════════════════════════════
+
+You should see:
+✓ Success message
+✓ Doctor details displayed
+
+═══════════════════════════════════════════════════════════════
+STEP 4: Test in Application
+═══════════════════════════════════════════════════════════════
+
+1. Refresh patient page (Ctrl+Shift+R)
+2. Go to Appointments tab
+3. Search for "ducho"
+4. Doctor should appear! ✓
+
+═══════════════════════════════════════════════════════════════
+VERIFICATION
+═══════════════════════════════════════════════════════════════
+
+After SQL runs, you should see:
+
+id  | name  | email                | specialization    | is_active
+----|-------|----------------------|-------------------|----------
+XX  | ducho | duchopatel@gmail.com | General Physician | true
+
+═══════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+If still not showing:
+
+1. Clear browser cache (Ctrl+Shift+Delete)
+2. Hard refresh (Ctrl+Shift+R)
+3. Check browser console for errors (F12)
+4. Run this query to verify:
+   
+   SELECT * FROM doctors WHERE is_active = true;
+
+═══════════════════════════════════════════════════════════════
+ALTERNATIVE: Re-register
+═══════════════════════════════════════════════════════════════
+
+If SQL doesn't work:
+
+1. Delete auth user in Supabase (Authentication > Users)
+2. Register again with complete information
+3. Verify doctor appears in patient tab
+
+═══════════════════════════════════════════════════════════════
+
+Need the SQL file? Check: FIX_DUCHO_FINAL.sql
+Need detailed guide? Check: STEP_BY_STEP_FIX.md
+
+═══════════════════════════════════════════════════════════════

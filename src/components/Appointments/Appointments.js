@@ -10,7 +10,9 @@ import {
   Alert,
   Nav,
   Tab,
-  Modal
+  Modal,
+  Toast,
+  ToastContainer
 } from 'react-bootstrap';
 import { appointmentsAPI, doctorsAPI } from '../../utils/api';
 import authService from '../../services/authService';
@@ -22,7 +24,11 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationType, setNotificationType] = useState('success');
 
   const [formData, setFormData] = useState({
     date: '',
@@ -34,6 +40,14 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
     if (user) {
       fetchDoctors();
       fetchAppointments();
+      
+      // Check for appointments today
+      checkTodayAppointments();
+      
+      // Set up interval to check appointments every minute
+      const interval = setInterval(checkTodayAppointments, 60000);
+      
+      return () => clearInterval(interval);
     }
   }, [user]);
 
@@ -49,6 +63,31 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
     }
   }, [preSelectedDoctor, doctors]);
 
+  const checkTodayAppointments = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const todayAppointments = appointments.filter(apt => {
+      const aptDate = apt.date;
+      return aptDate === today && apt.status === 'Confirmed';
+    });
+
+    if (todayAppointments.length > 0) {
+      const apt = todayAppointments[0];
+      showNotificationToast(
+        `Reminder: You have an appointment with ${apt.doctor_name} today at ${apt.time}`,
+        'info'
+      );
+    }
+  };
+
+  const showNotificationToast = (message, type = 'success') => {
+    setNotificationMessage(message);
+    setNotificationType(type);
+    setShowNotification(true);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => setShowNotification(false), 5000);
+  };
+
   const fetchDoctors = async () => {
     try {
       const response = await doctorsAPI.getAll();
@@ -63,7 +102,22 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
   const fetchAppointments = async () => {
     try {
       const response = await appointmentsAPI.getAll();
-      setAppointments(response.data.appointments);
+      const fetchedAppointments = response.data.appointments;
+      
+      // Check for newly confirmed appointments
+      if (appointments.length > 0) {
+        fetchedAppointments.forEach(newApt => {
+          const oldApt = appointments.find(a => a.id === newApt.id);
+          if (oldApt && oldApt.status === 'Pending' && newApt.status === 'Confirmed') {
+            showNotificationToast(
+              `Your appointment with ${newApt.doctor_name} on ${newApt.date} at ${newApt.time} has been confirmed!`,
+              'success'
+            );
+          }
+        });
+      }
+      
+      setAppointments(fetchedAppointments);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching appointments:', err);
@@ -99,6 +153,11 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       
+      showNotificationToast(
+        `Appointment request sent to ${selectedDoctor.name}. You'll be notified once confirmed.`,
+        'success'
+      );
+      
       // Refresh appointments
       fetchAppointments();
     } catch (err) {
@@ -112,6 +171,7 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
 
     try {
       await appointmentsAPI.delete(id);
+      showNotificationToast('Appointment cancelled successfully', 'warning');
       fetchAppointments(); // Refresh appointments
     } catch (err) {
       console.error(err);
@@ -123,169 +183,292 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
     ...new Set(doctors.map((d) => d.specialization))
   ];
 
-  const filteredDoctors =
-    activeCategory === 'all'
-      ? doctors
-      : doctors.filter((d) => d.specialization === activeCategory);
+  const filteredDoctors = doctors
+    .filter((d) => {
+      // Filter by specialization
+      const matchesCategory = activeCategory === 'all' || d.specialization === activeCategory;
+      
+      // Filter by search query
+      const matchesSearch = searchQuery === '' || 
+        d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        d.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (d.qualification && d.qualification.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (d.license_number && d.license_number.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      return matchesCategory && matchesSearch;
+    });
 
   return (
-    <div>
+    <div className="appointments-page">
+      {/* Notification Toast */}
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999 }}>
+        <Toast 
+          show={showNotification} 
+          onClose={() => setShowNotification(false)}
+          bg={notificationType}
+          autohide
+          delay={5000}
+        >
+          <Toast.Header>
+            <i className={`bi bi-${notificationType === 'success' ? 'check-circle' : notificationType === 'info' ? 'info-circle' : 'exclamation-triangle'} me-2`}></i>
+            <strong className="me-auto">
+              {notificationType === 'success' ? 'Success' : notificationType === 'info' ? 'Reminder' : 'Notice'}
+            </strong>
+          </Toast.Header>
+          <Toast.Body className={notificationType === 'info' ? 'text-white' : ''}>
+            {notificationMessage}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+
       {showSuccess && (
         <Alert
           variant="success"
           dismissible
           onClose={() => setShowSuccess(false)}
+          className="appointment-success-alert"
         >
+          <i className="bi bi-check-circle-fill me-2"></i>
           Appointment booked successfully!
         </Alert>
       )}
 
-      <Row>
+      <Row className="g-4">
         {/* Doctors Section */}
-        <Col lg={8} md={12} className="mb-4">
-          <Card className="mb-4">
+        <Col lg={8} md={12}>
+          <Card className="appointments-doctors-card">
             <Card.Body>
-              <h4>Available Doctors</h4>
-              <p className="text-muted">
-                Browse by specialization and book an appointment
-              </p>
+              <div className="appointments-section-header">
+                <div>
+                  <h3>Available Doctors</h3>
+                  <p className="text-muted">
+                    Browse by specialization and book an appointment
+                  </p>
+                </div>
+              </div>
 
-              <Tab.Container
-                activeKey={activeCategory}
-                onSelect={(k) => setActiveCategory(k)}
-              >
-                <Nav variant="pills" className="mb-3 flex-wrap">
-                  <Nav.Item>
-                    <Nav.Link eventKey="all">All</Nav.Link>
-                  </Nav.Item>
-                  {getSpecializations().map((spec) => (
-                    <Nav.Item key={spec}>
-                      <Nav.Link eventKey={spec}>{spec}</Nav.Link>
-                    </Nav.Item>
-                  ))}
-                </Nav>
-
-                {loading ? (
-                  <div className="text-center py-4">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading doctors...</span>
-                    </div>
-                    <p className="mt-3 text-muted">Loading doctors...</p>
-                  </div>
-                ) : filteredDoctors.length === 0 ? (
-                  <div className="text-center py-4">
-                    <p className="text-muted">No doctors found. Please check your connection.</p>
-                    <Button variant="outline-primary" onClick={fetchDoctors}>
-                      Retry Loading Doctors
-                    </Button>
-                  </div>
-                ) : (
-                  <Row>
-                    {filteredDoctors.map((doctor) => (
-                      <Col lg={6} md={6} sm={12} key={doctor.id} className="mb-3">
-                        <Card className="h-100">
-                          <Card.Body>
-                            <h5>{doctor.name}</h5>
-                            <Badge bg="primary" className="mb-2">
-                              {doctor.specialization}
-                            </Badge>
-                            <p className="text-muted">
-                              ⭐ {doctor.rating} | {doctor.experience}
-                            </p>
-
-                            <div className="d-flex justify-content-between">
-                              <Badge bg="success">
-                                Available
-                              </Badge>
-
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleBookAppointment(doctor)
-                                }
-                              >
-                                Book
-                              </Button>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    ))}
-                  </Row>
+              {/* Search Bar */}
+              <div className="doctor-search-bar">
+                <div className="search-input-wrapper">
+                  <i className="bi bi-search search-icon"></i>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search doctors by name, specialization, qualification, or license..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                  />
+                  {searchQuery && (
+                    <button 
+                      className="clear-search-btn"
+                      onClick={() => setSearchQuery('')}
+                      type="button"
+                    >
+                      <i className="bi bi-x-lg"></i>
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <p className="search-results-text">
+                    Found {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? 's' : ''} matching "{searchQuery}"
+                  </p>
                 )}
-              </Tab.Container>
+              </div>
+
+              <div className="specialization-filter">
+                <h6>Filter by Specialization</h6>
+                <div className="specialization-pills">
+                  <button
+                    className={`specialization-pill ${activeCategory === 'all' ? 'active' : ''}`}
+                    onClick={() => setActiveCategory('all')}
+                  >
+                    All Doctors
+                  </button>
+                  {getSpecializations().map((spec) => (
+                    <button
+                      key={spec}
+                      className={`specialization-pill ${activeCategory === spec ? 'active' : ''}`}
+                      onClick={() => setActiveCategory(spec)}
+                    >
+                      {spec}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {loading ? (
+                <div className="appointments-loading">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading doctors...</span>
+                  </div>
+                  <p className="mt-3">Loading doctors...</p>
+                </div>
+              ) : filteredDoctors.length === 0 ? (
+                <div className="appointments-empty-state">
+                  <i className="bi bi-person-x"></i>
+                  <h5>No doctors found</h5>
+                  <p>Please check your connection or try again later.</p>
+                  <Button variant="outline-primary" onClick={fetchDoctors}>
+                    <i className="bi bi-arrow-clockwise me-2"></i>
+                    Retry Loading
+                  </Button>
+                </div>
+              ) : (
+                <div className="doctors-grid">
+                  {filteredDoctors.map((doctor) => (
+                    <div key={doctor.id} className="doctor-card-modern">
+                      <div className="doctor-card-top">
+                        <div className="doctor-avatar-large">
+                          {doctor.name.charAt(0)}
+                        </div>
+                        <div className="doctor-card-info">
+                          <h5 className="doctor-name">{doctor.name}</h5>
+                          <span className="doctor-spec-badge">{doctor.specialization}</span>
+                          {doctor.is_verified && (
+                            <span className="doctor-verified-badge">
+                              <i className="bi bi-patch-check-fill"></i> Verified
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="doctor-card-details">
+                        <div className="doctor-detail-row">
+                          <i className="bi bi-star-fill"></i>
+                          <span className="doctor-rating-stars">{doctor.rating}</span>
+                        </div>
+                        <div className="doctor-detail-row">
+                          <i className="bi bi-briefcase"></i>
+                          <span>{doctor.experience}</span>
+                        </div>
+                        <div className="doctor-detail-row">
+                          <i className="bi bi-mortarboard"></i>
+                          <span>{doctor.qualification}</span>
+                        </div>
+                        <div className="doctor-detail-row">
+                          <i className="bi bi-card-text"></i>
+                          <span className="doctor-license">License: {doctor.license_number}</span>
+                        </div>
+                        {doctor.phone && doctor.phone !== 'Not specified' && (
+                          <div className="doctor-detail-row">
+                            <i className="bi bi-telephone"></i>
+                            <span>{doctor.phone}</span>
+                          </div>
+                        )}
+                        <div className="doctor-detail-row">
+                          <i className="bi bi-clock"></i>
+                          <span className="doctor-availability-badge available">
+                            <i className="bi bi-circle-fill"></i>
+                            Available
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        className="book-btn-modern"
+                        onClick={() => handleBookAppointment(doctor)}
+                      >
+                        <i className="bi bi-calendar-plus me-2"></i>
+                        Book Appointment
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card.Body>
           </Card>
         </Col>
 
         {/* Appointments Section */}
         <Col lg={4} md={12}>
-          <Card>
+          <Card className="your-appointments-section">
             <Card.Body>
-              <h5>Your Appointments</h5>
-              <ListGroup variant="flush">
-                {appointments.length === 0 ? (
-                  <div className="text-center py-4">
-                    <p className="text-muted">No appointments scheduled</p>
-                  </div>
-                ) : (
-                  appointments.map((a) => (
-                    <ListGroup.Item key={a.id}>
-                      <div className="mb-2">
-                        <div className="d-flex justify-content-between">
-                          <strong>{a.doctor_name}</strong>
-                          <Badge
-                            bg={
-                              a.status === 'Confirmed'
-                                ? 'success'
-                                : a.status === 'Rejected'
-                                ? 'danger'
-                                : 'warning'
-                            }
-                          >
-                            {a.status}
-                          </Badge>
+              <div className="appointments-header">
+                <h3>Your Appointments</h3>
+                <span className="appointments-count">{appointments.length}</span>
+              </div>
+              
+              {appointments.length === 0 ? (
+                <div className="appointments-empty-state">
+                  <i className="bi bi-calendar-x"></i>
+                  <h5>No appointments yet</h5>
+                  <p>Book your first appointment with a doctor</p>
+                </div>
+              ) : (
+                <div className="appointments-list">
+                  {appointments.map((a) => (
+                    <div key={a.id} className="appointment-card">
+                      <div className="appointment-card-header">
+                        <div className="appointment-doctor-info">
+                          <h5>{a.doctor_name}</h5>
+                          <span className="appointment-spec">{a.specialization}</span>
                         </div>
-                        <Badge bg="info">{a.specialization}</Badge>
-                        <p className="small mb-1">
-                          {a.date} • {a.time}
-                        </p>
-                        <p className="small text-muted mb-1">{a.reason}</p>
-                        
-                        {a.status === 'Rejected' && a.rejected_reason && (
-                          <div className="alert alert-danger py-1 px-2 small mb-2">
-                            <strong>Rejection Reason:</strong> {a.rejected_reason}
-                          </div>
-                        )}
-                        
-                        {a.diagnosis && (
-                          <div className="alert alert-info py-1 px-2 small mb-2">
-                            <strong>Diagnosis:</strong> {a.diagnosis}
-                          </div>
-                        )}
-                        
-                        {a.prescription && (
-                          <div className="alert alert-success py-1 px-2 small mb-2">
-                            <strong>Prescription:</strong> {a.prescription}
-                          </div>
-                        )}
+                        <span className={`appointment-status ${a.status.toLowerCase()}`}>
+                          {a.status}
+                        </span>
                       </div>
-                      {a.status !== 'Rejected' && (
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          className="w-100"
-                          onClick={() =>
-                            handleDeleteAppointment(a.id)
-                          }
-                        >
-                          Cancel Appointment
-                        </Button>
+                      
+                      <div className="appointment-card-body">
+                        <div className="appointment-info-item">
+                          <i className="bi bi-calendar3"></i>
+                          <span>{a.date}</span>
+                        </div>
+                        <div className="appointment-info-item">
+                          <i className="bi bi-clock"></i>
+                          <span>{a.time}</span>
+                        </div>
+                        <div className="appointment-info-item">
+                          <i className="bi bi-file-text"></i>
+                          <span>{a.reason}</span>
+                        </div>
+                      </div>
+                      
+                      {a.status === 'Rejected' && a.rejected_reason && (
+                        <div className="appointment-alert danger">
+                          <i className="bi bi-x-circle"></i>
+                          <div>
+                            <strong>Rejection Reason:</strong>
+                            <p>{a.rejected_reason}</p>
+                          </div>
+                        </div>
                       )}
-                    </ListGroup.Item>
-                  ))
-                )}
-              </ListGroup>
+                      
+                      {a.diagnosis && (
+                        <div className="appointment-alert info">
+                          <i className="bi bi-clipboard-pulse"></i>
+                          <div>
+                            <strong>Diagnosis:</strong>
+                            <p>{a.diagnosis}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {a.prescription && (
+                        <div className="appointment-alert success">
+                          <i className="bi bi-prescription2"></i>
+                          <div>
+                            <strong>Prescription:</strong>
+                            <p>{a.prescription}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {a.status !== 'Rejected' && (
+                        <div className="appointment-card-footer">
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => handleDeleteAppointment(a.id)}
+                          >
+                            <i className="bi bi-x-lg me-1"></i>
+                            Cancel
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card.Body>
           </Card>
         </Col>
@@ -296,22 +479,34 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
         show={showBookingModal}
         onHide={() => setShowBookingModal(false)}
         centered
+        className="appointment-booking-modal"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Book Appointment</Modal.Title>
+          <Modal.Title>
+            <i className="bi bi-calendar-plus me-2"></i>
+            Book Appointment
+          </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           {selectedDoctor && (
-            <div className="mb-3">
-              <h5>{selectedDoctor.name}</h5>
-              <Badge bg="primary">{selectedDoctor.specialization}</Badge>
+            <div className="selected-doctor-info">
+              <div className="doctor-avatar-modal">
+                {selectedDoctor.name.charAt(0)}
+              </div>
+              <div>
+                <h5>{selectedDoctor.name}</h5>
+                <Badge bg="primary">{selectedDoctor.specialization}</Badge>
+              </div>
             </div>
           )}
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Date</Form.Label>
+              <Form.Label>
+                <i className="bi bi-calendar3 me-2"></i>
+                Date
+              </Form.Label>
               <Form.Control
                 type="date"
                 name="date"
@@ -323,7 +518,10 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Time</Form.Label>
+              <Form.Label>
+                <i className="bi bi-clock me-2"></i>
+                Time
+              </Form.Label>
               <Form.Control
                 type="time"
                 name="time"
@@ -334,26 +532,32 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Reason</Form.Label>
+              <Form.Label>
+                <i className="bi bi-file-text me-2"></i>
+                Reason for Visit
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
                 name="reason"
                 value={formData.reason}
                 onChange={handleChange}
+                placeholder="Describe your symptoms or reason for consultation..."
                 required
               />
             </Form.Group>
 
             <div className="d-flex gap-2">
               <Button
-                variant="secondary"
+                variant="outline-secondary"
                 onClick={() => setShowBookingModal(false)}
+                className="flex-fill"
               >
                 Cancel
               </Button>
-              <Button variant="primary" type="submit">
-                Confirm
+              <Button variant="primary" type="submit" className="flex-fill">
+                <i className="bi bi-check-lg me-2"></i>
+                Confirm Booking
               </Button>
             </div>
           </Form>
