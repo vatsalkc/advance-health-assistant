@@ -100,11 +100,11 @@ function DoctorAppointments() {
 
   if (loading) {
     return (
-      <div className="text-center py-5">
+      <div className="appointments-loading">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p className="mt-3">Loading appointments...</p>
+        <p>Loading appointments...</p>
       </div>
     );
   }
@@ -112,12 +112,12 @@ function DoctorAppointments() {
   return (
     <div>
       <Card>
-        <Card.Header>
+        <Card.Header className="doctor-appointments-header">
           <h4>Appointment Management</h4>
         </Card.Header>
         <Card.Body>
           {/* Filter Tabs */}
-          <Nav variant="pills" className="mb-4">
+          <Nav variant="pills" className="mb-4" style={{ marginTop: '20px' }}>
             <Nav.Item>
               <Nav.Link 
                 active={activeTab === 'all'} 
@@ -154,12 +154,13 @@ function DoctorAppointments() {
 
           {/* Appointments Table */}
           {filteredAppointments.length === 0 ? (
-            <div className="text-center py-5">
-              <p className="text-muted">No appointments found</p>
+            <div className="appointments-empty-state">
+              <i className="bi bi-calendar-x"></i>
+              <p>No appointments found</p>
             </div>
           ) : (
             <div className="table-responsive">
-              <Table striped bordered hover>
+              <Table striped bordered hover className="doctor-appointments-table">
                 <thead>
                   <tr>
                     <th>Patient</th>
@@ -173,14 +174,27 @@ function DoctorAppointments() {
                   {filteredAppointments.map(apt => (
                     <tr key={apt.id}>
                       <td>
-                        <strong>{apt.users?.name || 'Unknown'}</strong>
-                        <br />
-                        <small className="text-muted">
-                          {apt.users?.email}
-                        </small>
+                        <div className="patient-info-cell">
+                          <div className="patient-info-avatar">
+                            {apt.users?.name?.charAt(0) || 'U'}
+                          </div>
+                          <div className="patient-info-details">
+                            <div className="patient-info-name">
+                              {apt.users?.name || 'Unknown'}
+                            </div>
+                            <div className="patient-info-email">
+                              {apt.users?.email || 'No email'}
+                            </div>
+                            {apt.users?.phone && (
+                              <div className="patient-info-email">
+                                📞 {apt.users.phone}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </td>
                       <td>
-                        {apt.date}
+                        <strong>{apt.date}</strong>
                         <br />
                         <small>{apt.time}</small>
                       </td>
@@ -188,12 +202,13 @@ function DoctorAppointments() {
                       <td>{getStatusBadge(apt.status)}</td>
                       <td>
                         {apt.status === 'Pending' && (
-                          <div className="d-flex gap-2">
+                          <div className="appointment-actions">
                             <Button
                               size="sm"
                               variant="success"
                               onClick={() => handleAccept(apt.id)}
                             >
+                              <i className="bi bi-check-circle me-1"></i>
                               Accept
                             </Button>
                             <Button
@@ -201,6 +216,7 @@ function DoctorAppointments() {
                               variant="danger"
                               onClick={() => handleReject(apt.id)}
                             >
+                              <i className="bi bi-x-circle me-1"></i>
                               Reject
                             </Button>
                           </div>
@@ -211,11 +227,13 @@ function DoctorAppointments() {
                             variant="primary"
                             onClick={() => handleAddPrescription(apt)}
                           >
+                            <i className="bi bi-prescription2 me-1"></i>
                             {apt.prescription ? 'Edit' : 'Add'} Prescription
                           </Button>
                         )}
                         {apt.status === 'Rejected' && apt.rejected_reason && (
                           <small className="text-muted">
+                            <i className="bi bi-info-circle me-1"></i>
                             Reason: {apt.rejected_reason}
                           </small>
                         )}
@@ -230,16 +248,24 @@ function DoctorAppointments() {
       </Card>
 
       {/* Prescription Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" className="prescription-modal">
         <Modal.Header closeButton>
-          <Modal.Title>Add Prescription</Modal.Title>
+          <Modal.Title>
+            <i className="bi bi-prescription2 me-2"></i>
+            Add Prescription
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedAppointment && (
-            <div className="mb-3">
-              <strong>Patient:</strong> {selectedAppointment.users?.name}
-              <br />
-              <strong>Date:</strong> {selectedAppointment.date} {selectedAppointment.time}
+            <div className="patient-summary">
+              <div><strong>Patient:</strong> {selectedAppointment.users?.name}</div>
+              <div><strong>Date:</strong> {selectedAppointment.date} {selectedAppointment.time}</div>
+              {selectedAppointment.users?.email && (
+                <div><strong>Email:</strong> {selectedAppointment.users.email}</div>
+              )}
+              {selectedAppointment.users?.phone && (
+                <div><strong>Phone:</strong> {selectedAppointment.users.phone}</div>
+              )}
             </div>
           )}
 
