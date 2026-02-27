@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UML Diagrams - Advanced Health Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 80px 0 60px;
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .diagram-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .diagram-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .diagram-description {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-light);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: transparent;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="landing.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Health Assistant
+            </a>
+            <a href="landing.html" class="back-btn">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container text-center">
+            <h1 class="page-title">UML Diagrams</h1>
+            <p class="page-subtitle">System architecture and design diagrams</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#usecase">Use Case Diagram</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#class">Class Diagram</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#activity">Activity Diagrams</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#sequence">Sequence Diagrams</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Use Case Diagram -->
+            <div id="usecase" class="tab-pane fade show active">
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-diagram-3"></i>
+                        Use Case Diagram
+                    </h2>
+                    <p class="diagram-description">
+                        This diagram shows the interactions between actors (Patient, Doctor, System) and the various use cases in the Health Assistant system.
+                    </p>
+                    <div class="mermaid">
+graph TB
+    Patient((Patient))
+    Doctor((Doctor))
+    System((System))
+    
+    Patient --> UC1[Register/Login]
+    Patient --> UC2[Check Symptoms]
+    Patient --> UC3[View Disease Prediction]
+    Patient --> UC4[Search Doctors]
+    Patient --> UC5[Book Appointment]
+    Patient --> UC6[Manage Medicines]
+    Patient --> UC7[Set Reminders]
+    Patient --> UC8[View History]
+    Patient --> UC9[Chat with AI]
+    Patient --> UC10[Update Profile]
+    
+    Doctor --> UC11[Doctor Login]
+    Doctor --> UC12[View Appointments]
+    Doctor --> UC13[Accept/Reject Appointment]
+    Doctor --> UC14[Add Prescription]
+    Doctor --> UC15[Add Diagnosis]
+    Doctor --> UC16[View Patient Details]
+    Doctor --> UC17[Manage Profile]
+    
+    System --> UC18[Send Notifications]
+    System --> UC19[AI Disease Prediction]
+    System --> UC20[Generate Reports]
+    
+    UC2 --> UC19
+    UC5 --> UC18
+    UC13 --> UC18
+    UC7 --> UC18
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class Diagram -->
+            <div id="class" class="tab-pane fade">
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-boxes"></i>
+                        Class Diagram
+                    </h2>
+                    <p class="diagram-description">
+                        This diagram represents the main classes and their relationships in the system.
+                    </p>
+                    <div class="mermaid">
+classDiagram
+    class User {
+        +UUID id
+        +String name
+        +String email
+        +String phone
+        +Integer age
+        +String gender
+        +DateTime created_at
+        +register()
+        +login()
+        +updateProfile()
+        +logout()
+    }
+    
+    class Doctor {
+        +Integer id
+        +UUID auth_id
+        +String name
+        +String email
+        +String phone
+        +String specialization
+        +String experience
+        +String qualification
+        +String license_number
+        +Decimal rating
+        +Boolean is_verified
+        +Boolean is_active
+        +DateTime created_at
+        +register()
+        +login()
+        +updateProfile()
+        +viewAppointments()
+        +managePrescription()
+    }
+    
+    class Appointment {
+        +Integer id
+        +UUID user_id
+        +Integer doctor_id
+        +String doctor_name
+        +Date date
+        +Time time
+        +String reason
+        +String status
+        +String prescription
+        +String diagnosis
+        +DateTime created_at
+        +book()
+        +cancel()
+        +updateStatus()
+        +addPrescription()
+    }
+    
+    class SymptomCheck {
+        +Integer id
+        +UUID user_id
+        +Array symptoms
+        +String predicted_disease
+        +String recommended_specialization
+        +Decimal confidence
+        +String description
+        +Array precautions
+        +DateTime created_at
+        +checkSymptoms()
+        +predictDisease()
+        +getRecommendation()
+    }
+    
+    class Medicine {
+        +Integer id
+        +UUID user_id
+        +String medicine_name
+        +String dosage
+        +Time time
+        +String frequency
+        +Boolean active
+        +DateTime created_at
+        +add()
+        +update()
+        +delete()
+        +setReminder()
+    }
+    
+    class MedicalReport {
+        +Integer id
+        +UUID patient_id
+        +Integer doctor_id
+        +Integer appointment_id
+        +String report_type
+        +String report_title
+        +String report_content
+        +Date report_date
+        +DateTime created_at
+        +create()
+        +update()
+        +view()
+    }
+    
+    class Prescription {
+        +Integer id
+        +UUID patient_id
+        +Integer doctor_id
+        +Integer appointment_id
+        +JSONB medicines
+        +String instructions
+        +Date valid_until
+        +DateTime created_at
+        +create()
+        +update()
+        +view()
+    }
+    
+    User "1" --> "*" Appointment : books
+    User "1" --> "*" SymptomCheck : performs
+    User "1" --> "*" Medicine : manages
+    User "1" --> "*" MedicalReport : receives
+    User "1" --> "*" Prescription : receives
+    
+    Doctor "1" --> "*" Appointment : handles
+    Doctor "1" --> "*" MedicalReport : creates
+    Doctor "1" --> "*" Prescription : issues
+    
+    Appointment "1" --> "0..1" MedicalReport : generates
+    Appointment "1" --> "0..1" Prescription : includes
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Diagrams -->
+            <div id="activity" class="tab-pane fade">
+                <!-- Patient Registration -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-person-plus"></i>
+                        Patient Registration Activity
+                    </h2>
+                    <p class="diagram-description">
+                        Flow of patient registration process from start to finish.
+                    </p>
+                    <div class="mermaid">
+graph TD
+    Start([Start]) --> A[Open Registration Page]
+    A --> B[Enter Name, Email, Password]
+    B --> C[Enter Phone, Age, Gender]
+    C --> D{Validate Input}
+    D -->|Invalid| E[Show Error Message]
+    E --> B
+    D -->|Valid| F[Submit Registration]
+    F --> G{Email Already Exists?}
+    G -->|Yes| H[Show Error: Email Exists]
+    H --> B
+    G -->|No| I[Create User Account]
+    I --> J[Send Verification Email]
+    J --> K[Create User Profile]
+    K --> L[Auto Login]
+    L --> M[Redirect to Dashboard]
+    M --> End([End])
+                    </div>
+                </div>
+
+                <!-- Symptom Checking -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-activity"></i>
+                        Symptom Checking Activity
+                    </h2>
+                    <p class="diagram-description">
+                        Process flow for checking symptoms and getting disease predictions.
+                    </p>
+                    <div class="mermaid">
+graph TD
+    Start([Start]) --> A[Navigate to Symptom Checker]
+    A --> B[View Symptom Input Field]
+    B --> C[Type Symptom]
+    C --> D[View Suggestions]
+    D --> E{Select Symptom?}
+    E -->|Yes| F[Add to Selected List]
+    F --> G{Add More?}
+    G -->|Yes| C
+    G -->|No| H[Click Check Symptoms]
+    E -->|No| C
+    H --> I[AI Analyzes Symptoms]
+    I --> J[Calculate Weighted Scores]
+    J --> K[Predict Disease]
+    K --> L[Show Results]
+    L --> M[Display Disease Name]
+    M --> N[Show Confidence Score]
+    N --> O[Recommend Specialist]
+    O --> P[Show Precautions]
+    P --> Q{Book Appointment?}
+    Q -->|Yes| R[Navigate to Appointments]
+    Q -->|No| S[Save to History]
+    R --> S
+    S --> End([End])
+                    </div>
+                </div>
+
+                <!-- Appointment Booking -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-calendar-check"></i>
+                        Appointment Booking Activity
+                    </h2>
+                    <p class="diagram-description">
+                        Complete flow of booking an appointment with a doctor.
+                    </p>
+                    <div class="mermaid">
+graph TD
+    Start([Start]) --> A[Navigate to Appointments]
+    A --> B[View Doctor List]
+    B --> C{Search Doctor?}
+    C -->|Yes| D[Enter Search Query]
+    D --> E[Filter Results]
+    E --> B
+    C -->|No| F[Select Doctor]
+    F --> G[View Doctor Details]
+    G --> H[Click Book Appointment]
+    H --> I[Select Date]
+    I --> J[Select Time]
+    J --> K[Enter Reason]
+    K --> L{Validate Input?}
+    L -->|Invalid| M[Show Error]
+    M --> I
+    L -->|Valid| N[Submit Booking]
+    N --> O[Create Appointment Record]
+    O --> P[Set Status: Pending]
+    P --> Q[Send Notification to Doctor]
+    Q --> R[Show Success Message]
+    R --> S[Display Appointment Details]
+    S --> End([End])
+                    </div>
+                </div>
+
+                <!-- Doctor Appointment Management -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-clipboard-check"></i>
+                        Doctor Appointment Management
+                    </h2>
+                    <p class="diagram-description">
+                        How doctors manage incoming appointment requests.
+                    </p>
+                    <div class="mermaid">
+graph TD
+    Start([Start]) --> A[Doctor Logs In]
+    A --> B[View Dashboard]
+    B --> C[See Pending Appointments]
+    C --> D[Select Appointment]
+    D --> E[View Patient Details]
+    E --> F{Decision}
+    F -->|Accept| G[Click Accept]
+    G --> H[Update Status: Confirmed]
+    H --> I[Send Confirmation to Patient]
+    I --> J[Show in Confirmed List]
+    F -->|Reject| K[Click Reject]
+    K --> L[Enter Rejection Reason]
+    L --> M[Update Status: Rejected]
+    M --> N[Send Rejection to Patient]
+    N --> O[Remove from Pending]
+    J --> P{Add Prescription?}
+    P -->|Yes| Q[Enter Diagnosis]
+    Q --> R[Enter Prescription]
+    R --> S[Save Prescription]
+    S --> T[Update Appointment]
+    P -->|No| T
+    O --> T
+    T --> End([End])
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sequence Diagrams -->
+            <div id="sequence" class="tab-pane fade">
+                <!-- Patient Registration Sequence -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Patient Registration Sequence
+                    </h2>
+                    <p class="diagram-description">
+                        Interaction sequence between patient, frontend, backend, and database during registration.
+                    </p>
+                    <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant A as Auth Service
+    participant S as Supabase
+    participant D as Database
+    
+    P->>F: Open Registration Page
+    F->>P: Display Registration Form
+    P->>F: Enter Details (name, email, password)
+    F->>F: Validate Input
+    F->>A: Register Request
+    A->>S: Create Auth User
+    S->>D: Insert into auth.users
+    D-->>S: User Created
+    S-->>A: Auth User ID
+    A->>S: Create User Profile
+    S->>D: Insert into users table
+    D-->>S: Profile Created
+    S-->>A: Success
+    A-->>F: Registration Success
+    F->>A: Auto Login
+    A->>S: Create Session
+    S-->>A: Session Token
+    A-->>F: Login Success
+    F->>P: Redirect to Dashboard
+                    </div>
+                </div>
+
+                <!-- Symptom Checking Sequence -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Symptom Checking Sequence
+                    </h2>
+                    <p class="diagram-description">
+                        How symptom checking works from user input to AI prediction.
+                    </p>
+                    <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant ML as ML Algorithm
+    participant S as Supabase
+    participant D as Database
+    
+    P->>F: Navigate to Symptom Checker
+    F->>P: Display Symptom Input
+    P->>F: Type Symptom
+    F->>F: Show Suggestions
+    P->>F: Select Symptoms
+    P->>F: Click Check Symptoms
+    F->>ML: Send Symptoms Array
+    ML->>ML: Calculate Weighted Scores
+    ML->>ML: Match with Disease Database
+    ML->>ML: Calculate Confidence
+    ML-->>F: Return Prediction Result
+    F->>S: Save Symptom Check
+    S->>D: Insert into symptom_checks
+    D-->>S: Record Saved
+    S-->>F: Success
+    F->>P: Display Results
+    F->>P: Show Disease, Confidence, Specialist
+    F->>P: Show Precautions
+                    </div>
+                </div>
+
+                <!-- Appointment Booking Sequence -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Appointment Booking Sequence
+                    </h2>
+                    <p class="diagram-description">
+                        Complete sequence of booking an appointment with notifications.
+                    </p>
+                    <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant API as Appointment API
+    participant S as Supabase
+    participant D as Database
+    participant N as Notification System
+    
+    P->>F: Select Doctor
+    F->>P: Show Booking Form
+    P->>F: Enter Date, Time, Reason
+    F->>API: Create Appointment Request
+    API->>S: Insert Appointment
+    S->>D: Insert into appointments table
+    D-->>S: Appointment Created
+    S-->>API: Appointment ID
+    API->>N: Trigger Notification
+    N->>N: Send to Doctor
+    N-->>API: Notification Sent
+    API-->>F: Booking Success
+    F->>P: Show Success Message
+    F->>P: Display Appointment Details
+                    </div>
+                </div>
+
+                <!-- Doctor Prescription Sequence -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Doctor Prescription Sequence
+                    </h2>
+                    <p class="diagram-description">
+                        How doctors add prescriptions to confirmed appointments.
+                    </p>
+                    <div class="mermaid">
+sequenceDiagram
+    participant D as Doctor
+    participant F as Frontend
+    participant API as Doctor API
+    participant S as Supabase
+    participant DB as Database
+    participant P as Patient
+    
+    D->>F: View Confirmed Appointment
+    F->>API: Get Appointment Details
+    API->>S: Query Appointment
+    S->>DB: Select from appointments
+    DB-->>S: Appointment Data
+    S-->>API: Appointment Details
+    API-->>F: Return Data
+    F->>D: Display Patient Info
+    D->>F: Click Add Prescription
+    F->>D: Show Prescription Form
+    D->>F: Enter Diagnosis
+    D->>F: Enter Prescription
+    D->>F: Submit
+    F->>API: Update Appointment
+    API->>S: Update Record
+    S->>DB: Update appointments table
+    DB-->>S: Updated
+    S-->>API: Success
+    API-->>F: Prescription Saved
+    F->>D: Show Success Message
+    F->>P: Notify Patient
+                    </div>
+                </div>
+
+                <!-- Medicine Reminder Sequence -->
+                <div class="diagram-card">
+                    <h2 class="diagram-title">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Medicine Reminder Sequence
+                    </h2>
+                    <p class="diagram-description">
+                        Setting up and triggering medicine reminders.
+                    </p>
+                    <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant API as Medicine API
+    participant S as Supabase
+    participant D as Database
+    participant N as Notification System
+    
+    P->>F: Navigate to Medicines
+    F->>P: Display Medicine List
+    P->>F: Click Add Medicine
+    F->>P: Show Add Form
+    P->>F: Enter Medicine Details
+    P->>F: Set Time & Frequency
+    P->>F: Submit
+    F->>API: Create Medicine Reminder
+    API->>S: Insert Medicine
+    S->>D: Insert into medicines table
+    D-->>S: Medicine Created
+    S-->>API: Medicine ID
+    API->>N: Schedule Reminder
+    N->>N: Set Timer
+    N-->>API: Reminder Scheduled
+    API-->>F: Success
+    F->>P: Show Success Message
+    
+    Note over N: At Scheduled Time
+    N->>F: Trigger Reminder
+    F->>P: Show Notification
+    P->>F: Acknowledge
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2563eb',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#1e40af',
+                lineColor: '#64748b',
+                secondaryColor: '#3b82f6',
+                tertiaryColor: '#f8fafc'
+            }
+        });
+    </script>
+</body>
+</html>

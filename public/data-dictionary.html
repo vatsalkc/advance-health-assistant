@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Dictionary - Advanced Health Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 80px 0 60px;
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-description {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge-pk {
+            background: #10b981;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-fk {
+            background: #f59e0b;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-required {
+            background: #ef4444;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-light);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: transparent;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .relationship-box {
+            background: #f0f9ff;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="landing.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Health Assistant
+            </a>
+            <a href="landing.html" class="back-btn">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container text-center">
+            <h1 class="page-title">Data Dictionary</h1>
+            <p class="page-subtitle">Complete database schema and table definitions</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#users">Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#doctors">Doctors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#appointments">Appointments</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#medicines">Medicines</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#symptoms">Symptom Checks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#reports">Medical Reports</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#prescriptions">Prescriptions</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+
+            <!-- Users Table -->
+            <div id="users" class="tab-pane fade show active">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-person"></i>
+                        Users Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores patient/user information. Extends Supabase auth.users table.<br>
+                        <strong>Primary Key:</strong> id (UUID)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>UUID</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Unique identifier, linked to Supabase auth</td>
+                            </tr>
+                            <tr>
+                                <td><strong>name</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Full name of the user</td>
+                            </tr>
+                            <tr>
+                                <td><strong>email</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">UNIQUE</span></td>
+                                <td>Email address (unique across system)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>phone</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Contact phone number</td>
+                            </tr>
+                            <tr>
+                                <td><strong>age</strong></td>
+                                <td>INTEGER</td>
+                                <td>NULL</td>
+                                <td>User's age in years</td>
+                            </tr>
+                            <tr>
+                                <td><strong>gender</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>User's gender (Male/Female/Other)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Account creation timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>One-to-Many with <strong>appointments</strong> (user_id)</li>
+                            <li>One-to-Many with <strong>medicines</strong> (user_id)</li>
+                            <li>One-to-Many with <strong>symptom_checks</strong> (user_id)</li>
+                            <li>One-to-Many with <strong>medical_reports</strong> (patient_id)</li>
+                            <li>One-to-Many with <strong>prescriptions</strong> (patient_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctors Table -->
+            <div id="doctors" class="tab-pane fade">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-person-badge"></i>
+                        Doctors Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores doctor profiles, credentials, and availability.<br>
+                        <strong>Primary Key:</strong> id (SERIAL)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>SERIAL</td>
+                                <td>AUTO INCREMENT</td>
+                                <td>Auto-incrementing unique identifier</td>
+                            </tr>
+                            <tr>
+                                <td><strong>auth_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>UUID</td>
+                                <td>REFERENCES auth.users</td>
+                                <td>Link to Supabase auth for doctor login</td>
+                            </tr>
+                            <tr>
+                                <td><strong>name</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Doctor's full name</td>
+                            </tr>
+                            <tr>
+                                <td><strong>email</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">UNIQUE</span></td>
+                                <td>Doctor's email address</td>
+                            </tr>
+                            <tr>
+                                <td><strong>phone</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Doctor's contact number</td>
+                            </tr>
+                            <tr>
+                                <td><strong>specialization</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Medical specialization (e.g., Cardiologist)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>experience</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Years of experience (e.g., "10 years")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>qualification</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Educational qualifications (e.g., MBBS, MD)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>license_number</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Medical license/registration number</td>
+                            </tr>
+                            <tr>
+                                <td><strong>rating</strong></td>
+                                <td>DECIMAL(2,1)</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Doctor rating (0.0 to 5.0)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>is_verified</strong></td>
+                                <td>BOOLEAN</td>
+                                <td>DEFAULT FALSE</td>
+                                <td>Whether doctor is verified by admin</td>
+                            </tr>
+                            <tr>
+                                <td><strong>is_active</strong></td>
+                                <td>BOOLEAN</td>
+                                <td>DEFAULT TRUE</td>
+                                <td>Whether doctor account is active</td>
+                            </tr>
+                            <tr>
+                                <td><strong>consultation_fee</strong></td>
+                                <td>DECIMAL(10,2)</td>
+                                <td>NULL</td>
+                                <td>Consultation fee amount</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Account creation timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>One-to-Many with <strong>appointments</strong> (doctor_id)</li>
+                            <li>One-to-Many with <strong>medical_reports</strong> (doctor_id)</li>
+                            <li>One-to-Many with <strong>prescriptions</strong> (doctor_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments Table -->
+            <div id="appointments" class="tab-pane fade">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-calendar-check"></i>
+                        Appointments Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores appointment bookings between patients and doctors.<br>
+                        <strong>Primary Key:</strong> id (SERIAL)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>SERIAL</td>
+                                <td>AUTO INCREMENT</td>
+                                <td>Auto-incrementing unique identifier</td>
+                            </tr>
+                            <tr>
+                                <td><strong>user_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>UUID</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Patient who booked the appointment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>doctor_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>INTEGER</td>
+                                <td>REFERENCES doctors</td>
+                                <td>Doctor assigned to appointment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>doctor_name</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Doctor's name (denormalized)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>specialization</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Doctor's specialization</td>
+                            </tr>
+                            <tr>
+                                <td><strong>date</strong></td>
+                                <td>DATE</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Appointment date</td>
+                            </tr>
+                            <tr>
+                                <td><strong>time</strong></td>
+                                <td>TIME</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Appointment time</td>
+                            </tr>
+                            <tr>
+                                <td><strong>reason</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Reason for appointment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>status</strong></td>
+                                <td>TEXT</td>
+                                <td>DEFAULT 'Pending'</td>
+                                <td>Status: Pending/Confirmed/Rejected/Completed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>prescription</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Prescription details</td>
+                            </tr>
+                            <tr>
+                                <td><strong>diagnosis</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Diagnosis made by doctor</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Booking creation timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Many-to-One with <strong>users</strong> (user_id)</li>
+                            <li>Many-to-One with <strong>doctors</strong> (doctor_id)</li>
+                            <li>One-to-Many with <strong>medical_reports</strong> (appointment_id)</li>
+                            <li>One-to-Many with <strong>prescriptions</strong> (appointment_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medicines Table -->
+            <div id="medicines" class="tab-pane fade">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-capsule"></i>
+                        Medicines Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores medicine reminders for patients.<br>
+                        <strong>Primary Key:</strong> id (SERIAL)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>SERIAL</td>
+                                <td>AUTO INCREMENT</td>
+                                <td>Auto-incrementing unique identifier</td>
+                            </tr>
+                            <tr>
+                                <td><strong>user_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>UUID</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Patient who set the reminder</td>
+                            </tr>
+                            <tr>
+                                <td><strong>medicine_name</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Name of the medicine</td>
+                            </tr>
+                            <tr>
+                                <td><strong>dosage</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Dosage information (e.g., "500mg")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>time</strong></td>
+                                <td>TIME</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Time to take medicine</td>
+                            </tr>
+                            <tr>
+                                <td><strong>frequency</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Frequency (e.g., "Daily", "Twice a day")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>active</strong></td>
+                                <td>BOOLEAN</td>
+                                <td>DEFAULT TRUE</td>
+                                <td>Whether reminder is active</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Reminder creation timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Many-to-One with <strong>users</strong> (user_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Symptom Checks Table -->
+            <div id="symptoms" class="tab-pane fade">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-activity"></i>
+                        Symptom Checks Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores symptom checker results and AI predictions.<br>
+                        <strong>Primary Key:</strong> id (SERIAL)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>SERIAL</td>
+                                <td>AUTO INCREMENT</td>
+                                <td>Auto-incrementing unique identifier</td>
+                            </tr>
+                            <tr>
+                                <td><strong>user_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>UUID</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>User who performed the check</td>
+                            </tr>
+                            <tr>
+                                <td><strong>symptoms</strong></td>
+                                <td>TEXT[]</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Array of symptoms entered</td>
+                            </tr>
+                            <tr>
+                                <td><strong>predicted_disease</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>AI-predicted disease name</td>
+                            </tr>
+                            <tr>
+                                <td><strong>recommended_specialization</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Recommended doctor specialization</td>
+                            </tr>
+                            <tr>
+                                <td><strong>confidence</strong></td>
+                                <td>DECIMAL(5,2)</td>
+                                <td>NULL</td>
+                                <td>Prediction confidence score (0-100)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>description</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>Disease description</td>
+                            </tr>
+                            <tr>
+                                <td><strong>precautions</strong></td>
+                                <td>TEXT[]</td>
+                                <td>NULL</td>
+                                <td>Array of recommended precautions</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Check timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Many-to-One with <strong>users</strong> (user_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Reports Table -->
+            <div id="reports" class="tab-pane fade">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-file-medical"></i>
+                        Medical Reports Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores medical reports created by doctors for patients.<br>
+                        <strong>Primary Key:</strong> id (SERIAL)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>SERIAL</td>
+                                <td>AUTO INCREMENT</td>
+                                <td>Auto-incrementing unique identifier</td>
+                            </tr>
+                            <tr>
+                                <td><strong>patient_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>UUID</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Patient the report is for</td>
+                            </tr>
+                            <tr>
+                                <td><strong>doctor_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>INTEGER</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Doctor who created the report</td>
+                            </tr>
+                            <tr>
+                                <td><strong>appointment_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>INTEGER</td>
+                                <td>NULL</td>
+                                <td>Related appointment (optional)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>report_type</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Type of report (e.g., "Lab Test")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>report_title</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Title of the report</td>
+                            </tr>
+                            <tr>
+                                <td><strong>report_content</strong></td>
+                                <td>TEXT</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Detailed report content</td>
+                            </tr>
+                            <tr>
+                                <td><strong>report_date</strong></td>
+                                <td>DATE</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Date of the report</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Report creation timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Many-to-One with <strong>users</strong> (patient_id)</li>
+                            <li>Many-to-One with <strong>doctors</strong> (doctor_id)</li>
+                            <li>Many-to-One with <strong>appointments</strong> (appointment_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prescriptions Table -->
+            <div id="prescriptions" class="tab-pane fade">
+                <div class="table-card">
+                    <h2 class="table-title">
+                        <i class="bi bi-prescription2"></i>
+                        Prescriptions Table
+                    </h2>
+                    <p class="table-description">
+                        <strong>Purpose:</strong> Stores digital prescriptions issued by doctors.<br>
+                        <strong>Primary Key:</strong> id (SERIAL)
+                    </p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Data Type</th>
+                                <th>Constraints</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>id</strong> <span class="badge-pk">PK</span></td>
+                                <td>SERIAL</td>
+                                <td>AUTO INCREMENT</td>
+                                <td>Auto-incrementing unique identifier</td>
+                            </tr>
+                            <tr>
+                                <td><strong>patient_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>UUID</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Patient receiving prescription</td>
+                            </tr>
+                            <tr>
+                                <td><strong>doctor_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>INTEGER</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>Doctor issuing prescription</td>
+                            </tr>
+                            <tr>
+                                <td><strong>appointment_id</strong> <span class="badge-fk">FK</span></td>
+                                <td>INTEGER</td>
+                                <td>NULL</td>
+                                <td>Related appointment (optional)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>medicines</strong></td>
+                                <td>JSONB</td>
+                                <td><span class="badge-required">NOT NULL</span></td>
+                                <td>JSON array of medicine objects</td>
+                            </tr>
+                            <tr>
+                                <td><strong>instructions</strong></td>
+                                <td>TEXT</td>
+                                <td>NULL</td>
+                                <td>General instructions for patient</td>
+                            </tr>
+                            <tr>
+                                <td><strong>valid_until</strong></td>
+                                <td>DATE</td>
+                                <td>NULL</td>
+                                <td>Prescription validity date</td>
+                            </tr>
+                            <tr>
+                                <td><strong>created_at</strong></td>
+                                <td>TIMESTAMP WITH TIME ZONE</td>
+                                <td>DEFAULT NOW()</td>
+                                <td>Prescription creation timestamp</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="relationship-box mt-4">
+                        <strong><i class="bi bi-diagram-3 me-2"></i>Relationships:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Many-to-One with <strong>users</strong> (patient_id)</li>
+                            <li>Many-to-One with <strong>doctors</strong> (doctor_id)</li>
+                            <li>Many-to-One with <strong>appointments</strong> (appointment_id)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
