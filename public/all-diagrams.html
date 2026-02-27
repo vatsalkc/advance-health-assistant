@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Health Assistant - UML Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .diagram-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #64748b;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .diagram-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .diagram-section.active {
+            display: block;
+        }
+
+        .diagram-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .diagram-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .diagram-description {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .diagram-content {
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .image-placeholder {
+            text-align: center;
+            padding: 3rem;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .image-placeholder i {
+            font-size: 4rem;
+            color: #94a3b8;
+        }
+
+        .image-placeholder p {
+            margin-top: 1rem;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .image-placeholder small {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container">
+        <a href="landing.html" class="back-link">
+            <i class="bi bi-arrow-left me-2"></i>Back to Home
+        </a>
+
+        <div class="header">
+            <h1>Advanced Health Assistant - UML Diagrams</h1>
+            <p>Use Case, Class, Activity, and Sequence Diagrams</p>
+        </div>
+
+        <div class="diagram-nav">
+            <button class="nav-btn active" onclick="showDiagram('usecase')">Use Case Diagram</button>
+            <button class="nav-btn" onclick="showDiagram('class')">Class Diagram</button>
+            <button class="nav-btn" onclick="showDiagram('activity')">Activity Diagrams</button>
+            <button class="nav-btn" onclick="showDiagram('sequence')">Sequence Diagrams</button>
+        </div>
+
+        <!-- USE CASE DIAGRAM -->
+        <div id="usecase" class="diagram-section active">
+            <div class="diagram-header">
+                <h2 class="diagram-title">Use Case Diagram</h2>
+                <p class="diagram-description">System interactions between actors and use cases</p>
+            </div>
+            <div class="diagram-content">
+                <div class="mermaid">
+graph TB
+    Patient((Patient))
+    Doctor((Doctor))
+    System((System))
+    
+    Patient --> UC1[Register/Login]
+    Patient --> UC2[Check Symptoms]
+    Patient --> UC3[View Disease Prediction]
+    Patient --> UC4[Search Doctors]
+    Patient --> UC5[Book Appointment]
+    Patient --> UC6[Manage Medicines]
+    Patient --> UC7[Set Reminders]
+    Patient --> UC8[View History]
+    Patient --> UC9[Chat with AI]
+    Patient --> UC10[Update Profile]
+    
+    Doctor --> UC11[Doctor Login]
+    Doctor --> UC12[View Appointments]
+    Doctor --> UC13[Accept/Reject Appointment]
+    Doctor --> UC14[Add Prescription]
+    Doctor --> UC15[Add Diagnosis]
+    Doctor --> UC16[View Patient Details]
+    Doctor --> UC17[Manage Profile]
+    
+    System --> UC18[Send Notifications]
+    System --> UC19[AI Disease Prediction]
+    System --> UC20[Generate Reports]
+    
+    UC2 --> UC19
+    UC5 --> UC18
+    UC13 --> UC18
+    UC7 --> UC18
+                </div>
+            </div>
+        </div>
+
+        <!-- CLASS DIAGRAM -->
+        <div id="class" class="diagram-section">
+            <div class="diagram-header">
+                <h2 class="diagram-title">Class Diagram</h2>
+                <p class="diagram-description">Main classes and their relationships in the system</p>
+            </div>
+            <div class="diagram-content">
+                <div class="image-placeholder">
+                    <i class="bi bi-image"></i>
+                    <p>Class Diagram Image Placeholder</p>
+                    <small>Replace this section with your class diagram image</small>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h5 style="color: #667eea; margin-bottom: 1rem;">Classes in the System:</h5>
+                    <ul style="color: #1e293b; line-height: 2;">
+                        <li><strong>User:</strong> id, name, email, phone, age, gender</li>
+                        <li><strong>Doctor:</strong> id, name, email, specialization, experience, rating</li>
+                        <li><strong>Appointment:</strong> id, userId, doctorId, date, time, status</li>
+                        <li><strong>SymptomCheck:</strong> id, userId, symptoms, disease, confidence</li>
+                        <li><strong>Medicine:</strong> id, userId, name, dosage, time</li>
+                    </ul>
+                    <p style="margin-top: 1rem; color: #64748b; font-size: 0.9rem;">
+                        <strong>Relationships:</strong> User has many Appointments, SymptomChecks, and Medicines. Doctor has many Appointments.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY DIAGRAMS -->
+        <div id="activity" class="diagram-section">
+            <div class="diagram-header">
+                <h2 class="diagram-title">Activity Diagrams</h2>
+                <p class="diagram-description">Process flows and workflows</p>
+            </div>
+            <div class="diagram-content">
+                <h3 style="color: #667eea; margin-bottom: 1rem;">Patient Registration Activity</h3>
+                <div class="image-placeholder">
+                    <i class="bi bi-image"></i>
+                    <p>Patient Registration Activity Diagram</p>
+                    <small>Replace with your activity diagram image</small>
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 2rem;">Symptom Checking Activity</h3>
+                <div class="image-placeholder">
+                    <i class="bi bi-image"></i>
+                    <p>Symptom Checking Activity Diagram</p>
+                    <small>Replace with your activity diagram image</small>
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 2rem;">Appointment Booking Activity</h3>
+                <div class="image-placeholder">
+                    <i class="bi bi-image"></i>
+                    <p>Appointment Booking Activity Diagram</p>
+                    <small>Replace with your activity diagram image</small>
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 2rem;">Doctor Appointment Management</h3>
+                <div class="image-placeholder">
+                    <i class="bi bi-image"></i>
+                    <p>Doctor Appointment Management Activity Diagram</p>
+                    <small>Replace with your activity diagram image</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEQUENCE DIAGRAMS -->
+        <div id="sequence" class="diagram-section">
+            <div class="diagram-header">
+                <h2 class="diagram-title">Sequence Diagrams</h2>
+                <p class="diagram-description">Component interactions and message flows</p>
+            </div>
+            <div class="diagram-content">
+                <h3 style="color: #667eea; margin-bottom: 1rem;">Patient Registration Sequence</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant A as Auth Service
+    participant S as Supabase
+    participant D as Database
+    
+    P->>F: Open Registration Page
+    F->>P: Display Registration Form
+    P->>F: Enter Details (name, email, password)
+    F->>F: Validate Input
+    F->>A: Register Request
+    A->>S: Create Auth User
+    S->>D: Insert into auth.users
+    D-->>S: User Created
+    S-->>A: Auth User ID
+    A->>S: Create User Profile
+    S->>D: Insert into users table
+    D-->>S: Profile Created
+    S-->>A: Success
+    A-->>F: Registration Success
+    F->>A: Auto Login
+    A->>S: Create Session
+    S-->>A: Session Token
+    A-->>F: Login Success
+    F->>P: Redirect to Dashboard
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 3rem;">Symptom Checking Sequence</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant ML as ML Algorithm
+    participant S as Supabase
+    participant D as Database
+    
+    P->>F: Navigate to Symptom Checker
+    F->>P: Display Symptom Input
+    P->>F: Type Symptom
+    F->>F: Show Suggestions
+    P->>F: Select Symptoms
+    P->>F: Click Check Symptoms
+    F->>ML: Send Symptoms Array
+    ML->>ML: Calculate Weighted Scores
+    ML->>ML: Match with Disease Database
+    ML->>ML: Calculate Confidence
+    ML-->>F: Return Prediction Result
+    F->>S: Save Symptom Check
+    S->>D: Insert into symptom_checks
+    D-->>S: Record Saved
+    S-->>F: Success
+    F->>P: Display Results
+    F->>P: Show Disease, Confidence, Specialist
+    F->>P: Show Precautions
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 3rem;">Appointment Booking Sequence</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant API as Appointment API
+    participant S as Supabase
+    participant D as Database
+    participant N as Notification System
+    
+    P->>F: Select Doctor
+    F->>P: Show Booking Form
+    P->>F: Enter Date, Time, Reason
+    F->>API: Create Appointment Request
+    API->>S: Insert Appointment
+    S->>D: Insert into appointments table
+    D-->>S: Appointment Created
+    S-->>API: Appointment ID
+    API->>N: Trigger Notification
+    N->>N: Send to Doctor
+    N-->>API: Notification Sent
+    API-->>F: Booking Success
+    F->>P: Show Success Message
+    F->>P: Display Appointment Details
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 3rem;">Doctor Prescription Sequence</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant D as Doctor
+    participant F as Frontend
+    participant API as Doctor API
+    participant S as Supabase
+    participant DB as Database
+    participant P as Patient
+    
+    D->>F: View Confirmed Appointment
+    F->>API: Get Appointment Details
+    API->>S: Query Appointment
+    S->>DB: Select from appointments
+    DB-->>S: Appointment Data
+    S-->>API: Appointment Details
+    API-->>F: Return Data
+    F->>D: Display Patient Info
+    D->>F: Click Add Prescription
+    F->>D: Show Prescription Form
+    D->>F: Enter Diagnosis
+    D->>F: Enter Prescription
+    D->>F: Submit
+    F->>API: Update Appointment
+    API->>S: Update Record
+    S->>DB: Update appointments table
+    DB-->>S: Updated
+    S-->>API: Success
+    API-->>F: Prescription Saved
+    F->>D: Show Success Message
+    F->>P: Notify Patient
+                </div>
+
+                <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 3rem;">Medicine Reminder Sequence</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant API as Medicine API
+    participant S as Supabase
+    participant D as Database
+    participant N as Notification System
+    
+    P->>F: Navigate to Medicines
+    F->>P: Display Medicine List
+    P->>F: Click Add Medicine
+    F->>P: Show Add Form
+    P->>F: Enter Medicine Details
+    P->>F: Set Time & Frequency
+    P->>F: Submit
+    F->>API: Create Medicine Reminder
+    API->>S: Insert Medicine
+    S->>D: Insert into medicines table
+    D-->>S: Medicine Created
+    S-->>API: Medicine ID
+    API->>N: Schedule Reminder
+    N->>N: Set Timer
+    N-->>API: Reminder Scheduled
+    API-->>F: Success
+    F->>P: Show Success Message
+    
+    Note over N: At Scheduled Time
+    N->>F: Trigger Reminder
+    F->>P: Show Notification
+    P->>F: Acknowledge
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+
+        function showDiagram(diagramName) {
+            document.querySelectorAll('.diagram-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(diagramName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
