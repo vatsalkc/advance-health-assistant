@@ -218,128 +218,53 @@ graph TB
                     </p>
                     <div class="mermaid">
 classDiagram
-    class User {
+    class User{
         UUID id
         String name
         String email
         String phone
         Integer age
         String gender
-        DateTime createdAt
-        register()
-        login()
-        updateProfile()
-        logout()
     }
     
-    class Doctor {
+    class Doctor{
         Integer id
-        UUID authId
         String name
         String email
-        String phone
         String specialization
         String experience
-        String qualification
-        String licenseNumber
         Decimal rating
-        Boolean isVerified
-        Boolean isActive
-        DateTime createdAt
-        register()
-        login()
-        updateProfile()
-        viewAppointments()
-        managePrescription()
     }
     
-    class Appointment {
+    class Appointment{
         Integer id
         UUID userId
         Integer doctorId
-        String doctorName
         Date date
         Time time
-        String reason
         String status
-        String prescription
-        String diagnosis
-        DateTime createdAt
-        book()
-        cancel()
-        updateStatus()
-        addPrescription()
     }
     
-    class SymptomCheck {
+    class SymptomCheck{
         Integer id
         UUID userId
         Array symptoms
-        String predictedDisease
-        String recommendedSpecialization
+        String disease
         Decimal confidence
-        String description
-        Array precautions
-        DateTime createdAt
-        checkSymptoms()
-        predictDisease()
-        getRecommendation()
     }
     
-    class Medicine {
+    class Medicine{
         Integer id
         UUID userId
-        String medicineName
+        String name
         String dosage
         Time time
-        String frequency
-        Boolean active
-        DateTime createdAt
-        add()
-        update()
-        delete()
-        setReminder()
-    }
-    
-    class MedicalReport {
-        Integer id
-        UUID patientId
-        Integer doctorId
-        Integer appointmentId
-        String reportType
-        String reportTitle
-        String reportContent
-        Date reportDate
-        DateTime createdAt
-        create()
-        update()
-        view()
-    }
-    
-    class Prescription {
-        Integer id
-        UUID patientId
-        Integer doctorId
-        Integer appointmentId
-        JSONB medicines
-        String instructions
-        Date validUntil
-        DateTime createdAt
-        create()
-        update()
-        view()
     }
     
     User "1" -- "*" Appointment
     User "1" -- "*" SymptomCheck
     User "1" -- "*" Medicine
-    User "1" -- "*" MedicalReport
-    User "1" -- "*" Prescription
     Doctor "1" -- "*" Appointment
-    Doctor "1" -- "*" MedicalReport
-    Doctor "1" -- "*" Prescription
-    Appointment "1" -- "0..1" MedicalReport
-    Appointment "1" -- "0..1" Prescription
                     </div>
                 </div>
             </div>
@@ -356,23 +281,21 @@ classDiagram
                         Flow of patient registration process from start to finish.
                     </p>
                     <div class="mermaid">
-flowchart TD
-    Start([Start]) --> A[Open Registration Page]
-    A --> B[Enter Name Email Password]
-    B --> C[Enter Phone Age Gender]
-    C --> D{Validate Input}
-    D -->|Invalid| E[Show Error Message]
-    E --> B
-    D -->|Valid| F[Submit Registration]
-    F --> G{Email Already Exists}
-    G -->|Yes| H[Show Error Email Exists]
-    H --> B
-    G -->|No| I[Create User Account]
-    I --> J[Send Verification Email]
-    J --> K[Create User Profile]
-    K --> L[Auto Login]
-    L --> M[Redirect to Dashboard]
-    M --> End([End])
+graph TD
+    A[Start] --> B[Open Registration Page]
+    B --> C[Enter Details]
+    C --> D{Valid Input?}
+    D -->|No| E[Show Error]
+    E --> C
+    D -->|Yes| F[Submit]
+    F --> G{Email Exists?}
+    G -->|Yes| H[Show Error]
+    H --> C
+    G -->|No| I[Create Account]
+    I --> J[Send Email]
+    J --> K[Auto Login]
+    K --> L[Go to Dashboard]
+    L --> M[End]
                     </div>
                 </div>
 
@@ -386,30 +309,27 @@ flowchart TD
                         Process flow for checking symptoms and getting disease predictions.
                     </p>
                     <div class="mermaid">
-flowchart TD
-    Start([Start]) --> A[Navigate to Symptom Checker]
-    A --> B[View Symptom Input Field]
+graph TD
+    A[Start] --> B[Open Symptom Checker]
     B --> C[Type Symptom]
     C --> D[View Suggestions]
-    D --> E{Select Symptom}
-    E -->|Yes| F[Add to Selected List]
-    F --> G{Add More}
-    G -->|Yes| C
-    G -->|No| H[Click Check Symptoms]
-    E -->|No| C
-    H --> I[AI Analyzes Symptoms]
-    I --> J[Calculate Weighted Scores]
-    J --> K[Predict Disease]
-    K --> L[Show Results]
-    L --> M[Display Disease Name]
-    M --> N[Show Confidence Score]
-    N --> O[Recommend Specialist]
-    O --> P[Show Precautions]
-    P --> Q{Book Appointment}
-    Q -->|Yes| R[Navigate to Appointments]
-    Q -->|No| S[Save to History]
-    R --> S
-    S --> End([End])
+    D --> E[Select Symptom]
+    E --> F{Add More?}
+    F -->|Yes| C
+    F -->|No| G[Click Check]
+    G --> H[AI Analysis]
+    H --> I[Calculate Scores]
+    I --> J[Predict Disease]
+    J --> K[Show Results]
+    K --> L[Display Disease]
+    L --> M[Show Confidence]
+    M --> N[Recommend Doctor]
+    N --> O[Show Precautions]
+    O --> P{Book Appointment?}
+    P -->|Yes| Q[Go to Appointments]
+    P -->|No| R[Save History]
+    Q --> R
+    R --> S[End]
                     </div>
                 </div>
 
