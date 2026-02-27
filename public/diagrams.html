@@ -216,55 +216,27 @@ graph TB
                     <p class="diagram-description">
                         This diagram represents the main classes and their relationships in the system.
                     </p>
-                    <div class="mermaid">
-classDiagram
-    class User{
-        +id : string
-        +name : string
-        +email : string
-        +phone : string
-        +age : int
-        +gender : string
-    }
-    
-    class Doctor{
-        +id : int
-        +name : string
-        +email : string
-        +specialization : string
-        +experience : string
-        +rating : float
-    }
-    
-    class Appointment{
-        +id : int
-        +userId : string
-        +doctorId : int
-        +date : string
-        +time : string
-        +status : string
-    }
-    
-    class SymptomCheck{
-        +id : int
-        +userId : string
-        +symptoms : string
-        +disease : string
-        +confidence : float
-    }
-    
-    class Medicine{
-        +id : int
-        +userId : string
-        +name : string
-        +dosage : string
-        +time : string
-    }
-    
-    User "1" --> "*" Appointment
-    User "1" --> "*" SymptomCheck
-    User "1" --> "*" Medicine
-    Doctor "1" --> "*" Appointment
+                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
+                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
+                            Class Diagram Image Placeholder
+                        </p>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">
+                            Replace this section with your class diagram image
+                        </p>
+                        <div style="margin-top: 2rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; background: white; padding: 1.5rem; border-radius: 8px;">
+                            <h5 style="color: var(--primary); margin-bottom: 1rem;">Classes in the System:</h5>
+                            <ul style="color: var(--text-dark); line-height: 2;">
+                                <li><strong>User:</strong> id, name, email, phone, age, gender</li>
+                                <li><strong>Doctor:</strong> id, name, email, specialization, experience, rating</li>
+                                <li><strong>Appointment:</strong> id, userId, doctorId, date, time, status</li>
+                                <li><strong>SymptomCheck:</strong> id, userId, symptoms, disease, confidence</li>
+                                <li><strong>Medicine:</strong> id, userId, name, dosage, time</li>
+                            </ul>
+                            <p style="margin-top: 1rem; color: var(--text-light); font-size: 0.9rem;">
+                                <strong>Relationships:</strong> User has many Appointments, SymptomChecks, and Medicines. Doctor has many Appointments.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -280,22 +252,14 @@ classDiagram
                     <p class="diagram-description">
                         Flow of patient registration process from start to finish.
                     </p>
-                    <div class="mermaid">
-flowchart TD
-    A([Start]) --> B[Open Registration Page]
-    B --> C[Enter Details]
-    C --> D{Valid Input?}
-    D -- No --> E[Show Error]
-    E --> C
-    D -- Yes --> F[Submit]
-    F --> G{Email Exists?}
-    G -- Yes --> H[Show Error]
-    H --> C
-    G -- No --> I[Create Account]
-    I --> J[Send Email]
-    J --> K[Auto Login]
-    K --> L[Go to Dashboard]
-    L --> M([End])
+                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
+                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
+                            Patient Registration Activity Diagram Image Placeholder
+                        </p>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">
+                            Replace this section with your activity diagram image
+                        </p>
                     </div>
                 </div>
 
@@ -308,28 +272,14 @@ flowchart TD
                     <p class="diagram-description">
                         Process flow for checking symptoms and getting disease predictions.
                     </p>
-                    <div class="mermaid">
-flowchart TD
-    A([Start]) --> B[Open Symptom Checker]
-    B --> C[Type Symptom]
-    C --> D[View Suggestions]
-    D --> E[Select Symptom]
-    E --> F{Add More?}
-    F -- Yes --> C
-    F -- No --> G[Click Check]
-    G --> H[AI Analysis]
-    H --> I[Calculate Scores]
-    I --> J[Predict Disease]
-    J --> K[Show Results]
-    K --> L[Display Disease]
-    L --> M[Show Confidence]
-    M --> N[Recommend Doctor]
-    N --> O[Show Precautions]
-    O --> P{Book Appointment?}
-    P -- Yes --> Q[Go to Appointments]
-    P -- No --> R[Save History]
-    Q --> R
-    R --> S([End])
+                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
+                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
+                            Symptom Checking Activity Diagram Image Placeholder
+                        </p>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">
+                            Replace this section with your activity diagram image
+                        </p>
                     </div>
                 </div>
 
@@ -342,29 +292,14 @@ flowchart TD
                     <p class="diagram-description">
                         Complete flow of booking an appointment with a doctor.
                     </p>
-                    <div class="mermaid">
-flowchart TD
-    Start([Start]) --> A[Navigate to Appointments]
-    A --> B[View Doctor List]
-    B --> C{Search Doctor?}
-    C -- Yes --> D[Enter Search Query]
-    D --> E[Filter Results]
-    E --> B
-    C -- No --> F[Select Doctor]
-    F --> G[View Doctor Details]
-    G --> H[Click Book Appointment]
-    H --> I[Select Date]
-    I --> J[Select Time]
-    J --> K[Enter Reason]
-    K --> L{Validate Input}
-    L -- Invalid --> M[Show Error]
-    M --> I
-    L -- Valid --> N[Submit Booking]
-    N --> O[Create Appointment Record]
-    O --> P[Set Status Pending]
-    P --> Q[Send Notification to Doctor]
-    Q --> R[Show Success Message]
-    R --> S([End])
+                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
+                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
+                            Appointment Booking Activity Diagram Image Placeholder
+                        </p>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">
+                            Replace this section with your activity diagram image
+                        </p>
                     </div>
                 </div>
 
@@ -377,31 +312,14 @@ flowchart TD
                     <p class="diagram-description">
                         How doctors manage incoming appointment requests.
                     </p>
-                    <div class="mermaid">
-flowchart TD
-    Start([Start]) --> A[Doctor Logs In]
-    A --> B[View Dashboard]
-    B --> C[See Pending Appointments]
-    C --> D[Select Appointment]
-    D --> E[View Patient Details]
-    E --> F{Decision}
-    F -->|Accept| G[Click Accept]
-    G --> H[Update Status Confirmed]
-    H --> I[Send Confirmation to Patient]
-    I --> J[Show in Confirmed List]
-    F -->|Reject| K[Click Reject]
-    K --> L[Enter Rejection Reason]
-    L --> M[Update Status Rejected]
-    M --> N[Send Rejection to Patient]
-    N --> O[Remove from Pending]
-    J --> P{Add Prescription}
-    P -->|Yes| Q[Enter Diagnosis]
-    Q --> R[Enter Prescription]
-    R --> S[Save Prescription]
-    S --> T[Update Appointment]
-    P -->|No| T
-    O --> T
-    T --> End([End])
+                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
+                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
+                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
+                            Doctor Appointment Management Activity Diagram Image Placeholder
+                        </p>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">
+                            Replace this section with your activity diagram image
+                        </p>
                     </div>
                 </div>
             </div>
@@ -610,22 +528,133 @@ sequenceDiagram
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // #region agent log
+        function agentDebugLog(hypothesisId, message, data) {
+            try {
+                fetch('http://127.0.0.1:7410/ingest/a9e45f1e-876a-4625-936a-2bb550949010', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Debug-Session-Id': 'f873c8'
+                    },
+                    body: JSON.stringify({
+                        sessionId: 'f873c8',
+                        runId: 'initial',
+                        hypothesisId: hypothesisId,
+                        location: 'public/diagrams.html:script',
+                        message: message,
+                        data: data || {},
+                        timestamp: Date.now()
+                    })
+                }).catch(function () {});
+            } catch (e) {}
+        }
+        // #endregion
+
         mermaid.initialize({ 
             startOnLoad: false,
             securityLevel: 'loose',
             theme: 'default'
         });
         
-        // Render diagrams on page load
+        // Render diagrams on page load with per-diagram parsing checks
         document.addEventListener("DOMContentLoaded", function () {
-            mermaid.run();
+            var mermaidEls = document.querySelectorAll('.mermaid');
+
+            // #region agent log
+            agentDebugLog('H1', 'DOMContentLoaded - mermaid elements found', {
+                count: mermaidEls.length
+            });
+            // #endregion
+
+            mermaidEls.forEach(function (el, index) {
+                var code = (el.textContent || '').trim();
+                if (!code) {
+                    // #region agent log
+                    agentDebugLog('H2', 'Empty mermaid code block', {
+                        index: index,
+                        tabId: el.closest('.tab-pane') ? el.closest('.tab-pane').id : null
+                    });
+                    // #endregion
+                    return;
+                }
+
+                try {
+                    mermaid.parse(code);
+                } catch (err) {
+                    // #region agent log
+                    agentDebugLog('H3', 'Mermaid parse error on initial load', {
+                        index: index,
+                        tabId: el.closest('.tab-pane') ? el.closest('.tab-pane').id : null,
+                        firstLine: code.split('\n')[0],
+                        error: (err && err.message) ? err.message : String(err)
+                    });
+                    // #endregion
+                }
+            });
+
+            try {
+                mermaid.run();
+            } catch (err) {
+                // #region agent log
+                agentDebugLog('H4', 'Mermaid run error on initial load', {
+                    error: (err && err.message) ? err.message : String(err)
+                });
+                // #endregion
+            }
         });
         
-        // Re-render diagrams when switching tabs
+        // Re-parse and re-render diagrams when switching tabs
         var tabEls = document.querySelectorAll('a[data-bs-toggle="tab"]');
-        tabEls.forEach(function(tabEl) {
-            tabEl.addEventListener('shown.bs.tab', function () {
-                mermaid.run();
+        tabEls.forEach(function (tabEl) {
+            tabEl.addEventListener('shown.bs.tab', function (event) {
+                var targetId = event.target.getAttribute('href');
+                var targetPane = targetId ? document.querySelector(targetId) : null;
+                var mermaidElsInTab = targetPane ? targetPane.querySelectorAll('.mermaid') : [];
+
+                // #region agent log
+                agentDebugLog('H5', 'Tab shown - re-render request', {
+                    targetId: targetId,
+                    count: mermaidElsInTab.length
+                });
+                // #endregion
+
+                mermaidElsInTab.forEach(function (el, index) {
+                    var code = (el.textContent || '').trim();
+                    if (!code) {
+                        // #region agent log
+                        agentDebugLog('H6', 'Empty mermaid code block on tab switch', {
+                            index: index,
+                            tabId: targetId
+                        });
+                        // #endregion
+                        return;
+                    }
+
+                    try {
+                        mermaid.parse(code);
+                    } catch (err) {
+                        // #region agent log
+                        agentDebugLog('H7', 'Mermaid parse error on tab switch', {
+                            index: index,
+                            tabId: targetId,
+                            firstLine: code.split('\n')[0],
+                            error: (err && err.message) ? err.message : String(err)
+                        });
+                        // #endregion
+                    }
+                });
+
+                try {
+                    mermaid.run();
+                } catch (err) {
+                    // #region agent log
+                    agentDebugLog('H8', 'Mermaid run error on tab switch', {
+                        targetId: targetId,
+                        error: (err && err.message) ? err.message : String(err)
+                    });
+                    // #endregion
+                }
             });
         });
     </script>
