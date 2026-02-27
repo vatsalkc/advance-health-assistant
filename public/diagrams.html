@@ -225,7 +225,7 @@ classDiagram
         +String phone
         +Integer age
         +String gender
-        +DateTime created_at
+        +DateTime createdAt
         +register()
         +login()
         +updateProfile()
@@ -234,18 +234,18 @@ classDiagram
     
     class Doctor {
         +Integer id
-        +UUID auth_id
+        +UUID authId
         +String name
         +String email
         +String phone
         +String specialization
         +String experience
         +String qualification
-        +String license_number
+        +String licenseNumber
         +Decimal rating
-        +Boolean is_verified
-        +Boolean is_active
-        +DateTime created_at
+        +Boolean isVerified
+        +Boolean isActive
+        +DateTime createdAt
         +register()
         +login()
         +updateProfile()
@@ -255,16 +255,16 @@ classDiagram
     
     class Appointment {
         +Integer id
-        +UUID user_id
-        +Integer doctor_id
-        +String doctor_name
+        +UUID userId
+        +Integer doctorId
+        +String doctorName
         +Date date
         +Time time
         +String reason
         +String status
         +String prescription
         +String diagnosis
-        +DateTime created_at
+        +DateTime createdAt
         +book()
         +cancel()
         +updateStatus()
@@ -273,14 +273,14 @@ classDiagram
     
     class SymptomCheck {
         +Integer id
-        +UUID user_id
+        +UUID userId
         +Array symptoms
-        +String predicted_disease
-        +String recommended_specialization
+        +String predictedDisease
+        +String recommendedSpecialization
         +Decimal confidence
         +String description
         +Array precautions
-        +DateTime created_at
+        +DateTime createdAt
         +checkSymptoms()
         +predictDisease()
         +getRecommendation()
@@ -288,13 +288,13 @@ classDiagram
     
     class Medicine {
         +Integer id
-        +UUID user_id
-        +String medicine_name
+        +UUID userId
+        +String medicineName
         +String dosage
         +Time time
         +String frequency
         +Boolean active
-        +DateTime created_at
+        +DateTime createdAt
         +add()
         +update()
         +delete()
@@ -303,14 +303,14 @@ classDiagram
     
     class MedicalReport {
         +Integer id
-        +UUID patient_id
-        +Integer doctor_id
-        +Integer appointment_id
-        +String report_type
-        +String report_title
-        +String report_content
-        +Date report_date
-        +DateTime created_at
+        +UUID patientId
+        +Integer doctorId
+        +Integer appointmentId
+        +String reportType
+        +String reportTitle
+        +String reportContent
+        +Date reportDate
+        +DateTime createdAt
         +create()
         +update()
         +view()
@@ -318,30 +318,30 @@ classDiagram
     
     class Prescription {
         +Integer id
-        +UUID patient_id
-        +Integer doctor_id
-        +Integer appointment_id
+        +UUID patientId
+        +Integer doctorId
+        +Integer appointmentId
         +JSONB medicines
         +String instructions
-        +Date valid_until
-        +DateTime created_at
+        +Date validUntil
+        +DateTime createdAt
         +create()
         +update()
         +view()
     }
     
-    User "1" --> "*" Appointment : books
-    User "1" --> "*" SymptomCheck : performs
-    User "1" --> "*" Medicine : manages
-    User "1" --> "*" MedicalReport : receives
-    User "1" --> "*" Prescription : receives
+    User "1" -- "*" Appointment : books
+    User "1" -- "*" SymptomCheck : performs
+    User "1" -- "*" Medicine : manages
+    User "1" -- "*" MedicalReport : receives
+    User "1" -- "*" Prescription : receives
     
-    Doctor "1" --> "*" Appointment : handles
-    Doctor "1" --> "*" MedicalReport : creates
-    Doctor "1" --> "*" Prescription : issues
+    Doctor "1" -- "*" Appointment : handles
+    Doctor "1" -- "*" MedicalReport : creates
+    Doctor "1" -- "*" Prescription : issues
     
-    Appointment "1" --> "0..1" MedicalReport : generates
-    Appointment "1" --> "0..1" Prescription : includes
+    Appointment "1" -- "0..1" MedicalReport : generates
+    Appointment "1" -- "0..1" Prescription : includes
                     </div>
                 </div>
             </div>

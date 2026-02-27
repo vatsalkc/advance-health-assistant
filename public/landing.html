@@ -65,6 +65,27 @@
             color: var(--primary) !important;
         }
 
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+        }
+
         .btn-primary-custom {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border: none;
@@ -344,16 +365,24 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link" href="#features">Features</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#documentation">Documentation</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Documentation
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="./diagrams.html"><i class="bi bi-diagram-3 me-2"></i>UML Diagrams</a></li>
+                            <li><a class="dropdown-item" href="./data-dictionary.html"><i class="bi bi-database me-2"></i>Data Dictionary</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#about"><i class="bi bi-info-circle me-2"></i>About Project</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./" onclick="sessionStorage.setItem('fromLanding', 'true')">
-                            <button class="btn btn-primary-custom">Launch App</button>
+                            <button class="btn btn-primary-custom">Login</button>
                         </a>
                     </li>
                 </ul>
@@ -506,6 +535,94 @@
                         <h3 class="feature-title">Data Dictionary</h3>
                         <p class="feature-description">Complete database schema with all tables, columns, and relationships.</p>
                         <a href="./data-dictionary.html" class="btn btn-primary-custom mt-3">View Dictionary</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Project Section -->
+    <section class="features-section" id="about" style="background: #f8fafc;">
+        <div class="container">
+            <h2 class="section-title">About the Project</h2>
+            <p class="section-subtitle">Comprehensive healthcare solution powered by AI</p>
+            
+            <div class="row g-4 mt-4">
+                <div class="col-lg-6">
+                    <div class="feature-card text-start">
+                        <h3 class="feature-title"><i class="bi bi-bullseye me-2"></i>Problem Statement</h3>
+                        <p class="feature-description">
+                            Healthcare accessibility remains a critical challenge with long waiting times, difficulty finding specialists, 
+                            and lack of immediate health guidance. Patients often delay seeking medical help due to uncertainty, 
+                            leading to 30% of unnecessary emergency visits.
+                        </p>
+                        <ul class="text-start" style="color: var(--text-light); line-height: 1.8;">
+                            <li>60% of patients delay medical help due to uncertainty</li>
+                            <li>40% medication non-compliance due to forgetfulness</li>
+                            <li>2-3 weeks average wait for specialist appointments</li>
+                            <li>Fragmented medical records across providers</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="feature-card text-start">
+                        <h3 class="feature-title"><i class="bi bi-lightbulb me-2"></i>Our Solution</h3>
+                        <p class="feature-description">
+                            Advanced Health Assistant provides a comprehensive digital healthcare platform that bridges the gap 
+                            between patients and healthcare providers through AI-powered features.
+                        </p>
+                        <ul class="text-start" style="color: var(--text-light); line-height: 1.8;">
+                            <li><strong>AI Symptom Checker:</strong> 34 diseases, 16 specializations</li>
+                            <li><strong>Smart Appointments:</strong> Real-time booking & tracking</li>
+                            <li><strong>Medicine Reminders:</strong> Automated notifications</li>
+                            <li><strong>Doctor Portal:</strong> Complete practice management</li>
+                            <li><strong>24/7 AI Chatbot:</strong> Instant health support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-4">
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="bi bi-code-square"></i>
+                        </div>
+                        <h3 class="feature-title">Technology Stack</h3>
+                        <p class="feature-description text-start">
+                            <strong>Frontend:</strong> React.js, Bootstrap 5<br>
+                            <strong>Backend:</strong> Supabase (PostgreSQL)<br>
+                            <strong>AI:</strong> Google Gemini, Custom ML<br>
+                            <strong>Auth:</strong> Supabase Auth with RLS
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3 class="feature-title">Key Metrics</h3>
+                        <p class="feature-description text-start">
+                            <strong>Database:</strong> 7 tables, 85+ columns<br>
+                            <strong>Coverage:</strong> 34 diseases, 16 specializations<br>
+                            <strong>Doctors:</strong> 36+ pre-registered<br>
+                            <strong>Security:</strong> 30+ RLS policies
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <h3 class="feature-title">Impact</h3>
+                        <p class="feature-description text-start">
+                            <strong>Accessibility:</strong> 24/7 health support<br>
+                            <strong>Efficiency:</strong> Instant symptom analysis<br>
+                            <strong>Compliance:</strong> Better medication adherence<br>
+                            <strong>Records:</strong> Centralized health data
+                        </p>
                     </div>
                 </div>
             </div>
