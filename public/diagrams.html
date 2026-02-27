@@ -219,129 +219,127 @@ graph TB
                     <div class="mermaid">
 classDiagram
     class User {
-        +UUID id
-        +String name
-        +String email
-        +String phone
-        +Integer age
-        +String gender
-        +DateTime createdAt
-        +register()
-        +login()
-        +updateProfile()
-        +logout()
+        UUID id
+        String name
+        String email
+        String phone
+        Integer age
+        String gender
+        DateTime createdAt
+        register()
+        login()
+        updateProfile()
+        logout()
     }
     
     class Doctor {
-        +Integer id
-        +UUID authId
-        +String name
-        +String email
-        +String phone
-        +String specialization
-        +String experience
-        +String qualification
-        +String licenseNumber
-        +Decimal rating
-        +Boolean isVerified
-        +Boolean isActive
-        +DateTime createdAt
-        +register()
-        +login()
-        +updateProfile()
-        +viewAppointments()
-        +managePrescription()
+        Integer id
+        UUID authId
+        String name
+        String email
+        String phone
+        String specialization
+        String experience
+        String qualification
+        String licenseNumber
+        Decimal rating
+        Boolean isVerified
+        Boolean isActive
+        DateTime createdAt
+        register()
+        login()
+        updateProfile()
+        viewAppointments()
+        managePrescription()
     }
     
     class Appointment {
-        +Integer id
-        +UUID userId
-        +Integer doctorId
-        +String doctorName
-        +Date date
-        +Time time
-        +String reason
-        +String status
-        +String prescription
-        +String diagnosis
-        +DateTime createdAt
-        +book()
-        +cancel()
-        +updateStatus()
-        +addPrescription()
+        Integer id
+        UUID userId
+        Integer doctorId
+        String doctorName
+        Date date
+        Time time
+        String reason
+        String status
+        String prescription
+        String diagnosis
+        DateTime createdAt
+        book()
+        cancel()
+        updateStatus()
+        addPrescription()
     }
     
     class SymptomCheck {
-        +Integer id
-        +UUID userId
-        +Array symptoms
-        +String predictedDisease
-        +String recommendedSpecialization
-        +Decimal confidence
-        +String description
-        +Array precautions
-        +DateTime createdAt
-        +checkSymptoms()
-        +predictDisease()
-        +getRecommendation()
+        Integer id
+        UUID userId
+        Array symptoms
+        String predictedDisease
+        String recommendedSpecialization
+        Decimal confidence
+        String description
+        Array precautions
+        DateTime createdAt
+        checkSymptoms()
+        predictDisease()
+        getRecommendation()
     }
     
     class Medicine {
-        +Integer id
-        +UUID userId
-        +String medicineName
-        +String dosage
-        +Time time
-        +String frequency
-        +Boolean active
-        +DateTime createdAt
-        +add()
-        +update()
-        +delete()
-        +setReminder()
+        Integer id
+        UUID userId
+        String medicineName
+        String dosage
+        Time time
+        String frequency
+        Boolean active
+        DateTime createdAt
+        add()
+        update()
+        delete()
+        setReminder()
     }
     
     class MedicalReport {
-        +Integer id
-        +UUID patientId
-        +Integer doctorId
-        +Integer appointmentId
-        +String reportType
-        +String reportTitle
-        +String reportContent
-        +Date reportDate
-        +DateTime createdAt
-        +create()
-        +update()
-        +view()
+        Integer id
+        UUID patientId
+        Integer doctorId
+        Integer appointmentId
+        String reportType
+        String reportTitle
+        String reportContent
+        Date reportDate
+        DateTime createdAt
+        create()
+        update()
+        view()
     }
     
     class Prescription {
-        +Integer id
-        +UUID patientId
-        +Integer doctorId
-        +Integer appointmentId
-        +JSONB medicines
-        +String instructions
-        +Date validUntil
-        +DateTime createdAt
-        +create()
-        +update()
-        +view()
+        Integer id
+        UUID patientId
+        Integer doctorId
+        Integer appointmentId
+        JSONB medicines
+        String instructions
+        Date validUntil
+        DateTime createdAt
+        create()
+        update()
+        view()
     }
     
-    User "1" -- "*" Appointment : books
-    User "1" -- "*" SymptomCheck : performs
-    User "1" -- "*" Medicine : manages
-    User "1" -- "*" MedicalReport : receives
-    User "1" -- "*" Prescription : receives
-    
-    Doctor "1" -- "*" Appointment : handles
-    Doctor "1" -- "*" MedicalReport : creates
-    Doctor "1" -- "*" Prescription : issues
-    
-    Appointment "1" -- "0..1" MedicalReport : generates
-    Appointment "1" -- "0..1" Prescription : includes
+    User "1" -- "*" Appointment
+    User "1" -- "*" SymptomCheck
+    User "1" -- "*" Medicine
+    User "1" -- "*" MedicalReport
+    User "1" -- "*" Prescription
+    Doctor "1" -- "*" Appointment
+    Doctor "1" -- "*" MedicalReport
+    Doctor "1" -- "*" Prescription
+    Appointment "1" -- "0..1" MedicalReport
+    Appointment "1" -- "0..1" Prescription
                     </div>
                 </div>
             </div>
@@ -358,16 +356,16 @@ classDiagram
                         Flow of patient registration process from start to finish.
                     </p>
                     <div class="mermaid">
-graph TD
+flowchart TD
     Start([Start]) --> A[Open Registration Page]
-    A --> B[Enter Name, Email, Password]
-    B --> C[Enter Phone, Age, Gender]
+    A --> B[Enter Name Email Password]
+    B --> C[Enter Phone Age Gender]
     C --> D{Validate Input}
     D -->|Invalid| E[Show Error Message]
     E --> B
     D -->|Valid| F[Submit Registration]
-    F --> G{Email Already Exists?}
-    G -->|Yes| H[Show Error: Email Exists]
+    F --> G{Email Already Exists}
+    G -->|Yes| H[Show Error Email Exists]
     H --> B
     G -->|No| I[Create User Account]
     I --> J[Send Verification Email]
@@ -388,14 +386,14 @@ graph TD
                         Process flow for checking symptoms and getting disease predictions.
                     </p>
                     <div class="mermaid">
-graph TD
+flowchart TD
     Start([Start]) --> A[Navigate to Symptom Checker]
     A --> B[View Symptom Input Field]
     B --> C[Type Symptom]
     C --> D[View Suggestions]
-    D --> E{Select Symptom?}
+    D --> E{Select Symptom}
     E -->|Yes| F[Add to Selected List]
-    F --> G{Add More?}
+    F --> G{Add More}
     G -->|Yes| C
     G -->|No| H[Click Check Symptoms]
     E -->|No| C
@@ -407,7 +405,7 @@ graph TD
     M --> N[Show Confidence Score]
     N --> O[Recommend Specialist]
     O --> P[Show Precautions]
-    P --> Q{Book Appointment?}
+    P --> Q{Book Appointment}
     Q -->|Yes| R[Navigate to Appointments]
     Q -->|No| S[Save to History]
     R --> S
@@ -425,10 +423,10 @@ graph TD
                         Complete flow of booking an appointment with a doctor.
                     </p>
                     <div class="mermaid">
-graph TD
+flowchart TD
     Start([Start]) --> A[Navigate to Appointments]
     A --> B[View Doctor List]
-    B --> C{Search Doctor?}
+    B --> C{Search Doctor}
     C -->|Yes| D[Enter Search Query]
     D --> E[Filter Results]
     E --> B
@@ -438,12 +436,12 @@ graph TD
     H --> I[Select Date]
     I --> J[Select Time]
     J --> K[Enter Reason]
-    K --> L{Validate Input?}
+    K --> L{Validate Input}
     L -->|Invalid| M[Show Error]
     M --> I
     L -->|Valid| N[Submit Booking]
     N --> O[Create Appointment Record]
-    O --> P[Set Status: Pending]
+    O --> P[Set Status Pending]
     P --> Q[Send Notification to Doctor]
     Q --> R[Show Success Message]
     R --> S[Display Appointment Details]
@@ -461,7 +459,7 @@ graph TD
                         How doctors manage incoming appointment requests.
                     </p>
                     <div class="mermaid">
-graph TD
+flowchart TD
     Start([Start]) --> A[Doctor Logs In]
     A --> B[View Dashboard]
     B --> C[See Pending Appointments]
@@ -469,15 +467,15 @@ graph TD
     D --> E[View Patient Details]
     E --> F{Decision}
     F -->|Accept| G[Click Accept]
-    G --> H[Update Status: Confirmed]
+    G --> H[Update Status Confirmed]
     H --> I[Send Confirmation to Patient]
     I --> J[Show in Confirmed List]
     F -->|Reject| K[Click Reject]
     K --> L[Enter Rejection Reason]
-    L --> M[Update Status: Rejected]
+    L --> M[Update Status Rejected]
     M --> N[Send Rejection to Patient]
     N --> O[Remove from Pending]
-    J --> P{Add Prescription?}
+    J --> P{Add Prescription}
     P -->|Yes| Q[Enter Diagnosis]
     Q --> R[Enter Prescription]
     R --> S[Save Prescription]
