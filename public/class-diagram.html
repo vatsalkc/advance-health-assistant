@@ -111,26 +111,98 @@
             <p class="diagram-description">
                 This diagram represents the main classes and their relationships in the system.
             </p>
-            <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
-                <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
-                <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
-                    Class Diagram Image Placeholder
-                </p>
-                <p style="color: #94a3b8; font-size: 0.9rem;">
-                    Replace this section with your class diagram image
-                </p>
-                <div style="margin-top: 2rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; background: white; padding: 1.5rem; border-radius: 8px;">
-                    <h5 style="color: var(--primary); margin-bottom: 1rem;">Classes in the System:</h5>
-                    <ul style="color: var(--text-dark); line-height: 2;">
-                        <li><strong>User:</strong> id, name, email, phone, age, gender</li>
-                        <li><strong>Doctor:</strong> id, name, email, specialization, experience, rating</li>
-                        <li><strong>Appointment:</strong> id, userId, doctorId, date, time, status</li>
-                        <li><strong>SymptomCheck:</strong> id, userId, symptoms, disease, confidence</li>
-                        <li><strong>Medicine:</strong> id, userId, name, dosage, time</li>
-                    </ul>
-                    <p style="margin-top: 1rem; color: var(--text-light); font-size: 0.9rem;">
-                        <strong>Relationships:</strong> User has many Appointments, SymptomChecks, and Medicines. Doctor has many Appointments.
+            <div style="text-align: center; background: white; padding: 2rem; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 2rem;">
+                <img src="https://i.imgur.com/placeholder.png" alt="Health Assistant Class Diagram" style="max-width: 100%; height: auto; border-radius: 8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display: none;">
+                    <i class="bi bi-info-circle" style="font-size: 3rem; color: #2563eb;"></i>
+                    <p style="color: #64748b; margin-top: 1rem;">
+                        To display your class diagram image, replace the image source in the HTML or save your diagram as <code>class-diagram.png</code> in the public folder.
                     </p>
+                </div>
+            </div>
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h5 style="color: var(--primary); margin-bottom: 1rem;">Classes in the System:</h5>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>User (Abstract)</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + userID: String<br>
+                            + name: String<br>
+                            + email: String<br>
+                            + password: String<br>
+                            + login()<br>
+                            + logout()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>Patient</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + healthHistory: String<br>
+                            + enterSymptoms()<br>
+                            + bookAppointment()<br>
+                            + viewHistory()<br>
+                            + addMedicineReminder()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>Doctor</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + specialization: String<br>
+                            + availability: String<br>
+                            + updateAvailability()<br>
+                            + viewPatientDetails()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>Admin</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + manageUsers()<br>
+                            + manageDataset()<br>
+                            + monitorSystem()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>Medicine</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + medName: String<br>
+                            + dosage: String<br>
+                            + setReminder()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>Appointment</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + appointmentID: String<br>
+                            + dateTime: DateTime<br>
+                            + status: String<br>
+                            + cancel()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>MLEngine</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + predictDisease(symptoms)<br>
+                            + recommendSpecialization()
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <h6 style="color: #1e293b; margin-bottom: 0.5rem;"><strong>SymptomDataset</strong></h6>
+                        <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-family: monospace;">
+                            + dataPoints: List<br>
+                            + updateData()
+                        </p>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h6 style="color: var(--primary); margin-bottom: 0.5rem;"><strong>Relationships:</strong></h6>
+                    <ul style="color: #64748b; font-size: 0.9rem; line-height: 1.8; margin: 0;">
+                        <li>User (abstract) is inherited by Patient, Doctor, and Admin</li>
+                        <li>Patient manages Medicine (1 to many)</li>
+                        <li>Patient books Appointment (1 to many)</li>
+                        <li>Doctor attends Appointment (1 to many)</li>
+                        <li>Admin maintains SymptomDataset (1 to 1)</li>
+                        <li>MLEngine processes SymptomDataset (dashed dependency)</li>
+                    </ul>
                 </div>
             </div>
         </div>
