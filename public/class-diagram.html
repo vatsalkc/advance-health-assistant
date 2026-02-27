@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Diagram - Advanced Health Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 80px 0 60px;
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .diagram-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .diagram-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .diagram-description {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="landing.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Health Assistant
+            </a>
+            <a href="diagrams.html" class="back-btn">
+                <i class="bi bi-arrow-left me-2"></i>Back to Diagrams
+            </a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container text-center">
+            <h1 class="page-title">Class Diagram</h1>
+            <p>System classes and relationships</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="diagram-card">
+            <h2 class="diagram-title">
+                <i class="bi bi-boxes me-2"></i>Class Diagram
+            </h2>
+            <p class="diagram-description">
+                This diagram represents the main classes and their relationships in the system.
+            </p>
+            <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
+                <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
+                <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
+                    Class Diagram Image Placeholder
+                </p>
+                <p style="color: #94a3b8; font-size: 0.9rem;">
+                    Replace this section with your class diagram image
+                </p>
+                <div style="margin-top: 2rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; background: white; padding: 1.5rem; border-radius: 8px;">
+                    <h5 style="color: var(--primary); margin-bottom: 1rem;">Classes in the System:</h5>
+                    <ul style="color: var(--text-dark); line-height: 2;">
+                        <li><strong>User:</strong> id, name, email, phone, age, gender</li>
+                        <li><strong>Doctor:</strong> id, name, email, specialization, experience, rating</li>
+                        <li><strong>Appointment:</strong> id, userId, doctorId, date, time, status</li>
+                        <li><strong>SymptomCheck:</strong> id, userId, symptoms, disease, confidence</li>
+                        <li><strong>Medicine:</strong> id, userId, name, dosage, time</li>
+                    </ul>
+                    <p style="margin-top: 1rem; color: var(--text-light); font-size: 0.9rem;">
+                        <strong>Relationships:</strong> User has many Appointments, SymptomChecks, and Medicines. Doctor has many Appointments.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -6,7 +6,6 @@
     <title>UML Diagrams - Advanced Health Assistant</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -53,51 +52,32 @@
 
         .diagram-card {
             background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 3rem;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            height: 100%;
+            border: 2px solid transparent;
+        }
+
+        .diagram-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
         }
 
         .diagram-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: var(--text-dark);
         }
 
         .diagram-description {
             color: var(--text-light);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
-        }
-
-        .mermaid {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .nav-tabs {
-            border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 2rem;
-        }
-
-        .nav-tabs .nav-link {
-            border: none;
-            color: var(--text-light);
-            font-weight: 600;
-            padding: 1rem 1.5rem;
-        }
-
-        .nav-tabs .nav-link.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-            background: transparent;
         }
 
         .back-btn {
@@ -114,6 +94,36 @@
 
         .back-btn:hover {
             background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .feature-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 3rem;
             color: white;
         }
     </style>
@@ -141,385 +151,91 @@
 
     <!-- Main Content -->
     <div class="container mb-5">
-        <!-- Tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#usecase">Use Case Diagram</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#class">Class Diagram</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#activity">Activity Diagrams</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#sequence">Sequence Diagrams</a>
-            </li>
-        </ul>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <!-- Use Case Diagram -->
-            <div id="usecase" class="tab-pane fade show active">
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-diagram-3"></i>
-                        Use Case Diagram
-                    </h2>
-                    <p class="diagram-description">
-                        This diagram shows the interactions between actors (Patient, Doctor, System) and the various use cases in the Health Assistant system.
-                    </p>
-                    <div class="mermaid">
-graph TB
-    Patient((Patient))
-    Doctor((Doctor))
-    System((System))
-    
-    Patient --> UC1[Register/Login]
-    Patient --> UC2[Check Symptoms]
-    Patient --> UC3[View Disease Prediction]
-    Patient --> UC4[Search Doctors]
-    Patient --> UC5[Book Appointment]
-    Patient --> UC6[Manage Medicines]
-    Patient --> UC7[Set Reminders]
-    Patient --> UC8[View History]
-    Patient --> UC9[Chat with AI]
-    Patient --> UC10[Update Profile]
-    
-    Doctor --> UC11[Doctor Login]
-    Doctor --> UC12[View Appointments]
-    Doctor --> UC13[Accept/Reject Appointment]
-    Doctor --> UC14[Add Prescription]
-    Doctor --> UC15[Add Diagnosis]
-    Doctor --> UC16[View Patient Details]
-    Doctor --> UC17[Manage Profile]
-    
-    System --> UC18[Send Notifications]
-    System --> UC19[AI Disease Prediction]
-    System --> UC20[Generate Reports]
-    
-    UC2 --> UC19
-    UC5 --> UC18
-    UC13 --> UC18
-    UC7 --> UC18
-                    </div>
-                </div>
-            </div>
-
-            <!-- Class Diagram -->
-            <div id="class" class="tab-pane fade">
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-boxes"></i>
-                        Class Diagram
-                    </h2>
-                    <p class="diagram-description">
-                        This diagram represents the main classes and their relationships in the system.
-                    </p>
-                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
-                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
-                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
-                            Class Diagram Image Placeholder
-                        </p>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">
-                            Replace this section with your class diagram image
-                        </p>
-                        <div style="margin-top: 2rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto; background: white; padding: 1.5rem; border-radius: 8px;">
-                            <h5 style="color: var(--primary); margin-bottom: 1rem;">Classes in the System:</h5>
-                            <ul style="color: var(--text-dark); line-height: 2;">
-                                <li><strong>User:</strong> id, name, email, phone, age, gender</li>
-                                <li><strong>Doctor:</strong> id, name, email, specialization, experience, rating</li>
-                                <li><strong>Appointment:</strong> id, userId, doctorId, date, time, status</li>
-                                <li><strong>SymptomCheck:</strong> id, userId, symptoms, disease, confidence</li>
-                                <li><strong>Medicine:</strong> id, userId, name, dosage, time</li>
-                            </ul>
-                            <p style="margin-top: 1rem; color: var(--text-light); font-size: 0.9rem;">
-                                <strong>Relationships:</strong> User has many Appointments, SymptomChecks, and Medicines. Doctor has many Appointments.
-                            </p>
+        <div class="row g-4">
+            <!-- Use Case Diagram Card -->
+            <div class="col-lg-6">
+                <div class="diagram-card" style="cursor: pointer;" onclick="window.location.href='usecase-diagram.html'">
+                    <div style="text-align: center;">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="bi bi-diagram-3"></i>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Activity Diagrams -->
-            <div id="activity" class="tab-pane fade">
-                <!-- Patient Registration -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-person-plus"></i>
-                        Patient Registration Activity
+                    <h2 class="diagram-title" style="text-align: center;">
+                        Use Case Diagram
                     </h2>
-                    <p class="diagram-description">
-                        Flow of patient registration process from start to finish.
+                    <p class="diagram-description" style="text-align: center;">
+                        System interactions between actors (Patient, Doctor, System) and various use cases.
                     </p>
-                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
-                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
-                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
-                            Patient Registration Activity Diagram Image Placeholder
-                        </p>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">
-                            Replace this section with your activity diagram image
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Symptom Checking -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-activity"></i>
-                        Symptom Checking Activity
-                    </h2>
-                    <p class="diagram-description">
-                        Process flow for checking symptoms and getting disease predictions.
-                    </p>
-                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
-                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
-                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
-                            Symptom Checking Activity Diagram Image Placeholder
-                        </p>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">
-                            Replace this section with your activity diagram image
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Appointment Booking -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-calendar-check"></i>
-                        Appointment Booking Activity
-                    </h2>
-                    <p class="diagram-description">
-                        Complete flow of booking an appointment with a doctor.
-                    </p>
-                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
-                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
-                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
-                            Appointment Booking Activity Diagram Image Placeholder
-                        </p>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">
-                            Replace this section with your activity diagram image
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Doctor Appointment Management -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-clipboard-check"></i>
-                        Doctor Appointment Management
-                    </h2>
-                    <p class="diagram-description">
-                        How doctors manage incoming appointment requests.
-                    </p>
-                    <div style="text-align: center; padding: 3rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;">
-                        <i class="bi bi-image" style="font-size: 4rem; color: #94a3b8;"></i>
-                        <p style="margin-top: 1rem; color: #64748b; font-size: 1.1rem;">
-                            Doctor Appointment Management Activity Diagram Image Placeholder
-                        </p>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">
-                            Replace this section with your activity diagram image
-                        </p>
+                    <div style="text-align: center;">
+                        <a href="usecase-diagram.html" class="btn btn-primary-custom">
+                            View Diagram <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Sequence Diagrams -->
-            <div id="sequence" class="tab-pane fade">
-                <!-- Patient Registration Sequence -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-arrow-left-right"></i>
-                        Patient Registration Sequence
+            <!-- Class Diagram Card -->
+            <div class="col-lg-6">
+                <div class="diagram-card" style="cursor: pointer;" onclick="window.location.href='class-diagram.html'">
+                    <div style="text-align: center;">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="bi bi-boxes"></i>
+                        </div>
+                    </div>
+                    <h2 class="diagram-title" style="text-align: center;">
+                        Class Diagram
                     </h2>
-                    <p class="diagram-description">
-                        Interaction sequence between patient, frontend, backend, and database during registration.
+                    <p class="diagram-description" style="text-align: center;">
+                        Main classes and their relationships in the system architecture.
                     </p>
-                    <div class="mermaid">
-sequenceDiagram
-    participant P as Patient
-    participant F as Frontend
-    participant A as Auth Service
-    participant S as Supabase
-    participant D as Database
-    
-    P->>F: Open Registration Page
-    F->>P: Display Registration Form
-    P->>F: Enter Details (name, email, password)
-    F->>F: Validate Input
-    F->>A: Register Request
-    A->>S: Create Auth User
-    S->>D: Insert into auth.users
-    D-->>S: User Created
-    S-->>A: Auth User ID
-    A->>S: Create User Profile
-    S->>D: Insert into users table
-    D-->>S: Profile Created
-    S-->>A: Success
-    A-->>F: Registration Success
-    F->>A: Auto Login
-    A->>S: Create Session
-    S-->>A: Session Token
-    A-->>F: Login Success
-    F->>P: Redirect to Dashboard
+                    <div style="text-align: center;">
+                        <a href="class-diagram.html" class="btn btn-primary-custom">
+                            View Diagram <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <!-- Symptom Checking Sequence -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-arrow-left-right"></i>
-                        Symptom Checking Sequence
+            <!-- Activity Diagrams Card -->
+            <div class="col-lg-6">
+                <div class="diagram-card" style="cursor: pointer;" onclick="window.location.href='activity-diagrams.html'">
+                    <div style="text-align: center;">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                    </div>
+                    <h2 class="diagram-title" style="text-align: center;">
+                        Activity Diagrams
                     </h2>
-                    <p class="diagram-description">
-                        How symptom checking works from user input to AI prediction.
+                    <p class="diagram-description" style="text-align: center;">
+                        Process flows for registration, symptom checking, appointments, and more.
                     </p>
-                    <div class="mermaid">
-sequenceDiagram
-    participant P as Patient
-    participant F as Frontend
-    participant ML as ML Algorithm
-    participant S as Supabase
-    participant D as Database
-    
-    P->>F: Navigate to Symptom Checker
-    F->>P: Display Symptom Input
-    P->>F: Type Symptom
-    F->>F: Show Suggestions
-    P->>F: Select Symptoms
-    P->>F: Click Check Symptoms
-    F->>ML: Send Symptoms Array
-    ML->>ML: Calculate Weighted Scores
-    ML->>ML: Match with Disease Database
-    ML->>ML: Calculate Confidence
-    ML-->>F: Return Prediction Result
-    F->>S: Save Symptom Check
-    S->>D: Insert into symptom_checks
-    D-->>S: Record Saved
-    S-->>F: Success
-    F->>P: Display Results
-    F->>P: Show Disease, Confidence, Specialist
-    F->>P: Show Precautions
+                    <div style="text-align: center;">
+                        <a href="activity-diagrams.html" class="btn btn-primary-custom">
+                            View Diagrams <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <!-- Appointment Booking Sequence -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-arrow-left-right"></i>
-                        Appointment Booking Sequence
-                    </h2>
-                    <p class="diagram-description">
-                        Complete sequence of booking an appointment with notifications.
-                    </p>
-                    <div class="mermaid">
-sequenceDiagram
-    participant P as Patient
-    participant F as Frontend
-    participant API as Appointment API
-    participant S as Supabase
-    participant D as Database
-    participant N as Notification System
-    
-    P->>F: Select Doctor
-    F->>P: Show Booking Form
-    P->>F: Enter Date, Time, Reason
-    F->>API: Create Appointment Request
-    API->>S: Insert Appointment
-    S->>D: Insert into appointments table
-    D-->>S: Appointment Created
-    S-->>API: Appointment ID
-    API->>N: Trigger Notification
-    N->>N: Send to Doctor
-    N-->>API: Notification Sent
-    API-->>F: Booking Success
-    F->>P: Show Success Message
-    F->>P: Display Appointment Details
+            <!-- Sequence Diagrams Card -->
+            <div class="col-lg-6">
+                <div class="diagram-card" style="cursor: pointer;" onclick="window.location.href='sequence-diagrams.html'">
+                    <div style="text-align: center;">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Doctor Prescription Sequence -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-arrow-left-right"></i>
-                        Doctor Prescription Sequence
+                    <h2 class="diagram-title" style="text-align: center;">
+                        Sequence Diagrams
                     </h2>
-                    <p class="diagram-description">
-                        How doctors add prescriptions to confirmed appointments.
+                    <p class="diagram-description" style="text-align: center;">
+                        Component interactions and message flows for key system operations.
                     </p>
-                    <div class="mermaid">
-sequenceDiagram
-    participant D as Doctor
-    participant F as Frontend
-    participant API as Doctor API
-    participant S as Supabase
-    participant DB as Database
-    participant P as Patient
-    
-    D->>F: View Confirmed Appointment
-    F->>API: Get Appointment Details
-    API->>S: Query Appointment
-    S->>DB: Select from appointments
-    DB-->>S: Appointment Data
-    S-->>API: Appointment Details
-    API-->>F: Return Data
-    F->>D: Display Patient Info
-    D->>F: Click Add Prescription
-    F->>D: Show Prescription Form
-    D->>F: Enter Diagnosis
-    D->>F: Enter Prescription
-    D->>F: Submit
-    F->>API: Update Appointment
-    API->>S: Update Record
-    S->>DB: Update appointments table
-    DB-->>S: Updated
-    S-->>API: Success
-    API-->>F: Prescription Saved
-    F->>D: Show Success Message
-    F->>P: Notify Patient
-                    </div>
-                </div>
-
-                <!-- Medicine Reminder Sequence -->
-                <div class="diagram-card">
-                    <h2 class="diagram-title">
-                        <i class="bi bi-arrow-left-right"></i>
-                        Medicine Reminder Sequence
-                    </h2>
-                    <p class="diagram-description">
-                        Setting up and triggering medicine reminders.
-                    </p>
-                    <div class="mermaid">
-sequenceDiagram
-    participant P as Patient
-    participant F as Frontend
-    participant API as Medicine API
-    participant S as Supabase
-    participant D as Database
-    participant N as Notification System
-    
-    P->>F: Navigate to Medicines
-    F->>P: Display Medicine List
-    P->>F: Click Add Medicine
-    F->>P: Show Add Form
-    P->>F: Enter Medicine Details
-    P->>F: Set Time & Frequency
-    P->>F: Submit
-    F->>API: Create Medicine Reminder
-    API->>S: Insert Medicine
-    S->>D: Insert into medicines table
-    D-->>S: Medicine Created
-    S-->>API: Medicine ID
-    API->>N: Schedule Reminder
-    N->>N: Set Timer
-    N-->>API: Reminder Scheduled
-    API-->>F: Success
-    F->>P: Show Success Message
-    
-    Note over N: At Scheduled Time
-    N->>F: Trigger Reminder
-    F->>P: Show Notification
-    P->>F: Acknowledge
+                    <div style="text-align: center;">
+                        <a href="sequence-diagrams.html" class="btn btn-primary-custom">
+                            View Diagrams <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -527,136 +243,5 @@ sequenceDiagram
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // #region agent log
-        function agentDebugLog(hypothesisId, message, data) {
-            try {
-                fetch('http://127.0.0.1:7410/ingest/a9e45f1e-876a-4625-936a-2bb550949010', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Debug-Session-Id': 'f873c8'
-                    },
-                    body: JSON.stringify({
-                        sessionId: 'f873c8',
-                        runId: 'initial',
-                        hypothesisId: hypothesisId,
-                        location: 'public/diagrams.html:script',
-                        message: message,
-                        data: data || {},
-                        timestamp: Date.now()
-                    })
-                }).catch(function () {});
-            } catch (e) {}
-        }
-        // #endregion
-
-        mermaid.initialize({ 
-            startOnLoad: false,
-            securityLevel: 'loose',
-            theme: 'default'
-        });
-        
-        // Render diagrams on page load with per-diagram parsing checks
-        document.addEventListener("DOMContentLoaded", function () {
-            var mermaidEls = document.querySelectorAll('.mermaid');
-
-            // #region agent log
-            agentDebugLog('H1', 'DOMContentLoaded - mermaid elements found', {
-                count: mermaidEls.length
-            });
-            // #endregion
-
-            mermaidEls.forEach(function (el, index) {
-                var code = (el.textContent || '').trim();
-                if (!code) {
-                    // #region agent log
-                    agentDebugLog('H2', 'Empty mermaid code block', {
-                        index: index,
-                        tabId: el.closest('.tab-pane') ? el.closest('.tab-pane').id : null
-                    });
-                    // #endregion
-                    return;
-                }
-
-                try {
-                    mermaid.parse(code);
-                } catch (err) {
-                    // #region agent log
-                    agentDebugLog('H3', 'Mermaid parse error on initial load', {
-                        index: index,
-                        tabId: el.closest('.tab-pane') ? el.closest('.tab-pane').id : null,
-                        firstLine: code.split('\n')[0],
-                        error: (err && err.message) ? err.message : String(err)
-                    });
-                    // #endregion
-                }
-            });
-
-            try {
-                mermaid.run();
-            } catch (err) {
-                // #region agent log
-                agentDebugLog('H4', 'Mermaid run error on initial load', {
-                    error: (err && err.message) ? err.message : String(err)
-                });
-                // #endregion
-            }
-        });
-        
-        // Re-parse and re-render diagrams when switching tabs
-        var tabEls = document.querySelectorAll('a[data-bs-toggle="tab"]');
-        tabEls.forEach(function (tabEl) {
-            tabEl.addEventListener('shown.bs.tab', function (event) {
-                var targetId = event.target.getAttribute('href');
-                var targetPane = targetId ? document.querySelector(targetId) : null;
-                var mermaidElsInTab = targetPane ? targetPane.querySelectorAll('.mermaid') : [];
-
-                // #region agent log
-                agentDebugLog('H5', 'Tab shown - re-render request', {
-                    targetId: targetId,
-                    count: mermaidElsInTab.length
-                });
-                // #endregion
-
-                mermaidElsInTab.forEach(function (el, index) {
-                    var code = (el.textContent || '').trim();
-                    if (!code) {
-                        // #region agent log
-                        agentDebugLog('H6', 'Empty mermaid code block on tab switch', {
-                            index: index,
-                            tabId: targetId
-                        });
-                        // #endregion
-                        return;
-                    }
-
-                    try {
-                        mermaid.parse(code);
-                    } catch (err) {
-                        // #region agent log
-                        agentDebugLog('H7', 'Mermaid parse error on tab switch', {
-                            index: index,
-                            tabId: targetId,
-                            firstLine: code.split('\n')[0],
-                            error: (err && err.message) ? err.message : String(err)
-                        });
-                        // #endregion
-                    }
-                });
-
-                try {
-                    mermaid.run();
-                } catch (err) {
-                    // #region agent log
-                    agentDebugLog('H8', 'Mermaid run error on tab switch', {
-                        targetId: targetId,
-                        error: (err && err.message) ? err.message : String(err)
-                    });
-                    // #endregion
-                }
-            });
-        });
-    </script>
 </body>
 </html>

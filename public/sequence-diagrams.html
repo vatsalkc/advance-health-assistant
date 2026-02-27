@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequence Diagrams - Advanced Health Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 80px 0 60px;
+            margin-bottom: 50px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .diagram-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .diagram-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .diagram-description {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="landing.html">
+                <i class="bi bi-heart-pulse-fill me-2"></i>Health Assistant
+            </a>
+            <a href="diagrams.html" class="back-btn">
+                <i class="bi bi-arrow-left me-2"></i>Back to Diagrams
+            </a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container text-center">
+            <h1 class="page-title">Sequence Diagrams</h1>
+            <p>Component interactions and message flows</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <!-- Patient Registration Sequence -->
+        <div class="diagram-card">
+            <h2 class="diagram-title">
+                <i class="bi bi-arrow-left-right me-2"></i>Patient Registration Sequence
+            </h2>
+            <p class="diagram-description">
+                Interaction sequence between patient, frontend, backend, and database during registration.
+            </p>
+            <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant A as Auth Service
+    participant S as Supabase
+    participant D as Database
+    
+    P->>F: Open Registration Page
+    F->>P: Display Registration Form
+    P->>F: Enter Details (name, email, password)
+    F->>F: Validate Input
+    F->>A: Register Request
+    A->>S: Create Auth User
+    S->>D: Insert into auth.users
+    D-->>S: User Created
+    S-->>A: Auth User ID
+    A->>S: Create User Profile
+    S->>D: Insert into users table
+    D-->>S: Profile Created
+    S-->>A: Success
+    A-->>F: Registration Success
+    F->>A: Auto Login
+    A->>S: Create Session
+    S-->>A: Session Token
+    A-->>F: Login Success
+    F->>P: Redirect to Dashboard
+            </div>
+        </div>
+
+        <!-- Symptom Checking Sequence -->
+        <div class="diagram-card">
+            <h2 class="diagram-title">
+                <i class="bi bi-arrow-left-right me-2"></i>Symptom Checking Sequence
+            </h2>
+            <p class="diagram-description">
+                How symptom checking works from user input to AI prediction.
+            </p>
+            <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant ML as ML Algorithm
+    participant S as Supabase
+    participant D as Database
+    
+    P->>F: Navigate to Symptom Checker
+    F->>P: Display Symptom Input
+    P->>F: Type Symptom
+    F->>F: Show Suggestions
+    P->>F: Select Symptoms
+    P->>F: Click Check Symptoms
+    F->>ML: Send Symptoms Array
+    ML->>ML: Calculate Weighted Scores
+    ML->>ML: Match with Disease Database
+    ML->>ML: Calculate Confidence
+    ML-->>F: Return Prediction Result
+    F->>S: Save Symptom Check
+    S->>D: Insert into symptom_checks
+    D-->>S: Record Saved
+    S-->>F: Success
+    F->>P: Display Results
+    F->>P: Show Disease, Confidence, Specialist
+    F->>P: Show Precautions
+            </div>
+        </div>
+
+        <!-- Appointment Booking Sequence -->
+        <div class="diagram-card">
+            <h2 class="diagram-title">
+                <i class="bi bi-arrow-left-right me-2"></i>Appointment Booking Sequence
+            </h2>
+            <p class="diagram-description">
+                Complete sequence of booking an appointment with notifications.
+            </p>
+            <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant API as Appointment API
+    participant S as Supabase
+    participant D as Database
+    participant N as Notification System
+    
+    P->>F: Select Doctor
+    F->>P: Show Booking Form
+    P->>F: Enter Date, Time, Reason
+    F->>API: Create Appointment Request
+    API->>S: Insert Appointment
+    S->>D: Insert into appointments table
+    D-->>S: Appointment Created
+    S-->>API: Appointment ID
+    API->>N: Trigger Notification
+    N->>N: Send to Doctor
+    N-->>API: Notification Sent
+    API-->>F: Booking Success
+    F->>P: Show Success Message
+    F->>P: Display Appointment Details
+            </div>
+        </div>
+
+        <!-- Doctor Prescription Sequence -->
+        <div class="diagram-card">
+            <h2 class="diagram-title">
+                <i class="bi bi-arrow-left-right me-2"></i>Doctor Prescription Sequence
+            </h2>
+            <p class="diagram-description">
+                How doctors add prescriptions to confirmed appointments.
+            </p>
+            <div class="mermaid">
+sequenceDiagram
+    participant D as Doctor
+    participant F as Frontend
+    participant API as Doctor API
+    participant S as Supabase
+    participant DB as Database
+    participant P as Patient
+    
+    D->>F: View Confirmed Appointment
+    F->>API: Get Appointment Details
+    API->>S: Query Appointment
+    S->>DB: Select from appointments
+    DB-->>S: Appointment Data
+    S-->>API: Appointment Details
+    API-->>F: Return Data
+    F->>D: Display Patient Info
+    D->>F: Click Add Prescription
+    F->>D: Show Prescription Form
+    D->>F: Enter Diagnosis
+    D->>F: Enter Prescription
+    D->>F: Submit
+    F->>API: Update Appointment
+    API->>S: Update Record
+    S->>DB: Update appointments table
+    DB-->>S: Updated
+    S-->>API: Success
+    API-->>F: Prescription Saved
+    F->>D: Show Success Message
+    F->>P: Notify Patient
+            </div>
+        </div>
+
+        <!-- Medicine Reminder Sequence -->
+        <div class="diagram-card">
+            <h2 class="diagram-title">
+                <i class="bi bi-arrow-left-right me-2"></i>Medicine Reminder Sequence
+            </h2>
+            <p class="diagram-description">
+                Setting up and triggering medicine reminders.
+            </p>
+            <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant F as Frontend
+    participant API as Medicine API
+    participant S as Supabase
+    participant D as Database
+    participant N as Notification System
+    
+    P->>F: Navigate to Medicines
+    F->>P: Display Medicine List
+    P->>F: Click Add Medicine
+    F->>P: Show Add Form
+    P->>F: Enter Medicine Details
+    P->>F: Set Time & Frequency
+    P->>F: Submit
+    F->>API: Create Medicine Reminder
+    API->>S: Insert Medicine
+    S->>D: Insert into medicines table
+    D-->>S: Medicine Created
+    S-->>API: Medicine ID
+    API->>N: Schedule Reminder
+    N->>N: Set Timer
+    N-->>API: Reminder Scheduled
+    API-->>F: Success
+    F->>P: Show Success Message
+    
+    Note over N: At Scheduled Time
+    N->>F: Trigger Reminder
+    F->>P: Show Notification
+    P->>F: Acknowledge
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
