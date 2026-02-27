@@ -1,0 +1,224 @@
+========================================
+HEALTH ASSISTANT - ACTIVITY DIAGRAMS
+PlantUML Code
+========================================
+
+Copy each diagram code to https://www.plantuml.com/plantuml/uml/
+or use a PlantUML editor to generate images.
+
+========================================
+1. PATIENT REGISTRATION ACTIVITY DIAGRAM
+========================================
+
+@startuml
+title Patient Registration Activity Diagram
+
+start
+
+:Open Registration Page;
+
+repeat
+  :Enter Details\n(Name, Email, Password, Phone, Age, Gender);
+  
+  if (Valid Input?) then (yes)
+    :Submit Registration;
+    
+    if (Email Already Exists?) then (no)
+      :Create User Account in Database;
+      :Send Welcome Email;
+      :Auto Login User;
+      :Redirect to Dashboard;
+      stop
+    else (yes)
+      :Show "Email Already Registered" Error;
+    endif
+  else (no)
+    :Show Validation Error;
+  endif
+repeat while (Retry?) is (yes)
+->no;
+stop
+
+@enduml
+
+
+========================================
+2. SYMPTOM CHECKING ACTIVITY DIAGRAM
+========================================
+
+@startuml
+title Symptom Checking Activity Diagram
+
+start
+
+:Open Symptom Checker;
+
+:Type Symptom in Search Box;
+
+:View Symptom Suggestions;
+
+repeat
+  :Select Symptom from List;
+  :Add Symptom to Selected List;
+  :Display Selected Symptoms;
+repeat while (Add More Symptoms?) is (yes)
+->no;
+
+:Click "Check Symptoms" Button;
+
+:AI Analysis Begins;
+
+:Calculate Weighted Scores;
+
+:Match with Disease Database;
+
+:Calculate Confidence Level;
+
+:Predict Disease;
+
+:Show Results Page;
+
+:Display Disease Name;
+
+:Show Confidence Percentage;
+
+:Recommend Specialist Doctor;
+
+:Show Precautions & Description;
+
+:Save to History;
+
+if (Book Appointment?) then (yes)
+  :Navigate to Appointments Page;
+else (no)
+endif
+
+stop
+
+@enduml
+
+
+========================================
+3. APPOINTMENT BOOKING ACTIVITY DIAGRAM
+========================================
+
+@startuml
+title Appointment Booking Activity Diagram
+
+start
+
+:Navigate to Appointments Page;
+
+:View Doctor List;
+
+if (Search for Specific Doctor?) then (yes)
+  :Enter Search Query\n(Name/Specialization);
+  :Filter Doctor Results;
+else (no)
+endif
+
+:Select Doctor from List;
+
+:View Doctor Details\n(Specialization, Experience, Rating);
+
+:Click "Book Appointment" Button;
+
+repeat
+  :Select Appointment Date;
+  :Select Appointment Time;
+  :Enter Reason for Visit;
+  
+  if (Validate Input?) then (valid)
+    :Submit Booking Request;
+    :Create Appointment Record;
+    :Set Status as "Pending";
+    :Send Notification to Doctor;
+    :Show Success Message;
+    :Display Appointment Details;
+    stop
+  else (invalid)
+    :Show Validation Error;
+  endif
+repeat while (Retry?) is (yes)
+->no;
+
+stop
+
+@enduml
+
+
+========================================
+4. DOCTOR APPOINTMENT MANAGEMENT ACTIVITY DIAGRAM
+========================================
+
+@startuml
+title Doctor Appointment Management Activity Diagram
+
+start
+
+:Doctor Logs In;
+
+:View Doctor Dashboard;
+
+:See Pending Appointments List;
+
+:Select Appointment;
+
+:View Patient Details\n(Name, Age, Reason, History);
+
+if (Decision?) then (Accept)
+  :Click "Accept" Button;
+  :Update Status to "Confirmed";
+  :Send Confirmation to Patient;
+  :Show in Confirmed Appointments List;
+  
+  if (Add Prescription?) then (yes)
+    :Enter Diagnosis;
+    :Enter Prescription Details\n(Medicines, Dosage, Instructions);
+    :Save Prescription;
+    :Update Appointment Record;
+    :Notify Patient;
+  else (no)
+    :Update Appointment Record;
+  endif
+  
+else (Reject)
+  :Click "Reject" Button;
+  :Enter Rejection Reason;
+  :Update Status to "Rejected";
+  :Send Rejection Notification to Patient;
+  :Remove from Pending List;
+endif
+
+stop
+
+@enduml
+
+
+========================================
+INSTRUCTIONS:
+========================================
+
+1. Copy each diagram code (from @startuml to @enduml)
+2. Go to https://www.plantuml.com/plantuml/uml/
+3. Paste the code in the text area
+4. Click "Submit" to generate the diagram
+5. Download the image (PNG or SVG)
+6. Save with these names:
+   - patient-registration-activity.png
+   - symptom-checking-activity.png
+   - appointment-booking-activity.png
+   - doctor-appointment-management-activity.png
+
+7. Send me the images and I'll add them to your HTML pages!
+
+========================================
+ALTERNATIVE TOOLS:
+========================================
+
+- VS Code Extension: "PlantUML" by jebbs
+- Online Editor: https://plantuml.com/
+- Desktop App: PlantUML GUI
+- IntelliJ IDEA Plugin: PlantUML integration
+
+========================================

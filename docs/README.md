@@ -1,218 +1,501 @@
-# Documentation Folder
-## Advanced Health Assistant System
+# 🏥 Advanced Health Assistant - AI-Powered Healthcare Platform
 
-Welcome to the documentation folder! This contains comprehensive documentation for the entire project.
+A comprehensive full-stack health management system with ML disease prediction, multi-device support, and real-time health tracking. Features 216 diseases, 30+ medical specializations, and seamless mobile access.
 
----
+![Health Assistant](https://img.shields.io/badge/Status-Development-blue)
+![React](https://img.shields.io/badge/React-18.2.0-blue)
+![Flask](https://img.shields.io/badge/Flask-2.3.3-green)
+![Python](https://img.shields.io/badge/Python-3.8+-yellow)
+![ML](https://img.shields.io/badge/ML-Scikit--Learn-orange)
 
-## 📚 Quick Access
+## ✨ Key Features
 
-### 🎯 Start Here
-- **New to the project?** → Read [PROJECT_OVERVIEW.txt](./PROJECT_OVERVIEW.txt)
-- **Need full details?** → Read [PROJECT_PRESENTATION.md](./PROJECT_PRESENTATION.md)
-- **Database info?** → Check [DATA_DICTIONARY.md](./DATA_DICTIONARY.md)
-- **Quick lookup?** → Use [DATABASE_QUICK_REFERENCE.txt](./DATABASE_QUICK_REFERENCE.txt)
+### 🤖 Advanced AI Disease Prediction
+- **216 Diseases Database** across 17+ medical specializations
+- **613 Unique Symptoms** for comprehensive analysis
+- **100% Training Accuracy** with Random Forest algorithm
+- **Confidence Scoring** for reliable predictions
+- **Real-time Symptom Suggestions** with autocomplete
+- **Detailed Disease Information** with precautions and descriptions
 
-### 📖 Navigation Guide
-See [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) for complete documentation guide.
+### 👨‍⚕️ Comprehensive Doctor Network
+- **100+ Doctors** across all medical specializations
+- **30+ Specializations** including Nephrology, Gynecology, Hematology
+- **Smart Filtering** by specialization and availability
+- **Doctor Ratings & Experience** for informed decisions
+- **Easy Appointment Booking** with calendar integration
 
----
+### 💊 Smart Medicine Management
+- **Personalized Reminders** with custom schedules
+- **Dosage Tracking** and frequency management
+- **Active/Inactive Status** for current and past medications
+- **Dashboard Integration** for quick overview
+- **Real-time Updates** across all devices
 
-## 📄 Available Documents
+### 📊 Intelligent Health Dashboard
+- **Personal Health Overview** with comprehensive statistics
+- **Recent Activity Tracking** for all health interactions
+- **User Profile Management** with detailed health information
+- **Quick Action Buttons** for fast access to features
+- **Visual Health Analytics** with charts and insights
 
-### 1. Project Documentation
+### 📱 Multi-Device & Mobile Support
+- **Cross-Platform Compatibility** - Desktop, tablet, and mobile
+- **Network Access** - Use same account on multiple devices simultaneously
+- **Responsive Design** optimized for all screen sizes
+- **Mobile-First UI** with touch-friendly interactions
+- **Real-time Sync** across all connected devices
 
-| Document | Format | Purpose | Size |
-|----------|--------|---------|------|
-| [PROJECT_PRESENTATION.md](./PROJECT_PRESENTATION.md) | Markdown | Complete presentation with problem statement & solution | 20K words |
-| [PROJECT_OVERVIEW.txt](./PROJECT_OVERVIEW.txt) | Text | Simplified overview for quick reading | 8K words |
+### 🔐 Secure Authentication System
+- **JWT Token Authentication** for secure sessions
+- **Multi-device Login** support
+- **Automatic Token Refresh** for seamless experience
+- **Password Hashing** with Werkzeug security
+- **Session Management** across devices
 
-### 2. Database Documentation
+## 🛠️ Tech Stack
 
-| Document | Format | Purpose | Size |
-|----------|--------|---------|------|
-| [DATA_DICTIONARY.md](./DATA_DICTIONARY.md) | Markdown | Complete database schema documentation | 15K words |
-| [DATABASE_QUICK_REFERENCE.txt](./DATABASE_QUICK_REFERENCE.txt) | Text | Quick reference for tables and relationships | 5K words |
+### Frontend
+- **React.js 18.2.0** - Modern UI framework with hooks
+- **Bootstrap 5** - Responsive design system
+- **React Bootstrap** - Bootstrap components for React
+- **Axios** - HTTP client for API communication
+- **JWT Decode** - Token management
 
-### 3. Technical Diagrams
+### Backend
+- **Flask 2.3.3** - Python web framework
+- **SQLite** - Lightweight relational database
+- **SQLAlchemy** - ORM for database operations
+- **JWT Authentication** - Secure token-based auth
+- **Flask-CORS** - Cross-origin resource sharing
+- **Werkzeug** - Password hashing and security
 
-| Document | Format | Purpose |
-|----------|--------|---------|
-| [sequence-diagrams.puml](./sequence-diagrams.puml) | PlantUML | Detailed system sequence diagrams |
-| [basic-sequence-diagrams.puml](./basic-sequence-diagrams.puml) | PlantUML | Basic interaction patterns |
-| [simple-sequence-diagrams.puml](./simple-sequence-diagrams.puml) | PlantUML | Simple workflow diagrams |
+### Machine Learning
+- **Scikit-Learn** - ML algorithms and model training
+- **Random Forest Classifier** - Disease prediction algorithm
+- **Pandas** - Data manipulation and analysis
+- **NumPy** - Numerical computing
+- **Pickle** - Model serialization and storage
 
-### 4. Guides
+### Database Schema
+- **Users** - Authentication and profile data
+- **Appointments** - Doctor booking and scheduling
+- **Medicines** - Medication reminders and tracking
+- **SymptomChecks** - ML predictions and history
+- **Doctors** - Medical professionals database
 
-| Document | Purpose |
-|----------|---------|
-| [SEQUENCE_DIAGRAMS_README.md](./SEQUENCE_DIAGRAMS_README.md) | Guide for sequence diagrams |
-| [BASIC_PLANTUML_GUIDE.md](./BASIC_PLANTUML_GUIDE.md) | PlantUML basics |
-| [SIMPLE_DIAGRAMS_GUIDE.md](./SIMPLE_DIAGRAMS_GUIDE.md) | Simple diagram guide |
+## 🚀 Quick Start
 
----
+### Prerequisites
+- **Python 3.8+** with pip
+- **Node.js 14+** with npm
+- **Git** for version control
 
-## 🎯 Use Cases
-
-### For Presentations
-Use **PROJECT_PRESENTATION.md** - Contains:
-- Executive summary
-- Problem statement
-- Solution overview
-- System architecture
-- Benefits & impact
-- Business model
-- Future enhancements
-
-### For Development
-Use **DATA_DICTIONARY.md** - Contains:
-- All 7 database tables
-- Column descriptions
-- Relationships
-- RLS policies
-- Indexes
-- Sample data
-
-### For Quick Reference
-Use **DATABASE_QUICK_REFERENCE.txt** - Contains:
-- Quick table lookup
-- ASCII formatted tables
-- Relationship diagrams
-- Index reference
-
-### For Overview
-Use **PROJECT_OVERVIEW.txt** - Contains:
-- Problem statement summary
-- Solution overview
-- Key features
-- Technology stack
-- Project statistics
-
----
-
-## 📊 Documentation Coverage
-
-✅ **Database Schema** - 7 tables fully documented  
-✅ **System Features** - 20+ features explained  
-✅ **Problem Statement** - Detailed analysis  
-✅ **Solution Architecture** - Complete system design  
-✅ **Technology Stack** - All technologies listed  
-✅ **Security & Privacy** - RLS policies documented  
-✅ **Future Enhancements** - Roadmap included  
-✅ **Business Model** - Revenue streams explained  
-
----
-
-## 🔄 Document Formats
-
-### Markdown (.md)
-- Best viewed on GitHub or with Markdown viewer
-- Can be converted to PDF, HTML, DOCX
-- Rich formatting with tables and diagrams
-
-### Text (.txt)
-- Universal compatibility
-- Easy to print
-- Terminal-friendly
-- No special viewer needed
-
-### PlantUML (.puml)
-- Sequence diagrams
-- View with PlantUML viewer or online
-- Can be exported to PNG, SVG, PDF
-
----
-
-## 📥 How to Use
-
-### View on GitHub
-All Markdown files are automatically rendered with formatting when viewed on GitHub.
-
-### View Locally
-- **Markdown:** Use VS Code, Typora, or any Markdown viewer
-- **Text:** Use any text editor or terminal
-- **PlantUML:** Use PlantUML extension in VS Code or online viewer
-
-### Convert to PDF
+### 1. Clone the Repository
 ```bash
-# For Markdown files
-pandoc PROJECT_PRESENTATION.md -o PROJECT_PRESENTATION.pdf
-
-# Or use VS Code with "Markdown PDF" extension
+git clone https://github.com/vatsalkc/advance-health-assistant.git
+cd advance-health-assistant
 ```
 
-### Print
-- Text files: Print directly
-- Markdown files: Convert to PDF first for best results
+### 2. Backend Setup
+```bash
+cd backend
+
+# Create and activate virtual environment
+python -m venv venv
+
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Initialize database and train ML model
+python create_model.py
+
+# Start the Flask server
+python app.py
+```
+
+Backend will be available at `http://localhost:5000`
+
+### 3. Frontend Setup
+```bash
+# Return to root directory
+cd ..
+
+# Install Node.js dependencies
+npm install
+
+# Create environment file
+echo "REACT_APP_API_URL=http://localhost:5000/api" > .env
+
+# Start the React development server
+npm start
+```
+
+Frontend will be available at `http://localhost:3000`
+
+### 4. Mobile Access Setup
+For mobile device access on the same network:
+
+1. **Start backend with network access**:
+   ```bash
+   cd backend
+   python app.py  # Already configured for 0.0.0.0
+   ```
+
+2. **Find your network IP** (displayed in backend console)
+
+3. **Access from mobile**: `http://YOUR_NETWORK_IP:3000`
+
+4. **Login with same account** - works across all devices simultaneously
+
+## 📱 Mobile Access Guide
+
+The application supports seamless multi-device access:
+
+- **Desktop**: `http://localhost:3000`
+- **Mobile/Tablet**: `http://YOUR_NETWORK_IP:3000`
+- **Same Account**: Login simultaneously on multiple devices
+- **Real-time Sync**: Data updates instantly across all devices
+- **Responsive Design**: Optimized for all screen sizes
+
+### Network Configuration
+- Backend runs on `0.0.0.0:5000` (all network interfaces)
+- Frontend detects access method and adjusts API URLs automatically
+- CORS configured for cross-origin mobile access
+
+## 🏗️ Project Structure
+
+```
+advance-health-assistant/
+├── backend/                    # Flask Backend
+│   ├── app.py                 # Main Flask application
+│   ├── models.py              # SQLAlchemy database models
+│   ├── database.py            # Database initialization
+│   ├── ml_model.py            # ML model implementation
+│   ├── create_model.py        # Model training and data setup
+│   ├── train_model.py         # Model training script
+│   ├── requirements.txt       # Python dependencies
+│   ├── disease_data.csv       # ML training dataset
+│   ├── disease_model.pkl      # Trained ML model
+│   └── instance/              # SQLite database files
+├── src/                       # React Frontend
+│   ├── components/            # React components
+│   │   ├── Auth/             # Login & Registration
+│   │   ├── Dashboard/        # Main dashboard
+│   │   ├── SymptomChecker/   # AI symptom analysis
+│   │   ├── Appointments/     # Doctor appointments
+│   │   ├── MedicineReminder/ # Medicine management
+│   │   ├── UserHistory/      # Health history tracking
+│   │   ├── DoctorRecommendation/ # Doctor suggestions
+│   │   └── NetworkStatus/    # Mobile connectivity
+│   ├── services/             # API services
+│   │   └── authService.js    # Authentication service
+│   ├── utils/                # Utility functions
+│   │   └── api.js            # API client with dynamic URLs
+│   ├── firebase/             # Firebase configuration (legacy)
+│   ├── App.js                # Main application component
+│   ├── App.css               # Global styles
+│   └── index.js              # Application entry point
+├── public/                   # Static assets
+│   └── index.html            # HTML template
+├── docs/                     # Documentation
+│   ├── MOBILE_ACCESS_GUIDE.md # Mobile setup guide
+│   ├── ML_SETUP_GUIDE.md     # ML model documentation
+│   └── SETUP_CHECKLIST.md   # Setup verification
+├── .env                      # Environment variables
+├── .env.example              # Environment template
+├── package.json              # Node.js dependencies
+└── README.md                 # This file
+```
+
+## 🚀 Usage Guide
+
+### 1. User Registration & Login
+```bash
+# Register new account
+1. Click "Register" button
+2. Fill in: Name, Email, Password, Phone, Age, Gender
+3. Click "Create Account"
+
+# Login to existing account
+1. Enter email and password
+2. Click "Login"
+3. Access granted across all devices
+```
+
+### 2. AI Symptom Checker
+```bash
+# Check symptoms with AI
+1. Navigate to "Symptom Checker"
+2. Type symptoms (autocomplete suggestions appear)
+3. Add multiple symptoms from suggestions
+4. Click "Analyze Symptoms"
+5. View AI prediction with confidence score
+6. See recommended doctor specialization
+7. Read disease description and precautions
+```
+
+### 3. Doctor Appointments
+```bash
+# Book appointments
+1. Go to "Appointments" section
+2. Browse 100+ doctors by specialization
+3. Filter by: Cardiologist, Neurologist, etc.
+4. Click "Book" on preferred doctor
+5. Select date, time, and reason
+6. Confirm appointment booking
+```
+
+### 4. Medicine Management
+```bash
+# Set up medicine reminders
+1. Navigate to "Medicine Reminder"
+2. Enter medicine name and dosage
+3. Set time and frequency
+4. Click "Add Reminder"
+5. Toggle active/inactive status
+6. View all medicines in dashboard
+```
+
+### 5. Health Dashboard
+```bash
+# Monitor your health
+- View total appointments count
+- See active medicines
+- Check symptom analysis history
+- Access quick action buttons
+- Review personal health profile
+```
+
+## 🔬 Machine Learning Model
+
+### Disease Prediction Engine
+- **Algorithm**: Random Forest Classifier
+- **Training Data**: 216 diseases with associated symptoms
+- **Accuracy**: 100% on training dataset
+- **Symptoms Database**: 613 unique medical symptoms
+- **Specializations**: 30+ medical specialties covered
+
+### Model Features
+- **Real-time Analysis**: Instant symptom processing
+- **Confidence Scoring**: Reliability percentage for predictions
+- **Top Predictions**: Multiple disease possibilities ranked
+- **Specialist Recommendations**: Appropriate doctor specialization
+- **Disease Information**: Detailed descriptions and precautions
+
+### Supported Medical Specializations
+```
+Cardiologist, Neurologist, Dermatologist, Gastroenterologist,
+Pulmonologist, Orthopedist, Psychiatrist, Urologist,
+Nephrologist, Gynecologist, Hematologist, Rheumatologist,
+Infectious Disease Specialist, Endocrinologist, Oncologist,
+Ophthalmologist, ENT Specialist, General Physician, and more...
+```
+
+## 🔐 Security & Authentication
+
+### JWT Token System
+- **Secure Authentication**: Industry-standard JWT tokens
+- **Multi-device Support**: Same account on multiple devices
+- **Automatic Refresh**: Seamless token renewal
+- **Session Management**: Secure session handling
+- **Password Security**: Werkzeug hashing algorithm
+
+### Data Protection
+- **User Isolation**: Each user's data is completely separate
+- **Input Validation**: Server-side data validation
+- **CORS Security**: Configured for safe cross-origin requests
+- **SQL Injection Prevention**: SQLAlchemy ORM protection
+
+## 🌐 API Endpoints
+
+### Authentication Endpoints
+```bash
+POST /api/auth/register     # User registration
+POST /api/auth/login        # User login
+GET  /api/auth/me          # Get current user
+POST /api/auth/refresh     # Refresh JWT token
+GET  /api/auth/validate    # Validate token
+```
+
+### Health Management Endpoints
+```bash
+# Symptom Analysis
+POST /api/symptom-check    # Analyze symptoms with AI
+GET  /api/symptom-checks   # Get user's symptom history
+GET  /api/symptoms/all     # Get all available symptoms
+
+# Doctor Management
+GET  /api/doctors          # Get all doctors
+GET  /api/doctors?specialization=Cardiologist  # Filter by specialty
+
+# Appointments
+GET  /api/appointments     # Get user appointments
+POST /api/appointments     # Book new appointment
+DELETE /api/appointments/:id  # Cancel appointment
+
+# Medicine Reminders
+GET  /api/medicines        # Get user medicines
+POST /api/medicines        # Add medicine reminder
+PUT  /api/medicines/:id    # Update medicine
+DELETE /api/medicines/:id  # Delete medicine
+
+# User Profile & Stats
+GET  /api/user/profile     # Comprehensive user data
+GET  /api/stats           # User health statistics
+```
+
+## 🚀 Running the Application
+
+### Local Development
+```bash
+# Backend (Terminal 1)
+cd backend
+venv\Scripts\activate  # Windows
+python app.py
+
+# Frontend (Terminal 2)
+npm start
+
+# Access: http://localhost:3000
+```
+
+### Network Access (Multi-device)
+```bash
+# Backend automatically runs on 0.0.0.0:5000
+# Frontend accessible via network IP
+# Mobile access: http://YOUR_NETWORK_IP:3000
+```
+
+## 📈 Recent Updates & Features
+
+### ✅ Latest Improvements (January 2026)
+- **Mobile Compatibility**: Full mobile device support with network access
+- **Enhanced ML Model**: 216 diseases, 613 symptoms, 30+ specializations
+- **Multi-device Login**: Same account works on desktop and mobile simultaneously
+- **Improved UI/UX**: Better responsive design and mobile-first approach
+- **Advanced Dashboard**: Comprehensive health overview with statistics
+- **Real-time Sync**: Data updates instantly across all connected devices
+- **Better Error Handling**: Enhanced debugging and user feedback
+- **Network Status**: Mobile connectivity indicators
+
+### 🔄 Architecture Migration
+- **From Firebase to Flask+SQLite**: Better control and customization
+- **JWT Authentication**: More secure and flexible than Firebase Auth
+- **Local ML Model**: Faster predictions without external API calls
+- **Responsive API**: Dynamic URL detection for mobile access
+
+## 🎯 Future Enhancements
+
+### Planned Features
+- [ ] **Email Notifications** for appointment confirmations
+- [ ] **SMS Reminders** for medicine schedules
+- [ ] **Video Consultation** integration with doctors
+- [ ] **Health Records Upload** (PDF, images)
+- [ ] **Family Member Management** for multiple profiles
+- [ ] **Insurance Integration** for cost estimation
+- [ ] **Prescription Management** with pharmacy integration
+- [ ] **Lab Test Results** tracking and analysis
+- [ ] **Health Analytics Dashboard** with charts and trends
+- [ ] **Multi-language Support** for global accessibility
+- [ ] **Wearable Device Integration** (fitness trackers)
+- [ ] **Telemedicine Platform** for remote consultations
+
+### Technical Improvements
+- [ ] **Progressive Web App (PWA)** for offline functionality
+- [ ] **Push Notifications** for reminders and updates
+- [ ] **Advanced ML Models** for better disease prediction
+- [ ] **Voice Input** for symptom description
+- [ ] **Image Analysis** for skin condition detection
+- [ ] **API Rate Limiting** for production scaling
+- [ ] **Caching System** for improved performance
+- [ ] **Microservices Architecture** for better scalability
+
+## 👨‍💻 Author & Contributors
+
+**Vatsal KC**
+- GitHub: [@vatsalkc](https://github.com/vatsalkc)
+- Project: [Advanced Health Assistant](https://github.com/vatsalkc/advance-health-assistant)
+- Role: Full-stack Developer & ML Engineer
+
+### 🏆 Project Achievements
+- **216 Diseases** in ML model with 100% training accuracy
+- **30+ Medical Specializations** covered
+- **100+ Doctors** in database across all specialties
+- **Multi-device Support** with seamless mobile access
+- **Real-time Data Sync** across all connected devices
+- **Comprehensive Health Management** in one platform
+
+## 🙏 Acknowledgments
+
+- **Scikit-Learn Community** for excellent ML algorithms
+- **Flask Team** for the robust web framework
+- **React Team** for the powerful UI library
+- **Bootstrap Team** for responsive design components
+- **Medical Community** for disease and symptom data
+- **Open Source Contributors** for various libraries used
+
+## 📞 Support & Contact
+
+### Getting Help
+1. **Documentation**: Check the comprehensive guides in `/docs`
+2. **Issues**: Open a GitHub issue for bugs or feature requests
+3. **Discussions**: Use GitHub Discussions for questions
+4. **Email**: Contact the maintainer for urgent issues
+
+### Reporting Issues
+When reporting issues, please include:
+- Operating system and browser version
+- Steps to reproduce the problem
+- Error messages or screenshots
+- Expected vs actual behavior
+
+### Contributing Guidelines
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request with detailed description
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### MIT License Summary
+- ✅ Commercial use allowed
+- ✅ Modification allowed
+- ✅ Distribution allowed
+- ✅ Private use allowed
+- ❌ No warranty provided
+- ❌ No liability accepted
+
+## ⚠️ Medical Disclaimer
+
+**IMPORTANT**: This application is for **educational and informational purposes only**. It should **NOT** be used as a substitute for professional medical advice, diagnosis, or treatment.
+
+### Guidelines
+- Always consult qualified healthcare providers for medical concerns
+- Do not rely solely on AI predictions for health decisions
+- Seek immediate medical attention for emergency situations
+- Use the app as a supplementary tool, not a replacement for medical care
+- The ML model is trained on general data and may not cover all cases
+
+## 🌟 Show Your Support
+
+If you found this project helpful, please consider:
+- ⭐ **Starring** the repository on GitHub
+- 🍴 **Forking** the project to contribute
+- 📢 **Sharing** with others who might benefit
+- 💬 **Providing feedback** through issues or discussions
+- 🤝 **Contributing** to make it even better
 
 ---
 
-## 🎓 Learning Path
+**Built with ❤️ using React, Flask, SQLite, and Machine Learning**
 
-### Day 1: Overview
-1. Read [PROJECT_OVERVIEW.txt](./PROJECT_OVERVIEW.txt) (30 min)
-2. Skim [DATABASE_QUICK_REFERENCE.txt](./DATABASE_QUICK_REFERENCE.txt) (15 min)
-
-### Day 2-3: Deep Dive
-1. Study [PROJECT_PRESENTATION.md](./PROJECT_PRESENTATION.md) (2 hours)
-2. Review [DATA_DICTIONARY.md](./DATA_DICTIONARY.md) (1 hour)
-
-### Day 4+: Reference
-Keep documentation handy for reference during development.
-
----
-
-## 📞 Support
-
-**For Questions:**
-- Check [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) for navigation help
-- Search within documents for specific topics
-- Refer to main [README.md](../README.md) for setup instructions
-
-**For Updates:**
-- Documentation is version controlled with Git
-- Check commit history for changes
-- Latest version always in main branch
-
----
-
-## ✨ Quick Stats
-
-- **Total Documents:** 10+
-- **Total Words:** 50,000+
-- **Database Tables:** 7 documented
-- **Features Covered:** 20+
-- **Diagrams:** 30+ sequence diagrams
-- **Formats:** Markdown, Text, PlantUML
-
----
-
-## 🔗 Related Files
-
-**In Root Directory:**
-- `README.md` - Main project README
-- `supabase_schema.sql` - Database creation script
-- `supabase_doctor_schema.sql` - Doctor portal schema
-- `package.json` - Project dependencies
-
-**In Source:**
-- `src/` - Application source code
-- `public/` - Static assets
-- `build/` - Production build
-
----
-
-**Last Updated:** February 26, 2026  
-**Documentation Version:** 1.0  
-**Maintained By:** Advanced Health Assistant Team
-
----
-
-## 📋 Quick Links
-
-- [📖 Documentation Index](./DOCUMENTATION_INDEX.md)
-- [🎯 Project Presentation](./PROJECT_PRESENTATION.md)
-- [📝 Project Overview](./PROJECT_OVERVIEW.txt)
-- [🗄️ Data Dictionary](./DATA_DICTIONARY.md)
-- [⚡ Quick Reference](./DATABASE_QUICK_REFERENCE.txt)
-- [🔄 Sequence Diagrams](./sequence-diagrams.puml)
+*Empowering individuals to take control of their health through technology*
