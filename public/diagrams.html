@@ -219,52 +219,52 @@ graph TB
                     <div class="mermaid">
 classDiagram
     class User{
-        UUID id
-        String name
-        String email
-        String phone
-        Integer age
-        String gender
+        +id : string
+        +name : string
+        +email : string
+        +phone : string
+        +age : int
+        +gender : string
     }
     
     class Doctor{
-        Integer id
-        String name
-        String email
-        String specialization
-        String experience
-        Decimal rating
+        +id : int
+        +name : string
+        +email : string
+        +specialization : string
+        +experience : string
+        +rating : float
     }
     
     class Appointment{
-        Integer id
-        UUID userId
-        Integer doctorId
-        Date date
-        Time time
-        String status
+        +id : int
+        +userId : string
+        +doctorId : int
+        +date : string
+        +time : string
+        +status : string
     }
     
     class SymptomCheck{
-        Integer id
-        UUID userId
-        Array symptoms
-        String disease
-        Decimal confidence
+        +id : int
+        +userId : string
+        +symptoms : string
+        +disease : string
+        +confidence : float
     }
     
     class Medicine{
-        Integer id
-        UUID userId
-        String name
-        String dosage
-        Time time
+        +id : int
+        +userId : string
+        +name : string
+        +dosage : string
+        +time : string
     }
     
-    User "1" -- "*" Appointment
-    User "1" -- "*" SymptomCheck
-    User "1" -- "*" Medicine
-    Doctor "1" -- "*" Appointment
+    User "1" --> "*" Appointment
+    User "1" --> "*" SymptomCheck
+    User "1" --> "*" Medicine
+    Doctor "1" --> "*" Appointment
                     </div>
                 </div>
             </div>
@@ -281,21 +281,21 @@ classDiagram
                         Flow of patient registration process from start to finish.
                     </p>
                     <div class="mermaid">
-graph TD
-    A[Start] --> B[Open Registration Page]
+flowchart TD
+    A([Start]) --> B[Open Registration Page]
     B --> C[Enter Details]
     C --> D{Valid Input?}
-    D -->|No| E[Show Error]
+    D -- No --> E[Show Error]
     E --> C
-    D -->|Yes| F[Submit]
+    D -- Yes --> F[Submit]
     F --> G{Email Exists?}
-    G -->|Yes| H[Show Error]
+    G -- Yes --> H[Show Error]
     H --> C
-    G -->|No| I[Create Account]
+    G -- No --> I[Create Account]
     I --> J[Send Email]
     J --> K[Auto Login]
     K --> L[Go to Dashboard]
-    L --> M[End]
+    L --> M([End])
                     </div>
                 </div>
 
@@ -309,14 +309,14 @@ graph TD
                         Process flow for checking symptoms and getting disease predictions.
                     </p>
                     <div class="mermaid">
-graph TD
-    A[Start] --> B[Open Symptom Checker]
+flowchart TD
+    A([Start]) --> B[Open Symptom Checker]
     B --> C[Type Symptom]
     C --> D[View Suggestions]
     D --> E[Select Symptom]
     E --> F{Add More?}
-    F -->|Yes| C
-    F -->|No| G[Click Check]
+    F -- Yes --> C
+    F -- No --> G[Click Check]
     G --> H[AI Analysis]
     H --> I[Calculate Scores]
     I --> J[Predict Disease]
@@ -326,10 +326,10 @@ graph TD
     M --> N[Recommend Doctor]
     N --> O[Show Precautions]
     O --> P{Book Appointment?}
-    P -->|Yes| Q[Go to Appointments]
-    P -->|No| R[Save History]
+    P -- Yes --> Q[Go to Appointments]
+    P -- No --> R[Save History]
     Q --> R
-    R --> S[End]
+    R --> S([End])
                     </div>
                 </div>
 
@@ -346,26 +346,25 @@ graph TD
 flowchart TD
     Start([Start]) --> A[Navigate to Appointments]
     A --> B[View Doctor List]
-    B --> C{Search Doctor}
-    C -->|Yes| D[Enter Search Query]
+    B --> C{Search Doctor?}
+    C -- Yes --> D[Enter Search Query]
     D --> E[Filter Results]
     E --> B
-    C -->|No| F[Select Doctor]
+    C -- No --> F[Select Doctor]
     F --> G[View Doctor Details]
     G --> H[Click Book Appointment]
     H --> I[Select Date]
     I --> J[Select Time]
     J --> K[Enter Reason]
     K --> L{Validate Input}
-    L -->|Invalid| M[Show Error]
+    L -- Invalid --> M[Show Error]
     M --> I
-    L -->|Valid| N[Submit Booking]
+    L -- Valid --> N[Submit Booking]
     N --> O[Create Appointment Record]
     O --> P[Set Status Pending]
     P --> Q[Send Notification to Doctor]
     Q --> R[Show Success Message]
-    R --> S[Display Appointment Details]
-    S --> End([End])
+    R --> S([End])
                     </div>
                 </div>
 
@@ -613,15 +612,8 @@ sequenceDiagram
     <script>
         mermaid.initialize({ 
             startOnLoad: true,
-            theme: 'default',
-            themeVariables: {
-                primaryColor: '#2563eb',
-                primaryTextColor: '#fff',
-                primaryBorderColor: '#1e40af',
-                lineColor: '#64748b',
-                secondaryColor: '#3b82f6',
-                tertiaryColor: '#f8fafc'
-            }
+            securityLevel: 'loose',
+            theme: 'default'
         });
     </script>
 </body>
