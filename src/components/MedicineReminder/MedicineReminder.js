@@ -9,6 +9,7 @@ function MedicineReminder({ user }) {
     medicine_name: '',
     dosage: '',
     time: '',
+    time2: '', // For twice daily
     frequency: 'daily'
   });
   const [showSuccess, setShowSuccess] = useState(false);
@@ -79,9 +80,18 @@ function MedicineReminder({ user }) {
     e.preventDefault();
     
     try {
-      await medicinesAPI.create(formData);
+      // For twice daily, combine times
+      let timeValue = formData.time;
+      if (formData.frequency === 'twice-daily' && formData.time2) {
+        timeValue = `${formData.time}, ${formData.time2}`;
+      }
       
-      setFormData({ medicine_name: '', dosage: '', time: '', frequency: 'daily' });
+      await medicinesAPI.create({
+        ...formData,
+        time: timeValue
+      });
+      
+      setFormData({ medicine_name: '', dosage: '', time: '', time2: '', frequency: 'daily' });
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       
@@ -184,6 +194,7 @@ function MedicineReminder({ user }) {
                   name="medicine_name"
                   value={formData.medicine_name}
                   onChange={handleChange}
+                  placeholder="e.g., Aspirin"
                   required
                 />
               </Form.Group>
@@ -193,19 +204,8 @@ function MedicineReminder({ user }) {
                 <Form.Control
                   type="text"
                   name="dosage"
-                  placeholder="e.g., 100mg"
+                  placeholder="e.g., 100mg, 2 tablets"
                   value={formData.dosage}
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Time</Form.Label>
-                <Form.Control
-                  type="time"
-                  name="time"
-                  value={formData.time}
                   onChange={handleChange}
                   required
                 />
@@ -214,13 +214,57 @@ function MedicineReminder({ user }) {
               <Form.Group className="mb-3">
                 <Form.Label>Frequency</Form.Label>
                 <Form.Select name="frequency" value={formData.frequency} onChange={handleChange}>
-                  <option value="daily">Daily</option>
+                  <option value="daily">Once Daily</option>
                   <option value="twice-daily">Twice Daily</option>
                   <option value="weekly">Weekly</option>
                 </Form.Select>
               </Form.Group>
 
+              {formData.frequency === 'twice-daily' ? (
+                <>
+                  <Form.Group className="mb-3">
+                    <Form.Label>First Time</Form.Label>
+                    <Form.Control
+                      type="time"
+                      name="time"
+                      value={formData.time}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Form.Text className="text-muted">
+                      Morning dose time
+                    </Form.Text>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Second Time</Form.Label>
+                    <Form.Control
+                      type="time"
+                      name="time2"
+                      value={formData.time2}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Form.Text className="text-muted">
+                      Evening dose time
+                    </Form.Text>
+                  </Form.Group>
+                </>
+              ) : (
+                <Form.Group className="mb-3">
+                  <Form.Label>Time</Form.Label>
+                  <Form.Control
+                    type="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+              )}
+
               <Button variant="primary" type="submit" className="w-100">
+                <i className="bi bi-plus-circle me-2"></i>
                 Add Reminder
               </Button>
             </Form>
