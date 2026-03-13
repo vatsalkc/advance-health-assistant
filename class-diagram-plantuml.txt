@@ -1,0 +1,273 @@
+========================================
+HEALTH ASSISTANT - CLASS DIAGRAM
+PlantUML Code (User & Patient Combined)
+========================================
+
+Copy this code to https://www.plantuml.com/plantuml/uml/
+to generate the class diagram image.
+
+========================================
+
+@startuml
+title Health Assistant - Class Diagram
+
+' Define Classes
+
+class Patient {
+  + userID: String
+  + name: String
+  + email: String
+  + password: String
+  + healthHistory: String
+  + phone: String
+  + age: Integer
+  + gender: String
+  --
+  + login()
+  + logout()
+  + enterSymptoms()
+  + bookAppointment()
+  + modifyAppointment()
+  + cancelAppointment()
+  + viewHistory()
+  + addMedicineReminder()
+}
+
+class Doctor {
+  + doctorID: String
+  + name: String
+  + email: String
+  + password: String
+  + specialization: String
+  + availability: String
+  + experience: String
+  + rating: Float
+  + phone: String
+  --
+  + login()
+  + logout()
+  + updateAvailability()
+  + viewPatientDetails()
+  + acceptAppointment()
+  + rejectAppointment()
+  + modifyAppointment()
+  + cancelAppointment()
+  + addPrescription()
+}
+
+class Admin {
+  + adminID: String
+  + name: String
+  + email: String
+  + password: String
+  --
+  + login()
+  + logout()
+  + manageUsers()
+  + manageDataset()
+  + monitorSystem()
+}
+
+class Medicine {
+  + medicineID: String
+  + patientID: String
+  + medName: String
+  + dosage: String
+  + frequency: String
+  + time: String
+  + startDate: Date
+  --
+  + setReminder()
+  + updateReminder()
+  + deleteReminder()
+}
+
+class Appointment {
+  + appointmentID: String
+  + patientID: String
+  + doctorID: String
+  + dateTime: DateTime
+  + status: String
+  + reason: String
+  + diagnosis: String
+  + prescription: String
+  + createdBy: String
+  + modifiedBy: String
+  + lastModified: DateTime
+  --
+  + create()
+  + modify()
+  + cancel()
+  + updateStatus()
+  + addPrescription()
+  + reschedule()
+}
+
+class MLEngine {
+  + engineID: String
+  + modelVersion: String
+  --
+  + predictDisease(symptoms: List)
+  + recommendSpecialization(disease: String)
+  + calculateConfidence(symptoms: List)
+  + analyzeSymptoms(symptoms: List)
+}
+
+class SymptomDataset {
+  + datasetID: String
+  + adminID: String
+  + dataPoints: List
+  + lastUpdated: DateTime
+  + version: String
+  --
+  + updateData()
+  + addDisease()
+  + addSymptom()
+  + validateData()
+}
+
+' Define Relationships with Cardinality
+
+Patient "1" -- "0..*" Medicine : manages >
+Patient "1" -- "0..*" Appointment : books >
+Doctor "1" -- "0..*" Appointment : attends >
+Doctor "0..*" -- "0..*" Patient : treats >
+Admin "1" -- "0..*" Patient : manages >
+Admin "1" -- "0..*" Doctor : manages >
+Admin "1" -- "1" SymptomDataset : maintains >
+MLEngine "1" ..> "1" SymptomDataset : processes >
+
+' Add notes for cardinality
+note right of Patient
+  1 Patient can have
+  many (0..*) Medicines
+  and Appointments
+  
+  Many Patients can be
+  treated by many Doctors
+  
+  Patient can:
+  - Book appointments
+  - Modify appointments
+  - Cancel appointments
+end note
+
+note right of Doctor
+  1 Doctor can attend
+  many (0..*) Appointments
+  
+  1 Doctor can treat
+  many (0..*) Patients
+  
+  Doctor can:
+  - Accept/Reject appointments
+  - Modify appointments
+  - Cancel appointments
+  - Add prescriptions
+end note
+
+note right of Admin
+  1 Admin can manage
+  many (0..*) Patients
+  and Doctors
+  
+  1 Admin maintains
+  1 SymptomDataset
+end note
+
+note bottom of Appointment
+  Both Patient and Doctor
+  can modify and cancel
+  appointments
+  
+  Tracks who created/modified
+  and when (audit trail)
+end note
+
+note bottom of MLEngine
+  MLEngine processes
+  SymptomDataset for
+  disease prediction
+end note
+
+@enduml
+
+========================================
+CARDINALITY NOTATION EXPLAINED:
+========================================
+
+1       = Exactly one
+0..1    = Zero or one
+0..*    = Zero or many (also written as *)
+1..*    = One or many
+m..n    = Between m and n
+
+In this diagram:
+- Patient "1" -- "0..*" Medicine
+  (1 Patient can have 0 or many Medicines)
+
+- Patient "1" -- "0..*" Appointment
+  (1 Patient can book 0 or many Appointments)
+
+- Doctor "1" -- "0..*" Appointment
+  (1 Doctor can attend 0 or many Appointments)
+
+- Doctor "0..*" -- "0..*" Patient
+  (Many Doctors can treat many Patients - Many-to-Many)
+
+- Admin "1" -- "0..*" Patient
+  (1 Admin can manage many Patients)
+
+- Admin "1" -- "0..*" Doctor
+  (1 Admin can manage many Doctors)
+
+- Admin "1" -- "1" SymptomDataset
+  (1 Admin maintains exactly 1 SymptomDataset)
+
+- MLEngine "1" ..> "1" SymptomDataset
+  (1 MLEngine processes 1 SymptomDataset)
+  (Dashed line = dependency relationship)
+
+========================================
+KEY CHANGES FROM ORIGINAL:
+========================================
+
+1. ✅ User and Patient are now COMBINED into one "Patient" class
+2. ✅ Patient class includes all User attributes (userID, name, email, password)
+3. ✅ Patient class includes Patient-specific attributes (healthHistory)
+4. ✅ All relationships now show cardinality (1-1, 1-m, etc.)
+5. ✅ Clear notation: "1" -- "0..*" for one-to-many
+6. ✅ Solid lines for associations, dashed for dependencies
+7. ✅ Patient, Doctor, and Admin are now CONNECTED:
+   - Doctor treats many Patients (many-to-many)
+   - Admin manages many Patients (one-to-many)
+   - Admin manages many Doctors (one-to-many)
+
+========================================
+INSTRUCTIONS:
+========================================
+
+1. Copy the code from @startuml to @enduml
+2. Go to https://www.plantuml.com/plantuml/uml/
+3. Paste the code
+4. Click "Submit"
+5. Download as PNG or SVG
+6. Save as "class-diagram-updated.png"
+7. Send me the image to add to your HTML pages!
+
+========================================
+ALTERNATIVE WITH DIFFERENT STYLE:
+========================================
+
+If you want a cleaner look, you can add this at the top
+after @startuml:
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FEFEFE
+skinparam class {
+  BackgroundColor White
+  BorderColor #2563eb
+  ArrowColor #64748b
+}
+
+========================================
