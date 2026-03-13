@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Badge, Button, Modal, Form, Nav, Tab } from 'react-bootstrap';
+import { Card, Table, Badge, Button, Modal, Form, Nav, Alert } from 'react-bootstrap';
 import { doctorAppointmentsAPI } from '../../utils/doctorApi';
 
 function DoctorAppointments() {
@@ -11,6 +11,13 @@ function DoctorAppointments() {
   const [showModal, setShowModal] = useState(false);
   const [prescription, setPrescription] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
+  const [modifyFormData, setModifyFormData] = useState({
+    date: '',
+    time: '',
+    reason: ''
+  });
 
   useEffect(() => {
     fetchAppointments();
@@ -91,6 +98,54 @@ function DoctorAppointments() {
     } catch (err) {
       console.error('Error saving prescription:', err);
       alert('Failed to save prescription');
+    }
+  };
+
+  const handleCancelClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowCancelModal(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    try {
+      await doctorAppointmentsAPI.delete(selectedAppointment.id);
+      setShowCancelModal(false);
+      setSelectedAppointment(null);
+      fetchAppointments();
+      alert('Appointment cancelled successfully');
+    } catch (err) {
+      console.error('Error cancelling appointment:', err);
+      alert('Failed to cancel appointment');
+    }
+  };
+
+  const handleModifyClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setModifyFormData({
+      date: appointment.date,
+      time: appointment.time,
+      reason: appointment.reason
+    });
+    setShowModifyModal(true);
+  };
+
+  const handleModifySubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await doctorAppointmentsAPI.update(selectedAppointment.id, {
+        date: modifyFormData.date,
+        time: modifyFormData.time,
+        reason: modifyFormData.reason,
+        status: 'Confirmed' // Keep confirmed status for doctor modifications
+      });
+      setShowModifyModal(false);
+      setSelectedAppointment(null);
+      setModifyFormData({ date: '', time: '', reason: '' });
+      fetchAppointments();
+      alert('Appointment modified successfully');
+    } catch (err) {
+      console.error('Error modifying appointment:', err);
+      alert('Failed to modify appointment');
     }
   };
 
@@ -228,14 +283,34 @@ function DoctorAppointments() {
                           </div>
                         )}
                         {apt.status === 'Confirmed' && (
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => handleAddPrescription(apt)}
-                          >
-                            <i className="bi bi-prescription2 me-1"></i>
-                            {apt.prescription ? 'Edit' : 'Add'} Prescription
-                          </Button>
+                          <div className="appointment-actions">
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              onClick={() => handleAddPrescription(apt)}
+                            >
+                              <i className="bi bi-prescription2 me-1"></i>
+                              {apt.prescription ? 'Edit' : 'Add'} Prescription
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline-secondary"
+                              onClick={() => handleModifyClick(apt)}
+                              className="mt-1"
+                            >
+                              <i className="bi bi-pencil me-1"></i>
+                              Modify
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline-danger"
+                              onClick={() => handleCancelClick(apt)}
+                              className="mt-1"
+                            >
+                              <i className="bi bi-x-lg me-1"></i>
+                              Cancel
+                            </Button>
+                          </div>
                         )}
                         {apt.status === 'Rejected' && apt.rejected_reason && (
                           <small className="text-muted">
@@ -305,6 +380,153 @@ function DoctorAppointments() {
           </Button>
           <Button variant="primary" onClick={handleSavePrescription}>
             Save Prescription
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modify Appointment Modal */}
+      <Modal
+        show={showModifyModal}
+        onHide={() => {
+          setShowModifyModal(false);
+          setSelectedAppointment(null);
+          setModifyFormData({ date: '', time: '', reason: '' });
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="bi bi-pencil-square me-2"></i>
+            Modify Appointment
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedAppointment && (
+            <div className="patient-summary mb-3">
+              <div><strong>Patient:</strong> {selectedAppointment.users?.name}</div>
+              <div><strong>Email:</strong> {selectedAppointment.users?.email}</div>
+            </div>
+          )}
+
+          <Form onSubmit={handleModifySubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <i className="bi bi-calendar3 me-2"></i>
+                Date
+              </Form.Label>
+              <Form.Control
+                type="date"
+                value={modifyFormData.date}
+                onChange={(e) => setModifyFormData({ ...modifyFormData, date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <i className="bi bi-clock me-2"></i>
+                Time
+              </Form.Label>
+              <Form.Control
+                type="time"
+                value={modifyFormData.time}
+                onChange={(e) => setModifyFormData({ ...modifyFormData, time: e.target.value })}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <i className="bi bi-file-text me-2"></i>
+                Reason
+              </Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={modifyFormData.reason}
+                onChange={(e) => setModifyFormData({ ...modifyFormData, reason: e.target.value })}
+                required
+              />
+            </Form.Group>
+
+            <div className="d-flex gap-2">
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  setShowModifyModal(false);
+                  setSelectedAppointment(null);
+                  setModifyFormData({ date: '', time: '', reason: '' });
+                }}
+                className="flex-fill"
+              >
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" className="flex-fill">
+                <i className="bi bi-check-lg me-2"></i>
+                Save Changes
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        show={showCancelModal}
+        onHide={() => {
+          setShowCancelModal(false);
+          setSelectedAppointment(null);
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="bi bi-exclamation-triangle me-2 text-warning"></i>
+            Confirm Cancellation
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedAppointment && (
+            <>
+              <p>Are you sure you want to cancel this appointment?</p>
+              <div className="appointment-details-box p-3 bg-light rounded">
+                <div className="mb-2">
+                  <strong>Patient:</strong> {selectedAppointment.users?.name}
+                </div>
+                <div className="mb-2">
+                  <strong>Email:</strong> {selectedAppointment.users?.email}
+                </div>
+                <div className="mb-2">
+                  <strong>Date:</strong> {selectedAppointment.date}
+                </div>
+                <div className="mb-2">
+                  <strong>Time:</strong> {selectedAppointment.time}
+                </div>
+                <div>
+                  <strong>Reason:</strong> {selectedAppointment.reason}
+                </div>
+              </div>
+              <Alert variant="warning" className="mt-3 mb-0">
+                <i className="bi bi-info-circle me-2"></i>
+                This action cannot be undone. The patient will be notified of the cancellation.
+              </Alert>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              setShowCancelModal(false);
+              setSelectedAppointment(null);
+            }}
+          >
+            Keep Appointment
+          </Button>
+          <Button variant="danger" onClick={handleConfirmCancel}>
+            <i className="bi bi-x-lg me-2"></i>
+            Yes, Cancel Appointment
           </Button>
         </Modal.Footer>
       </Modal>

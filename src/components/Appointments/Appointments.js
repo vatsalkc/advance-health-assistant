@@ -29,6 +29,9 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationType, setNotificationType] = useState('success');
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const [formData, setFormData] = useState({
     date: '',
@@ -166,16 +169,53 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
     }
   };
 
-  const handleDeleteAppointment = async (id) => {
-    if (!window.confirm('Cancel this appointment?')) return;
+  const handleCancelClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowCancelModal(true);
+  };
 
+  const handleConfirmCancel = async () => {
     try {
-      await appointmentsAPI.delete(id);
+      await appointmentsAPI.delete(selectedAppointment.id);
       showNotificationToast('Appointment cancelled successfully', 'warning');
-      fetchAppointments(); // Refresh appointments
+      setShowCancelModal(false);
+      setSelectedAppointment(null);
+      fetchAppointments();
     } catch (err) {
       console.error(err);
       alert('Failed to cancel appointment');
+    }
+  };
+
+  const handleModifyClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setFormData({
+      date: appointment.date,
+      time: appointment.time,
+      reason: appointment.reason
+    });
+    setShowModifyModal(true);
+  };
+
+  const handleModifySubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await appointmentsAPI.update(selectedAppointment.id, {
+        date: formData.date,
+        time: formData.time,
+        reason: formData.reason,
+        status: 'Pending' // Reset to pending when modified
+      });
+
+      setShowModifyModal(false);
+      setSelectedAppointment(null);
+      setFormData({ date: '', time: '', reason: '' });
+      showNotificationToast('Appointment modified successfully. Waiting for doctor confirmation.', 'success');
+      fetchAppointments();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to modify appointment');
     }
   };
 
@@ -453,12 +493,21 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
                         </div>
                       )}
                       
-                      {a.status !== 'Rejected' && (
+                      {a.status !== 'Rejected' && a.status !== 'Completed' && (
                         <div className="appointment-card-footer">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => handleModifyClick(a)}
+                            className="me-2"
+                          >
+                            <i className="bi bi-pencil me-1"></i>
+                            Modify
+                          </Button>
                           <Button
                             variant="outline-danger"
                             size="sm"
-                            onClick={() => handleDeleteAppointment(a.id)}
+                            onClick={() => handleCancelClick(a)}
                           >
                             <i className="bi bi-x-lg me-1"></i>
                             Cancel
@@ -562,6 +611,171 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
             </div>
           </Form>
         </Modal.Body>
+      </Modal>
+
+      {/* Modify Appointment Modal */}
+      <Modal
+        show={showModifyModal}
+        onHide={() => {
+          setShowModifyModal(false);
+          setSelectedAppointment(null);
+          setFormData({ date: '', time: '', reason: '' });
+        }}
+        centered
+        className="appointment-booking-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="bi bi-pencil-square me-2"></i>
+            Modify Appointment
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          {selectedAppointment && (
+            <div className="selected-doctor-info mb-3">
+              <div className="doctor-avatar-modal">
+                {selectedAppointment.doctor_name.charAt(0)}
+              </div>
+              <div>
+                <h5>{selectedAppointment.doctor_name}</h5>
+                <Badge bg="primary">{selectedAppointment.specialization}</Badge>
+              </div>
+            </div>
+          )}
+
+          <Alert variant="info" className="mb-3">
+            <i className="bi bi-info-circle me-2"></i>
+            Modifying this appointment will reset its status to "Pending" and require doctor confirmation again.
+          </Alert>
+
+          <Form onSubmit={handleModifySubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <i className="bi bi-calendar3 me-2"></i>
+                Date
+              </Form.Label>
+              <Form.Control
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <i className="bi bi-clock me-2"></i>
+                Time
+              </Form.Label>
+              <Form.Control
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <i className="bi bi-file-text me-2"></i>
+                Reason for Visit
+              </Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="reason"
+                value={formData.reason}
+                onChange={handleChange}
+                placeholder="Describe your symptoms or reason for consultation..."
+                required
+              />
+            </Form.Group>
+
+            <div className="d-flex gap-2">
+              <Button
+                variant="outline-secondary"
+                onClick={() => {
+                  setShowModifyModal(false);
+                  setSelectedAppointment(null);
+                  setFormData({ date: '', time: '', reason: '' });
+                }}
+                className="flex-fill"
+              >
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" className="flex-fill">
+                <i className="bi bi-check-lg me-2"></i>
+                Save Changes
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        show={showCancelModal}
+        onHide={() => {
+          setShowCancelModal(false);
+          setSelectedAppointment(null);
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="bi bi-exclamation-triangle me-2 text-warning"></i>
+            Confirm Cancellation
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          {selectedAppointment && (
+            <>
+              <p>Are you sure you want to cancel this appointment?</p>
+              <div className="appointment-details-box p-3 bg-light rounded">
+                <div className="mb-2">
+                  <strong>Doctor:</strong> {selectedAppointment.doctor_name}
+                </div>
+                <div className="mb-2">
+                  <strong>Specialization:</strong> {selectedAppointment.specialization}
+                </div>
+                <div className="mb-2">
+                  <strong>Date:</strong> {selectedAppointment.date}
+                </div>
+                <div className="mb-2">
+                  <strong>Time:</strong> {selectedAppointment.time}
+                </div>
+                <div>
+                  <strong>Reason:</strong> {selectedAppointment.reason}
+                </div>
+              </div>
+              <Alert variant="warning" className="mt-3 mb-0">
+                <i className="bi bi-info-circle me-2"></i>
+                This action cannot be undone. You'll need to book a new appointment if you change your mind.
+              </Alert>
+            </>
+          )}
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => {
+              setShowCancelModal(false);
+              setSelectedAppointment(null);
+            }}
+          >
+            Keep Appointment
+          </Button>
+          <Button variant="danger" onClick={handleConfirmCancel}>
+            <i className="bi bi-x-lg me-2"></i>
+            Yes, Cancel Appointment
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

@@ -89,6 +89,21 @@ export const appointmentsAPI = {
     return { data: { appointment: data } };
   },
 
+  async update(id, appointmentData) {
+    const { data, error } = await supabase
+      .from('appointments')
+      .update({
+        ...appointmentData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { data: { appointment: data } };
+  },
+
   async delete(id) {
     const { error } = await supabase
       .from('appointments')
