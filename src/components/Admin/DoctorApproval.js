@@ -3,7 +3,7 @@ import { Card, Table, Button, Badge, Modal, Form, Alert } from 'react-bootstrap'
 import adminAPI from '../../utils/adminApi';
 
 function DoctorApproval() {
-  const [pendingDoctors, setP endingDoctors] = useState([]);
+  const [pendingDoctors, setPendingDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
