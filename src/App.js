@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import authService from './services/authService';
 import doctorAuthService from './services/doctorAuthService';
+import adminAuthService from './services/adminAuthService';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -14,9 +15,10 @@ import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
 import AIChatbot from './components/AIChatbot/AIChatbot';
 import DoctorApp from './DoctorApp';
+import AdminApp from './AdminApp';
 
 function App() {
-  const [appMode, setAppMode] = useState('patient'); // 'patient' or 'doctor'
+  const [appMode, setAppMode] = useState('patient'); // 'patient', 'doctor', or 'admin'
   const [currentView, setCurrentView] = useState('login');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -41,6 +43,8 @@ function App() {
     const userRole = localStorage.getItem('user_role');
     if (userRole === 'doctor') {
       setAppMode('doctor');
+    } else if (userRole === 'admin') {
+      setAppMode('admin');
     } else {
       setAppMode('patient');
     }
@@ -139,13 +143,34 @@ function App() {
   };
 
   const handleSwitchToPatient = () => {
-    // Clear doctor auth
+    // Clear doctor/admin auth
     doctorAuthService.logout();
+    adminAuthService.logout();
     setUser(null);
     setIsAuthenticated(false);
     setAppMode('patient');
     setCurrentView('login');
   };
+
+  const handleSwitchToAdmin = () => {
+    // Clear patient auth
+    authService.logout();
+    setUser(null);
+    setIsAuthenticated(false);
+    setAppMode('admin');
+    setCurrentView('login');
+  };
+
+  // If in admin mode, render AdminApp
+  if (appMode === 'admin') {
+    return (
+      <AdminApp 
+        onSwitchToPatient={handleSwitchToPatient}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
+    );
+  }
 
   // If in doctor mode, render DoctorApp
   if (appMode === 'doctor') {
@@ -239,6 +264,7 @@ function App() {
             onLogin={handleLogin} 
             onSwitchToRegister={() => setCurrentView('register')} 
             onSwitchToDoctor={handleSwitchToDoctor}
+            onSwitchToAdmin={handleSwitchToAdmin}
             darkMode={darkMode} 
           />
         )}
@@ -248,6 +274,7 @@ function App() {
             onRegister={handleLogin} 
             onSwitchToLogin={() => setCurrentView('login')} 
             onSwitchToDoctor={handleSwitchToDoctor}
+            onSwitchToAdmin={handleSwitchToAdmin}
             darkMode={darkMode} 
           />
         )}

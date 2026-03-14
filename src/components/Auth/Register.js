@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
 import authService from '../../services/authService';
 
-function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, darkMode }) {
+function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdmin, darkMode }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -181,9 +181,17 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, darkMode }) {
               </Button>
             </p>
             {onSwitchToDoctor && (
-              <p>
+              <p className="mb-2">
                 <Button variant="link" onClick={onSwitchToDoctor} className="p-0">
                   Register as Doctor
+                </Button>
+              </p>
+            )}
+            {onSwitchToAdmin && (
+              <p>
+                <Button variant="link" onClick={onSwitchToAdmin} className="p-0">
+                  <i className="bi bi-shield-lock me-1"></i>
+                  Admin Portal
                 </Button>
               </p>
             )}

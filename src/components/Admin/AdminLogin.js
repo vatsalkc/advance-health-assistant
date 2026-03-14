@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
-import authService from '../../services/authService';
+import adminAuthService from '../../services/adminAuthService';
 
-function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin, darkMode }) {
+function AdminLogin({ onLogin, onSwitchToPatient, darkMode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,10 +20,10 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
     }
 
     try {
-      const user = await authService.login(email, password);
-      onLogin(user);
+      const admin = await adminAuthService.login(email, password);
+      onLogin(admin);
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('Admin login error:', err);
       setError(err.message || 'Login failed. Please try again.');
     }
     
@@ -35,7 +35,10 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
       <Card style={{ width: '400px' }}>
         <Card.Body>
           <Card.Title className="text-center mb-4">
-            <h3>Login</h3>
+            <h3>
+              <i className="bi bi-shield-lock-fill me-2" style={{ color: 'var(--primary-color)' }}></i>
+              Admin Login
+            </h3>
           </Card.Title>
           
           {error && <Alert variant="danger">{error}</Alert>}
@@ -45,7 +48,7 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter admin email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -68,30 +71,20 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
                   Logging in...
                 </>
               ) : (
-                'Login'
+                <>
+                  <i className="bi bi-box-arrow-in-right me-2"></i>
+                  Login as Admin
+                </>
               )}
             </Button>
           </Form>
 
           <div className="text-center">
-            <p className="mb-2">
-              Don't have an account?{' '}
-              <Button variant="link" onClick={onSwitchToRegister} className="p-0">
-                Register
-              </Button>
-            </p>
-            {onSwitchToDoctor && (
-              <p className="mb-2">
-                <Button variant="link" onClick={onSwitchToDoctor} className="p-0">
-                  Login as Doctor
-                </Button>
-              </p>
-            )}
-            {onSwitchToAdmin && (
+            {onSwitchToPatient && (
               <p>
-                <Button variant="link" onClick={onSwitchToAdmin} className="p-0">
-                  <i className="bi bi-shield-lock me-1"></i>
-                  Admin Login
+                <Button variant="link" onClick={onSwitchToPatient} className="p-0">
+                  <i className="bi bi-arrow-left me-1"></i>
+                  Back to Patient Login
                 </Button>
               </p>
             )}
@@ -102,4 +95,4 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
   );
 }
 
-export default Login;
+export default AdminLogin;
