@@ -80,21 +80,31 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
                 Register
               </Button>
             </p>
-            {onSwitchToDoctor && (
-              <p className="mb-2">
-                <Button variant="link" onClick={onSwitchToDoctor} className="p-0">
-                  Login as Doctor
+            
+            <div className="d-flex gap-2 justify-content-center mt-3">
+              {onSwitchToDoctor && (
+                <Button 
+                  variant="outline-primary" 
+                  size="sm"
+                  onClick={onSwitchToDoctor}
+                  className="flex-fill"
+                >
+                  <i className="bi bi-person-badge me-1"></i>
+                  Doctor Login
                 </Button>
-              </p>
-            )}
-            {onSwitchToAdmin && (
-              <p>
-                <Button variant="link" onClick={onSwitchToAdmin} className="p-0">
+              )}
+              {onSwitchToAdmin && (
+                <Button 
+                  variant="outline-danger" 
+                  size="sm"
+                  onClick={onSwitchToAdmin}
+                  className="flex-fill"
+                >
                   <i className="bi bi-shield-lock me-1"></i>
                   Admin Login
                 </Button>
-              </p>
-            )}
+              )}
+            </div>
           </div>
         </Card.Body>
       </Card>
