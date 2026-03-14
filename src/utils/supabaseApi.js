@@ -75,6 +75,8 @@ export const appointmentsAPI = {
           user_id: userId,
           doctor_id: appointmentData.doctor_id,
           doctor_name: appointmentData.doctor_name,
+          patient_name: appointmentData.patient_name, // Add patient name
+          patient_phone: appointmentData.patient_phone, // Add patient phone
           specialization: appointmentData.specialization,
           date: appointmentData.date,
           time: appointmentData.time,

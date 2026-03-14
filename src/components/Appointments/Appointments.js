@@ -16,12 +16,14 @@ import {
 } from 'react-bootstrap';
 import { appointmentsAPI, doctorsAPI } from '../../utils/api';
 import authService from '../../services/authService';
+import OTPVerification from './OTPVerification';
 
 function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelection }) {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,6 +34,7 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showModifyModal, setShowModifyModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [pendingBookingData, setPendingBookingData] = useState(null);
 
   const [formData, setFormData] = useState({
     date: '',
@@ -137,17 +140,98 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validateDateTime = () => {
+    const selectedDate = new Date(formData.date);
+    const selectedTime = formData.time;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Check if date is in the past
+    if (selectedDate < today) {
+      alert('Cannot book appointment for a past date');
+      return false;
+    }
+    
+    // If booking for today, check if time is in the past
+    if (selectedDate.toDateString() === today.toDateString()) {
+      const [hours, minutes] = selectedTime.split(':');
+      const selectedDateTime = new Date();
+      selectedDateTime.setHours(parseInt(hours), parseInt(minutes), 0);
+      
+      if (selectedDateTime <= now) {
+        alert('Cannot book appointment for a past time. Please select a future time.');
+        return false;
+      }
+    }
+    
+    // Check if date is too far in the future (e.g., more than 3 months)
+    const threeMonthsFromNow = new Date();
+    threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+    
+    if (selectedDate > threeMonthsFromNow) {
+      alert('Cannot book appointments more than 3 months in advance');
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await appointmentsAPI.create({
-        doctor_id: selectedDoctor.id,
-        doctor_name: selectedDoctor.name,
-        specialization: selectedDoctor.specialization,
-        date: formData.date,
-        time: formData.time,
-        reason: formData.reason,
+    // Validate date and time
+    if (!validateDateTime()) {
+      return;
+    }
+
+    // Check if user has phone number
+    if (!user.phone) {
+      alert('Please add your phone number in your profile before booking an appointment');
+      return;
+    }
+
+    // Store booking data and show OTP modal
+    setPendingBookingData({
+      doctor_id: selectedDoctor.id,
+      doctor_name: selectedDoctor.name,
+      patient_name: user.name, // Include patient name
+      patient_phone: user.phone, // Include patient phone
+      specialization: selectedDoctor.specialization,
+      date: formData.date,
+      time: formData.time,
+      reason: formData.reason,
+      status: 'Pending'
+    });
+    
+    setShowBookingModal(false);
+    setShowOTPModal(true);
+  };
+
+  const handleOTPVerified = async (verified) => {
+    if (verified && pendingBookingData) {
+      try {
+        await appointmentsAPI.create(pendingBookingData);
+
+        setFormData({ date: '', time: '', reason: '' });
+        setShowOTPModal(false);
+        setPendingBookingData(null);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+        
+        showNotificationToast(
+          `Appointment request sent to ${selectedDoctor.name}. You'll be notified once confirmed.`,
+          'success'
+        );
+        
+        // Refresh appointments
+        fetchAppointments();
+      } catch (err) {
+        console.error(err);
+        alert('Failed to book appointment');
+        setShowOTPModal(false);
+      }
+    }
+  };
         status: 'Pending'
       });
 
@@ -777,6 +861,18 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* OTP Verification Modal */}
+      <OTPVerification
+        show={showOTPModal}
+        onHide={() => {
+          setShowOTPModal(false);
+          setPendingBookingData(null);
+          setShowBookingModal(true); // Reopen booking modal if OTP is cancelled
+        }}
+        phoneNumber={user?.phone}
+        onVerify={handleOTPVerified}
+      />
     </div>
   );
 }

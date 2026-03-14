@@ -237,18 +237,18 @@ function DoctorAppointments() {
                       <td>
                         <div className="patient-info-cell">
                           <div className="patient-info-avatar">
-                            {apt.users?.name?.charAt(0) || 'U'}
+                            {apt.patient_name?.charAt(0) || apt.users?.name?.charAt(0) || 'U'}
                           </div>
                           <div className="patient-info-details">
                             <div className="patient-info-name">
-                              {apt.users?.name || 'Unknown'}
+                              {apt.patient_name || apt.users?.name || 'Unknown Patient'}
                             </div>
                             <div className="patient-info-email">
                               {apt.users?.email || 'No email'}
                             </div>
-                            {apt.users?.phone && (
+                            {(apt.patient_phone || apt.users?.phone) && (
                               <div className="patient-info-email">
-                                📞 {apt.users.phone}
+                                📞 {apt.patient_phone || apt.users.phone}
                               </div>
                             )}
                           </div>
