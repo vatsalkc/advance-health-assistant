@@ -232,26 +232,6 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
       }
     }
   };
-        status: 'Pending'
-      });
-
-      setFormData({ date: '', time: '', reason: '' });
-      setShowBookingModal(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-      
-      showNotificationToast(
-        `Appointment request sent to ${selectedDoctor.name}. You'll be notified once confirmed.`,
-        'success'
-      );
-      
-      // Refresh appointments
-      fetchAppointments();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to book appointment');
-    }
-  };
 
   const handleCancelClick = (appointment) => {
     setSelectedAppointment(appointment);
