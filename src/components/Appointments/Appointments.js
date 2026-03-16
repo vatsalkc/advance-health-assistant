@@ -16,14 +16,12 @@ import {
 } from 'react-bootstrap';
 import { appointmentsAPI, doctorsAPI } from '../../utils/api';
 import authService from '../../services/authService';
-import OTPVerification from './OTPVerification';
 
 function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelection }) {
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [showOTPModal, setShowOTPModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,7 +32,6 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showModifyModal, setShowModifyModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [pendingBookingData, setPendingBookingData] = useState(null);
 
   const [formData, setFormData] = useState({
     date: '',
@@ -184,52 +181,34 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
       return;
     }
 
-    // Check if user has phone number
-    if (!user.phone) {
-      alert('Please add your phone number in your profile before booking an appointment');
-      return;
-    }
+    try {
+      await appointmentsAPI.create({
+        doctor_id: selectedDoctor.id,
+        doctor_name: selectedDoctor.name,
+        patient_name: user.name,
+        patient_phone: user.phone || 'Not provided',
+        specialization: selectedDoctor.specialization,
+        date: formData.date,
+        time: formData.time,
+        reason: formData.reason,
+        status: 'Pending'
+      });
 
-    // Store booking data and show OTP modal
-    setPendingBookingData({
-      doctor_id: selectedDoctor.id,
-      doctor_name: selectedDoctor.name,
-      patient_name: user.name, // Include patient name
-      patient_phone: user.phone, // Include patient phone
-      specialization: selectedDoctor.specialization,
-      date: formData.date,
-      time: formData.time,
-      reason: formData.reason,
-      status: 'Pending'
-    });
-    
-    setShowBookingModal(false);
-    setShowOTPModal(true);
-  };
-
-  const handleOTPVerified = async (verified) => {
-    if (verified && pendingBookingData) {
-      try {
-        await appointmentsAPI.create(pendingBookingData);
-
-        setFormData({ date: '', time: '', reason: '' });
-        setShowOTPModal(false);
-        setPendingBookingData(null);
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-        
-        showNotificationToast(
-          `Appointment request sent to ${selectedDoctor.name}. You'll be notified once confirmed.`,
-          'success'
-        );
-        
-        // Refresh appointments
-        fetchAppointments();
-      } catch (err) {
-        console.error(err);
-        alert('Failed to book appointment');
-        setShowOTPModal(false);
-      }
+      setFormData({ date: '', time: '', reason: '' });
+      setShowBookingModal(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      
+      showNotificationToast(
+        `Appointment request sent to ${selectedDoctor.name}. You'll be notified once confirmed.`,
+        'success'
+      );
+      
+      // Refresh appointments
+      fetchAppointments();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to book appointment');
     }
   };
 
@@ -841,18 +820,6 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* OTP Verification Modal */}
-      <OTPVerification
-        show={showOTPModal}
-        onHide={() => {
-          setShowOTPModal(false);
-          setPendingBookingData(null);
-          setShowBookingModal(true); // Reopen booking modal if OTP is cancelled
-        }}
-        phoneNumber={user?.phone}
-        onVerify={handleOTPVerified}
-      />
     </div>
   );
 }
