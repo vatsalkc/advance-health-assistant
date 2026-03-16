@@ -6,9 +6,12 @@ function DoctorDashboard({ doctor, onNavigate }) {
   const [stats, setStats] = useState({
     totalPatients: 0,
     todayAppointments: 0,
-    pendingAppointments: 0
+    pendingAppointments: 0,
+    rejectedAppointments: 0,
+    modifiedAppointments: 0
   });
   const [pendingAppointments, setPendingAppointments] = useState([]);
+  const [todayAppointments, setTodayAppointments] = useState([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,19 +29,40 @@ function DoctorDashboard({ doctor, onNavigate }) {
       // Fetch stats
       const statsResponse = await doctorStatsAPI.get();
       console.log('Stats response:', statsResponse);
-      setStats(statsResponse.data);
+      
+      // Fetch all appointments to calculate additional stats
+      const allAppointmentsResponse = await doctorAppointmentsAPI.getAll();
+      const allAppointments = allAppointmentsResponse.data.appointments || [];
+      
+      // Calculate rejected and modified counts
+      const rejectedCount = allAppointments.filter(apt => apt.status === 'Rejected').length;
+      const today = new Date().toISOString().split('T')[0];
+      const modifiedCount = allAppointments.filter(apt => {
+        const createdDate = new Date(apt.created_at).toISOString().split('T')[0];
+        const updatedDate = new Date(apt.updated_at).toISOString().split('T')[0];
+        return createdDate !== updatedDate;
+      }).length;
+      
+      setStats({
+        ...statsResponse.data,
+        rejectedAppointments: rejectedCount,
+        modifiedAppointments: modifiedCount
+      });
 
       // Fetch pending appointments
       const pendingResponse = await doctorAppointmentsAPI.getAll('Pending');
       console.log('Pending appointments:', pendingResponse.data.appointments);
       setPendingAppointments(pendingResponse.data.appointments || []);
 
-      // Fetch upcoming confirmed appointments
+      // Get today's appointments (all statuses)
+      const todayAppts = allAppointments.filter(apt => apt.date === today);
+      setTodayAppointments(todayAppts);
+
+      // Fetch upcoming confirmed appointments (excluding today)
       const confirmedResponse = await doctorAppointmentsAPI.getAll('Confirmed');
       console.log('Confirmed appointments:', confirmedResponse.data.appointments);
-      const today = new Date().toISOString().split('T')[0];
       const upcoming = (confirmedResponse.data.appointments || []).filter(
-        apt => apt.date >= today
+        apt => apt.date > today
       ).slice(0, 5);
       setUpcomingAppointments(upcoming);
 
@@ -104,7 +128,7 @@ function DoctorDashboard({ doctor, onNavigate }) {
 
       {/* Stats Cards */}
       <Row className="mb-4">
-        <Col md={4} className="mb-3">
+        <Col md={3} sm={6} className="mb-3">
           <div className="doctor-stat-card">
             <i className="bi bi-people-fill" style={{ color: '#3b82f6' }}></i>
             <h2>{stats.totalPatients}</h2>
@@ -112,7 +136,7 @@ function DoctorDashboard({ doctor, onNavigate }) {
           </div>
         </Col>
 
-        <Col md={4} className="mb-3">
+        <Col md={3} sm={6} className="mb-3">
           <div className="doctor-stat-card">
             <i className="bi bi-calendar-check" style={{ color: '#10b981' }}></i>
             <h2>{stats.todayAppointments}</h2>
@@ -120,14 +144,88 @@ function DoctorDashboard({ doctor, onNavigate }) {
           </div>
         </Col>
 
-        <Col md={4} className="mb-3">
+        <Col md={3} sm={6} className="mb-3">
           <div className="doctor-stat-card">
             <i className="bi bi-clock-history" style={{ color: '#f59e0b' }}></i>
             <h2>{stats.pendingAppointments}</h2>
             <p>Pending Requests</p>
           </div>
         </Col>
+
+        <Col md={3} sm={6} className="mb-3">
+          <div className="doctor-stat-card">
+            <i className="bi bi-x-circle" style={{ color: '#ef4444' }}></i>
+            <h2>{stats.rejectedAppointments}</h2>
+            <p>Rejected</p>
+          </div>
+        </Col>
       </Row>
+
+      {/* Today's Appointments Section */}
+      {todayAppointments.length > 0 && (
+        <Card className="mb-4 today-appointments-card">
+          <Card.Header className="today-appointments-header">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 className="mb-0">
+                  <i className="bi bi-calendar-day me-2"></i>
+                  Today's Appointments
+                </h5>
+                <small>All appointments scheduled for today</small>
+              </div>
+              <Badge bg="primary" className="today-count-badge">
+                {todayAppointments.length} {todayAppointments.length === 1 ? 'Appointment' : 'Appointments'}
+              </Badge>
+            </div>
+          </Card.Header>
+          <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <ListGroup variant="flush">
+              {todayAppointments.map(apt => (
+                <ListGroup.Item key={apt.id} className="doctor-appointment-item today-appointment-item">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div className="flex-grow-1">
+                      <div className="d-flex align-items-center mb-2">
+                        <div className="patient-avatar me-3">
+                          {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h6 className="mb-1">{apt.patient_name || apt.users?.name || 'Unknown Patient'}</h6>
+                          <div className="patient-details">
+                            {apt.users?.email && (
+                              <span className="detail-item">
+                                <i className="bi bi-envelope"></i> {apt.users.email}
+                              </span>
+                            )}
+                            {(apt.patient_phone || apt.users?.phone) && (
+                              <span className="detail-item">
+                                <i className="bi bi-telephone"></i> {apt.patient_phone || apt.users.phone}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="appointment-info">
+                        <p className="mb-1">
+                          <i className="bi bi-clock"></i> <strong>{apt.time}</strong>
+                        </p>
+                        <p className="mb-0 reason-text">
+                          <i className="bi bi-file-text"></i> <strong>Reason:</strong> {apt.reason}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge 
+                      bg={apt.status === 'Confirmed' ? 'success' : apt.status === 'Pending' ? 'warning' : 'danger'} 
+                      className="status-badge"
+                    >
+                      {apt.status}
+                    </Badge>
+                  </div>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Card.Body>
+        </Card>
+      )}
 
       <Row>
         {/* Pending Appointments */}
