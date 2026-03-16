@@ -207,8 +207,9 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
       // Refresh appointments
       fetchAppointments();
     } catch (err) {
-      console.error(err);
-      alert('Failed to book appointment');
+      console.error('Appointment booking error:', err);
+      console.error('Error details:', err.message);
+      alert(`Failed to book appointment: ${err.message || 'Please try again'}`);
     }
   };
 

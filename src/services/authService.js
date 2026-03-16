@@ -22,10 +22,16 @@ class AuthService {
     try {
       console.log('[AuthService] Attempting registration...');
       
-      // Register user with Supabase Auth
+      // Register user with Supabase Auth with auto-confirmation
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            name: userData.name,
+          }
+        }
       });
 
       if (authError) throw authError;
