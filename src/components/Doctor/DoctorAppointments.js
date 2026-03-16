@@ -108,14 +108,24 @@ function DoctorAppointments() {
 
   const handleConfirmCancel = async () => {
     try {
+      console.log('[DoctorAppointments] Cancelling appointment:', selectedAppointment.id);
       await doctorAppointmentsAPI.delete(selectedAppointment.id);
       setShowCancelModal(false);
       setSelectedAppointment(null);
       fetchAppointments();
       alert('Appointment cancelled successfully');
     } catch (err) {
-      console.error('Error cancelling appointment:', err);
-      alert('Failed to cancel appointment');
+      console.error('[DoctorAppointments] Error cancelling appointment:', err);
+      console.error('[DoctorAppointments] Error message:', err.message);
+      
+      let errorMessage = 'Failed to cancel appointment. ';
+      if (err.message && err.message.includes('permission')) {
+        errorMessage += 'Permission denied. Please run FIX_DOCTOR_PERMISSIONS.sql script.';
+      } else if (err.message) {
+        errorMessage += err.message;
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -132,6 +142,7 @@ function DoctorAppointments() {
   const handleModifySubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log('[DoctorAppointments] Modifying appointment:', selectedAppointment.id);
       await doctorAppointmentsAPI.update(selectedAppointment.id, {
         date: modifyFormData.date,
         time: modifyFormData.time,
@@ -144,8 +155,17 @@ function DoctorAppointments() {
       fetchAppointments();
       alert('Appointment modified successfully');
     } catch (err) {
-      console.error('Error modifying appointment:', err);
-      alert('Failed to modify appointment');
+      console.error('[DoctorAppointments] Error modifying appointment:', err);
+      console.error('[DoctorAppointments] Error message:', err.message);
+      
+      let errorMessage = 'Failed to modify appointment. ';
+      if (err.message && err.message.includes('permission')) {
+        errorMessage += 'Permission denied. Please run FIX_DOCTOR_PERMISSIONS.sql script.';
+      } else if (err.message) {
+        errorMessage += err.message;
+      }
+      
+      alert(errorMessage);
     }
   };
 
@@ -237,7 +257,7 @@ function DoctorAppointments() {
                       <td>
                         <div className="patient-info-cell">
                           <div className="patient-info-avatar">
-                            {apt.patient_name?.charAt(0) || apt.users?.name?.charAt(0) || 'U'}
+                            {(apt.patient_name || apt.users?.name || 'U').charAt(0).toUpperCase()}
                           </div>
                           <div className="patient-info-details">
                             <div className="patient-info-name">
@@ -248,7 +268,7 @@ function DoctorAppointments() {
                             </div>
                             {(apt.patient_phone || apt.users?.phone) && (
                               <div className="patient-info-email">
-                                📞 {apt.patient_phone || apt.users.phone}
+                                📞 {apt.patient_phone || apt.users?.phone}
                               </div>
                             )}
                           </div>
@@ -339,13 +359,13 @@ function DoctorAppointments() {
         <Modal.Body>
           {selectedAppointment && (
             <div className="patient-summary">
-              <div><strong>Patient:</strong> {selectedAppointment.users?.name}</div>
+              <div><strong>Patient:</strong> {selectedAppointment.patient_name || selectedAppointment.users?.name || 'Unknown Patient'}</div>
               <div><strong>Date:</strong> {selectedAppointment.date} {selectedAppointment.time}</div>
               {selectedAppointment.users?.email && (
                 <div><strong>Email:</strong> {selectedAppointment.users.email}</div>
               )}
-              {selectedAppointment.users?.phone && (
-                <div><strong>Phone:</strong> {selectedAppointment.users.phone}</div>
+              {(selectedAppointment.patient_phone || selectedAppointment.users?.phone) && (
+                <div><strong>Phone:</strong> {selectedAppointment.patient_phone || selectedAppointment.users.phone}</div>
               )}
             </div>
           )}
@@ -403,8 +423,11 @@ function DoctorAppointments() {
         <Modal.Body>
           {selectedAppointment && (
             <div className="patient-summary mb-3">
-              <div><strong>Patient:</strong> {selectedAppointment.users?.name}</div>
-              <div><strong>Email:</strong> {selectedAppointment.users?.email}</div>
+              <div><strong>Patient:</strong> {selectedAppointment.patient_name || selectedAppointment.users?.name || 'Unknown Patient'}</div>
+              <div><strong>Email:</strong> {selectedAppointment.users?.email || 'No email'}</div>
+              {(selectedAppointment.patient_phone || selectedAppointment.users?.phone) && (
+                <div><strong>Phone:</strong> {selectedAppointment.patient_phone || selectedAppointment.users?.phone}</div>
+              )}
             </div>
           )}
 
@@ -492,11 +515,18 @@ function DoctorAppointments() {
               <p>Are you sure you want to cancel this appointment?</p>
               <div className="appointment-details-box p-3 bg-light rounded">
                 <div className="mb-2">
-                  <strong>Patient:</strong> {selectedAppointment.users?.name}
+                  <strong>Patient:</strong> {selectedAppointment.patient_name || selectedAppointment.users?.name || 'Unknown Patient'}
                 </div>
-                <div className="mb-2">
-                  <strong>Email:</strong> {selectedAppointment.users?.email}
-                </div>
+                {selectedAppointment.users?.email && (
+                  <div className="mb-2">
+                    <strong>Email:</strong> {selectedAppointment.users.email}
+                  </div>
+                )}
+                {(selectedAppointment.patient_phone || selectedAppointment.users?.phone) && (
+                  <div className="mb-2">
+                    <strong>Phone:</strong> {selectedAppointment.patient_phone || selectedAppointment.users.phone}
+                  </div>
+                )}
                 <div className="mb-2">
                   <strong>Date:</strong> {selectedAppointment.date}
                 </div>

@@ -13,6 +13,8 @@ export const doctorAppointmentsAPI = {
   async getAll(status = null) {
     const doctorId = await getCurrentDoctorId();
     
+    console.log('[doctorAppointmentsAPI] Fetching appointments for doctor:', doctorId);
+    
     let query = supabase
       .from('appointments')
       .select(`
@@ -35,11 +37,26 @@ export const doctorAppointmentsAPI = {
     }
 
     const { data, error } = await query;
-    if (error) throw error;
-    return { data: { appointments: data } };
+    if (error) {
+      console.error('[doctorAppointmentsAPI] Error fetching appointments:', error);
+      throw error;
+    }
+    
+    console.log('[doctorAppointmentsAPI] Fetched appointments:', data);
+    
+    // Ensure patient_name is available (use from appointment or fallback to users table)
+    const appointmentsWithPatientInfo = data.map(apt => ({
+      ...apt,
+      patient_name: apt.patient_name || apt.users?.name || 'Unknown Patient',
+      patient_phone: apt.patient_phone || apt.users?.phone || 'Not provided'
+    }));
+    
+    return { data: { appointments: appointmentsWithPatientInfo } };
   },
 
   async updateStatus(appointmentId, status, notes = null, rejectedReason = null) {
+    console.log('[doctorAppointmentsAPI] Updating appointment status:', appointmentId, status);
+    
     const updateData = {
       status,
       updated_at: new Date().toISOString()
@@ -55,11 +72,18 @@ export const doctorAppointmentsAPI = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('[doctorAppointmentsAPI] Error updating status:', error);
+      throw error;
+    }
+    
+    console.log('[doctorAppointmentsAPI] Status updated successfully');
     return { data: { appointment: data } };
   },
 
   async addPrescription(appointmentId, prescription, diagnosis = null) {
+    console.log('[doctorAppointmentsAPI] Adding prescription to appointment:', appointmentId);
+    
     const { data, error } = await supabase
       .from('appointments')
       .update({
@@ -71,8 +95,52 @@ export const doctorAppointmentsAPI = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('[doctorAppointmentsAPI] Error adding prescription:', error);
+      throw error;
+    }
+    
+    console.log('[doctorAppointmentsAPI] Prescription added successfully');
     return { data: { appointment: data } };
+  },
+
+  async update(appointmentId, appointmentData) {
+    console.log('[doctorAppointmentsAPI] Updating appointment:', appointmentId, appointmentData);
+    
+    const { data, error } = await supabase
+      .from('appointments')
+      .update({
+        ...appointmentData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', appointmentId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[doctorAppointmentsAPI] Error updating appointment:', error);
+      throw error;
+    }
+    
+    console.log('[doctorAppointmentsAPI] Appointment updated successfully');
+    return { data: { appointment: data } };
+  },
+
+  async delete(appointmentId) {
+    console.log('[doctorAppointmentsAPI] Deleting appointment:', appointmentId);
+    
+    const { error } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', appointmentId);
+
+    if (error) {
+      console.error('[doctorAppointmentsAPI] Error deleting appointment:', error);
+      throw error;
+    }
+    
+    console.log('[doctorAppointmentsAPI] Appointment deleted successfully');
+    return { data: { message: 'Appointment deleted' } };
   }
 };
 
