@@ -24,15 +24,19 @@ function DoctorDashboard({ doctor, onNavigate }) {
     try {
       setLoading(true);
       setError('');
-      console.log('Fetching dashboard data...');
+      console.log('[DoctorDashboard] Fetching dashboard data...');
       
       // Fetch stats
       const statsResponse = await doctorStatsAPI.get();
-      console.log('Stats response:', statsResponse);
+      console.log('[DoctorDashboard] Stats response:', statsResponse);
       
       // Fetch all appointments to calculate additional stats
       const allAppointmentsResponse = await doctorAppointmentsAPI.getAll();
       const allAppointments = allAppointmentsResponse.data.appointments || [];
+      
+      console.log('[DoctorDashboard] All appointments:', allAppointments);
+      console.log('[DoctorDashboard] First appointment patient_name:', allAppointments[0]?.patient_name);
+      console.log('[DoctorDashboard] First appointment users.name:', allAppointments[0]?.users?.name);
       
       // Calculate rejected and modified counts
       const rejectedCount = allAppointments.filter(apt => apt.status === 'Rejected').length;
@@ -51,16 +55,17 @@ function DoctorDashboard({ doctor, onNavigate }) {
 
       // Fetch pending appointments
       const pendingResponse = await doctorAppointmentsAPI.getAll('Pending');
-      console.log('Pending appointments:', pendingResponse.data.appointments);
+      console.log('[DoctorDashboard] Pending appointments:', pendingResponse.data.appointments);
       setPendingAppointments(pendingResponse.data.appointments || []);
 
       // Get today's appointments (all statuses)
       const todayAppts = allAppointments.filter(apt => apt.date === today);
+      console.log('[DoctorDashboard] Today appointments:', todayAppts);
       setTodayAppointments(todayAppts);
 
       // Fetch upcoming confirmed appointments (excluding today)
       const confirmedResponse = await doctorAppointmentsAPI.getAll('Confirmed');
-      console.log('Confirmed appointments:', confirmedResponse.data.appointments);
+      console.log('[DoctorDashboard] Confirmed appointments:', confirmedResponse.data.appointments);
       const upcoming = (confirmedResponse.data.appointments || []).filter(
         apt => apt.date > today
       ).slice(0, 5);
@@ -68,8 +73,8 @@ function DoctorDashboard({ doctor, onNavigate }) {
 
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      console.error('Error details:', err.message);
+      console.error('[DoctorDashboard] Error fetching dashboard data:', err);
+      console.error('[DoctorDashboard] Error details:', err.message);
       setError('Failed to load dashboard data: ' + err.message);
       setLoading(false);
     }
