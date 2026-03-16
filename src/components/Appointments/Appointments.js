@@ -810,7 +810,7 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
           {selectedAppointment && (
             <>
               <p>Are you sure you want to cancel this appointment?</p>
-              <div className="appointment-details-box p-3 bg-light rounded">
+              <div className="appointment-details-box p-3 rounded">
                 <div className="mb-2">
                   <strong>Doctor:</strong> {selectedAppointment.doctor_name}
                 </div>

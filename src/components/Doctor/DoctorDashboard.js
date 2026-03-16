@@ -255,19 +255,19 @@ function DoctorDashboard({ doctor, onNavigate }) {
                         <div className="flex-grow-1">
                           <div className="d-flex align-items-center mb-2">
                             <div className="patient-avatar me-3">
-                              {apt.users?.name?.charAt(0) || 'P'}
+                              {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <h6 className="mb-1">{apt.users?.name || 'Unknown Patient'}</h6>
+                              <h6 className="mb-1">{apt.patient_name || apt.users?.name || 'Unknown Patient'}</h6>
                               <div className="patient-details">
                                 {apt.users?.email && (
                                   <span className="detail-item">
                                     <i className="bi bi-envelope"></i> {apt.users.email}
                                   </span>
                                 )}
-                                {apt.users?.phone && (
+                                {(apt.patient_phone || apt.users?.phone) && (
                                   <span className="detail-item">
-                                    <i className="bi bi-telephone"></i> {apt.users.phone}
+                                    <i className="bi bi-telephone"></i> {apt.patient_phone || apt.users.phone}
                                   </span>
                                 )}
                                 {apt.users?.age && (
@@ -349,19 +349,19 @@ function DoctorDashboard({ doctor, onNavigate }) {
                         <div className="flex-grow-1">
                           <div className="d-flex align-items-center mb-2">
                             <div className="patient-avatar me-3">
-                              {apt.users?.name?.charAt(0) || 'P'}
+                              {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
                             </div>
                             <div>
-                              <h6 className="mb-1">{apt.users?.name || 'Unknown Patient'}</h6>
+                              <h6 className="mb-1">{apt.patient_name || apt.users?.name || 'Unknown Patient'}</h6>
                               <div className="patient-details">
                                 {apt.users?.email && (
                                   <span className="detail-item">
                                     <i className="bi bi-envelope"></i> {apt.users.email}
                                   </span>
                                 )}
-                                {apt.users?.phone && (
+                                {(apt.patient_phone || apt.users?.phone) && (
                                   <span className="detail-item">
-                                    <i className="bi bi-telephone"></i> {apt.users.phone}
+                                    <i className="bi bi-telephone"></i> {apt.patient_phone || apt.users.phone}
                                   </span>
                                 )}
                                 {apt.users?.age && (
