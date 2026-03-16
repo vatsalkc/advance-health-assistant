@@ -68,6 +68,9 @@ export const appointmentsAPI = {
   async create(appointmentData) {
     const userId = await getCurrentUserId();
 
+    console.log('[appointmentsAPI] Creating appointment for user:', userId);
+    console.log('[appointmentsAPI] Appointment data:', appointmentData);
+
     const { data, error } = await supabase
       .from('appointments')
       .insert([
@@ -87,7 +90,25 @@ export const appointmentsAPI = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('[appointmentsAPI] Insert error:', error);
+      console.error('[appointmentsAPI] Error code:', error.code);
+      console.error('[appointmentsAPI] Error message:', error.message);
+      console.error('[appointmentsAPI] Error details:', error.details);
+      
+      // Provide helpful error messages
+      if (error.message.includes('column') && (error.message.includes('patient_name') || error.message.includes('patient_phone'))) {
+        throw new Error('Database columns missing. Please run FIX_ALL_ISSUES.sql script. See COMPLETE_FIX_GUIDE.md');
+      } else if (error.code === '42501' || error.message.includes('policy')) {
+        throw new Error('Permission denied. Please check RLS policies. See COMPLETE_FIX_GUIDE.md');
+      } else if (error.message.includes('auth')) {
+        throw new Error('Authentication error. Please logout and login again.');
+      } else {
+        throw new Error(error.message || 'Failed to create appointment');
+      }
+    }
+    
+    console.log('[appointmentsAPI] Appointment created successfully:', data);
     return { data: { appointment: data } };
   },
 

@@ -20,11 +20,25 @@ function AdminLogin({ onLogin, onSwitchToPatient, darkMode }) {
     }
 
     try {
+      console.log('[AdminLogin] Attempting login for:', email);
       const admin = await adminAuthService.login(email, password);
+      console.log('[AdminLogin] Login successful:', admin);
       onLogin(admin);
     } catch (err) {
-      console.error('Admin login error:', err);
-      setError(err.message || 'Login failed. Please try again.');
+      console.error('[AdminLogin] Login error:', err);
+      console.error('[AdminLogin] Error message:', err.message);
+      
+      let errorMessage = err.message || 'Login failed. Please try again.';
+      
+      if (err.message && err.message.includes('Admin profile not found')) {
+        errorMessage = 'Admin profile not found. Please run the FIX_ALL_ISSUES.sql script in Supabase to create your admin account. See COMPLETE_FIX_GUIDE.md for instructions.';
+      } else if (err.message && err.message.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials.';
+      } else if (err.message && err.message.includes('inactive')) {
+        errorMessage = 'Admin account is inactive. Please contact support.';
+      }
+      
+      setError(errorMessage);
     }
     
     setLoading(false);

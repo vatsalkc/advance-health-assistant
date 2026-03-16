@@ -182,6 +182,18 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
     }
 
     try {
+      console.log('[Appointments] Creating appointment with data:', {
+        doctor_id: selectedDoctor.id,
+        doctor_name: selectedDoctor.name,
+        patient_name: user.name,
+        patient_phone: user.phone || 'Not provided',
+        specialization: selectedDoctor.specialization,
+        date: formData.date,
+        time: formData.time,
+        reason: formData.reason,
+        status: 'Pending'
+      });
+
       await appointmentsAPI.create({
         doctor_id: selectedDoctor.id,
         doctor_name: selectedDoctor.name,
@@ -207,9 +219,27 @@ function Appointments({ user, selectedDoctor: preSelectedDoctor, onClearSelectio
       // Refresh appointments
       fetchAppointments();
     } catch (err) {
-      console.error('Appointment booking error:', err);
-      console.error('Error details:', err.message);
-      alert(`Failed to book appointment: ${err.message || 'Please try again'}`);
+      console.error('[Appointments] Booking error:', err);
+      console.error('[Appointments] Error message:', err.message);
+      console.error('[Appointments] Error details:', err);
+      
+      let errorMessage = 'Failed to book appointment. ';
+      
+      if (err.message) {
+        if (err.message.includes('patient_name') || err.message.includes('patient_phone')) {
+          errorMessage += 'Database columns missing. Please run the FIX_ALL_ISSUES.sql script in Supabase.';
+        } else if (err.message.includes('RLS') || err.message.includes('policy')) {
+          errorMessage += 'Permission denied. Please check RLS policies in Supabase.';
+        } else if (err.message.includes('auth')) {
+          errorMessage += 'Authentication error. Please logout and login again.';
+        } else {
+          errorMessage += err.message;
+        }
+      } else {
+        errorMessage += 'Please check the COMPLETE_FIX_GUIDE.md file for solutions.';
+      }
+      
+      alert(errorMessage);
     }
   };
 
