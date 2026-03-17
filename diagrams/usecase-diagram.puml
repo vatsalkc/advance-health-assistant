@@ -1,0 +1,130 @@
+@startuml Health Assistant Use Case Diagram
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam actor {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+}
+skinparam usecase {
+  BackgroundColor #F3E5F5
+  BorderColor #7B1FA2
+}
+
+title Health Assistant System - Use Case Diagram
+
+left to right direction
+
+actor Patient as P
+actor Doctor as D
+actor Admin as A
+actor "AI System" as AI
+
+rectangle "Health Assistant System" {
+  
+  ' Patient Use Cases
+  usecase "Register Account" as UC1
+  usecase "Login" as UC2
+  usecase "Book Appointment" as UC3
+  usecase "Upload Medical Reports" as UC4
+  usecase "View My Reports" as UC5
+  usecase "Delete My Reports" as UC6
+  usecase "Chat with AI Assistant" as UC7
+  usecase "Check Symptoms" as UC8
+  usecase "View Appointment History" as UC9
+  usecase "Manage Profile" as UC10
+  
+  ' Doctor Use Cases
+  usecase "Doctor Login" as UC11
+  usecase "View Patient List" as UC12
+  usecase "View Patient Details" as UC13
+  usecase "Create Diagnosis" as UC14
+  usecase "View Patient Reports" as UC15
+  usecase "Download Patient Reports" as UC16
+  usecase "Manage Appointments" as UC17
+  usecase "View Patient History" as UC18
+  
+  ' Admin Use Cases
+  usecase "Manage Users" as UC19
+  usecase "System Configuration" as UC20
+  usecase "View System Analytics" as UC21
+  
+  ' AI System Use Cases
+  usecase "Process Health Queries" as UC22
+  usecase "Analyze Symptoms" as UC23
+  usecase "Provide Health Recommendations" as UC24
+}
+
+' Patient Relationships
+P --> UC1
+P --> UC2
+P --> UC3
+P --> UC4
+P --> UC5
+P --> UC6
+P --> UC7
+P --> UC8
+P --> UC9
+P --> UC10
+
+' Doctor Relationships
+D --> UC11
+D --> UC12
+D --> UC13
+D --> UC14
+D --> UC15
+D --> UC16
+D --> UC17
+D --> UC18
+
+' Admin Relationships
+A --> UC19
+A --> UC20
+A --> UC21
+
+' AI System Relationships
+AI --> UC22
+AI --> UC23
+AI --> UC24
+
+' Include/Extend Relationships
+UC7 ..> UC22 : <<include>>
+UC8 ..> UC23 : <<include>>
+UC22 ..> UC24 : <<extend>>
+
+' Authentication Dependencies
+UC3 ..> UC2 : <<include>>
+UC4 ..> UC2 : <<include>>
+UC5 ..> UC2 : <<include>>
+UC6 ..> UC2 : <<include>>
+UC7 ..> UC2 : <<include>>
+UC8 ..> UC2 : <<include>>
+UC9 ..> UC2 : <<include>>
+UC10 ..> UC2 : <<include>>
+
+UC12 ..> UC11 : <<include>>
+UC13 ..> UC11 : <<include>>
+UC14 ..> UC11 : <<include>>
+UC15 ..> UC11 : <<include>>
+UC16 ..> UC11 : <<include>>
+UC17 ..> UC11 : <<include>>
+UC18 ..> UC11 : <<include>>
+
+note right of UC4
+  Patients can upload photos
+  of medical reports (X-rays,
+  blood tests, prescriptions, etc.)
+end note
+
+note right of UC15
+  Doctors can view all reports
+  uploaded by patients and
+  download original files
+end note
+
+note right of UC7
+  AI chatbot powered by
+  Gemini AI provides health
+  information and guidance
+end note
+
+@enduml

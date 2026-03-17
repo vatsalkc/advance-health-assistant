@@ -1,0 +1,262 @@
+@startuml Health Assistant Class Diagram
+!theme plain
+skinparam class {
+  BackgroundColor #E8F5E8
+  BorderColor #4CAF50
+  ArrowColor #2E7D32
+}
+skinparam interface {
+  BackgroundColor #FFF3E0
+  BorderColor #FF9800
+}
+
+title Health Assistant System - Class Diagram
+
+package "User Management" {
+  class User {
+    +id: string
+    +email: string
+    +password: string
+    +name: string
+    +phone: string
+    +created_at: Date
+    +updated_at: Date
+    --
+    +register(): boolean
+    +login(): boolean
+    +updateProfile(): boolean
+    +logout(): void
+  }
+  
+  class Patient {
+    +date_of_birth: Date
+    +gender: string
+    +address: string
+    +emergency_contact: string
+    --
+    +bookAppointment(): boolean
+    +uploadReport(): boolean
+    +viewReports(): Report[]
+    +deleteReport(): boolean
+    +chatWithAI(): void
+  }
+  
+  class Doctor {
+    +specialization: string
+    +license_number: string
+    +experience_years: number
+    +qualification: string
+    +availability: string
+    --
+    +viewPatients(): Patient[]
+    +createDiagnosis(): boolean
+    +viewPatientReports(): Report[]
+    +downloadReport(): File
+    +manageAppointments(): void
+  }
+  
+  class Admin {
+    +role: string
+    +permissions: string[]
+    --
+    +manageUsers(): boolean
+    +configureSystem(): boolean
+    +viewAnalytics(): Analytics
+  }
+}
+
+package "Medical Records" {
+  class MedicalReport {
+    +id: string
+    +patient_id: string
+    +doctor_id: string
+    +report_title: string
+    +report_type: string
+    +report_content: string
+    +report_date: Date
+    +attachments: string[]
+    +created_at: Date
+    --
+    +upload(): boolean
+    +download(): File
+    +delete(): boolean
+    +view(): ReportDetails
+  }
+  
+  class Diagnosis {
+    +id: string
+    +patient_id: string
+    +doctor_id: string
+    +diagnosis_text: string
+    +symptoms: string[]
+    +recommendations: string
+    +created_at: Date
+    --
+    +create(): boolean
+    +update(): boolean
+    +view(): DiagnosisDetails
+  }
+  
+  class Appointment {
+    +id: string
+    +patient_id: string
+    +doctor_id: string
+    +appointment_date: Date
+    +status: string
+    +notes: string
+    +created_at: Date
+    --
+    +book(): boolean
+    +cancel(): boolean
+    +reschedule(): boolean
+    +complete(): boolean
+  }
+}
+
+package "AI Services" {
+  class AIChatbot {
+    +session_id: string
+    +user_id: string
+    +conversation_history: Message[]
+    --
+    +sendMessage(): AIResponse
+    +getQuickQuestions(): string[]
+    +processHealthQuery(): AIResponse
+    +analyzeSymptoms(): SymptomAnalysis
+  }
+  
+  class SymptomChecker {
+    +symptoms: string[]
+    +selected_symptoms: string[]
+    +suggestions: string[]
+    --
+    +addSymptom(): boolean
+    +removeSymptom(): boolean
+    +checkSymptoms(): AnalysisResult
+    +getRelatedSymptoms(): string[]
+  }
+  
+  class AIResponse {
+    +content: string
+    +confidence: number
+    +recommendations: string[]
+    +timestamp: Date
+  }
+}
+
+package "File Management" {
+  class FileStorage {
+    +bucket_name: string
+    +file_path: string
+    +file_size: number
+    +file_type: string
+    --
+    +upload(): string
+    +download(): File
+    +delete(): boolean
+    +getPublicUrl(): string
+  }
+  
+  class FileViewer {
+    +file_url: string
+    +file_name: string
+    +file_type: string
+    --
+    +viewFile(): void
+    +downloadFile(): void
+    +previewFile(): void
+  }
+}
+
+package "Database" {
+  interface DatabaseService {
+    +connect(): boolean
+    +query(): ResultSet
+    +insert(): boolean
+    +update(): boolean
+    +delete(): boolean
+  }
+  
+  class SupabaseService {
+    +client: SupabaseClient
+    +auth: AuthService
+    +storage: StorageService
+    --
+    +initialize(): boolean
+    +authenticate(): boolean
+    +uploadFile(): string
+    +queryData(): any[]
+  }
+}
+
+package "Authentication" {
+  class AuthService {
+    +current_user: User
+    +session: Session
+    --
+    +login(): AuthResult
+    +logout(): boolean
+    +register(): AuthResult
+    +resetPassword(): boolean
+    +verifyToken(): boolean
+  }
+  
+  class Session {
+    +user_id: string
+    +token: string
+    +expires_at: Date
+    +created_at: Date
+    --
+    +isValid(): boolean
+    +refresh(): boolean
+    +destroy(): void
+  }
+}
+
+' Inheritance Relationships
+User <|-- Patient
+User <|-- Doctor
+User <|-- Admin
+
+' Composition Relationships
+Patient ||--o{ MedicalReport : uploads
+Doctor ||--o{ Diagnosis : creates
+Patient ||--o{ Appointment : books
+Doctor ||--o{ Appointment : manages
+
+' Association Relationships
+Patient --> AIChatbot : uses
+Patient --> SymptomChecker : uses
+MedicalReport --> FileStorage : stores_files
+FileViewer --> FileStorage : accesses
+SupabaseService ..|> DatabaseService : implements
+AuthService --> Session : manages
+User --> AuthService : authenticates
+
+' Dependencies
+AIChatbot --> AIResponse : returns
+SymptomChecker --> AIResponse : generates
+MedicalReport --> FileViewer : viewed_by
+Diagnosis --> Patient : belongs_to
+Diagnosis --> Doctor : created_by
+
+note top of AIChatbot
+  Powered by Gemini AI
+  Provides health information
+  and guidance to patients
+end note
+
+note top of FileStorage
+  Uses Supabase Storage
+  for secure file handling
+  with proper RLS policies
+end note
+
+note top of MedicalReport
+  Supports multiple file types:
+  - Images (JPG, PNG)
+  - PDFs
+  - Medical documents
+end note
+
+@enduml

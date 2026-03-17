@@ -1,0 +1,136 @@
+@startuml Health Assistant Activity Diagram
+!theme plain
+skinparam activity {
+  BackgroundColor #E1F5FE
+  BorderColor #0277BD
+  StartColor #4CAF50
+  EndColor #F44336
+}
+
+title Health Assistant System - Activity Diagram (Patient Report Upload & Doctor Review)
+
+|Patient|
+start
+:Open Health Assistant App;
+:Navigate to Reports Section;
+:Click "Upload Report";
+
+if (User Authenticated?) then (No)
+  :Redirect to Login;
+  :Enter Credentials;
+  :Authenticate User;
+else (Yes)
+endif
+
+:Select Report Type;
+note right
+  - Blood Test
+  - X-Ray
+  - MRI
+  - CT Scan
+  - Prescription
+  - Other
+end note
+
+:Enter Report Title;
+:Enter Report Description;
+:Select Files to Upload;
+
+if (Files Selected?) then (No)
+  :Show Error Message;
+  stop
+else (Yes)
+endif
+
+|System|
+:Validate File Types;
+:Check File Sizes;
+
+if (Files Valid?) then (No)
+  |Patient|
+  :Show Validation Error;
+  stop
+else (Yes)
+endif
+
+:Upload Files to Storage;
+:Generate File URLs;
+:Save Report to Database;
+
+|Patient|
+:Show Success Message;
+:Display in My Reports;
+
+|Doctor|
+:Login to Doctor Portal;
+:View Patient List;
+:Select Patient;
+:Navigate to Patient Details;
+
+|System|
+:Load Patient Information;
+:Fetch Patient Reports;
+:Display Reports List;
+
+|Doctor|
+:Click on Report;
+:View Report Details;
+
+if (Has Attachments?) then (Yes)
+  :View/Download Files;
+  :Analyze Medical Data;
+else (No)
+endif
+
+:Create Diagnosis;
+:Enter Diagnosis Text;
+:Add Recommendations;
+:Save Diagnosis;
+
+|System|
+:Store Diagnosis;
+:Link to Patient Record;
+:Update Patient History;
+
+|Patient|
+:Receive Notification;
+:View Updated Diagnosis;
+
+|AI System|
+if (Patient Uses Chatbot?) then (Yes)
+  :Process Health Query;
+  :Analyze Symptoms;
+  :Generate AI Response;
+  :Provide Health Guidance;
+  
+  if (Serious Symptoms?) then (Yes)
+    :Recommend Doctor Visit;
+  else (No)
+    :Provide General Advice;
+  endif
+else (No)
+endif
+
+stop
+
+note right of "Upload Files to Storage"
+  Files are stored in Supabase Storage
+  with proper security policies.
+  Only authorized users can access.
+end note
+
+note right of "Create Diagnosis"
+  Doctors can create multiple
+  diagnoses for the same patient.
+  All diagnoses are tracked
+  in patient history.
+end note
+
+note right of "Process Health Query"
+  AI chatbot powered by Gemini
+  provides health information
+  but always recommends
+  professional medical advice.
+end note
+
+@enduml

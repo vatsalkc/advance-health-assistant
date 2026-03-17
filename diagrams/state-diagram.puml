@@ -1,0 +1,245 @@
+@startuml Health Assistant State Diagram
+!theme plain
+skinparam state {
+  BackgroundColor #F3E5F5
+  BorderColor #7B1FA2
+  StartColor #4CAF50
+  EndColor #F44336
+}
+
+title Health Assistant System - State Diagram (Medical Report Lifecycle)
+
+[*] --> Draft : Patient starts upload
+
+state "Report Lifecycle" as ReportStates {
+  
+  state Draft {
+    Draft : Patient filling form
+    Draft : Selecting files
+    Draft : Entering metadata
+    --
+    Draft : report_status = "draft"
+    Draft : attachments = []
+    Draft : validation_errors = []
+  }
+  
+  state Uploading {
+    Uploading : Files being uploaded
+    Uploading : Progress tracking
+    Uploading : Validation in progress
+    --
+    Uploading : upload_progress = 0-100%
+    Uploading : current_file = filename
+  }
+  
+  state ValidationFailed {
+    ValidationFailed : Invalid file type
+    ValidationFailed : File too large
+    ValidationFailed : Missing required fields
+    --
+    ValidationFailed : error_messages = []
+    ValidationFailed : retry_count++
+  }
+  
+  state Uploaded {
+    Uploaded : Successfully stored
+    Uploaded : Available for viewing
+    Uploaded : Awaiting doctor review
+    --
+    Uploaded : report_status = "uploaded"
+    Uploaded : file_urls = []
+    Uploaded : upload_date = timestamp
+  }
+  
+  state UnderReview {
+    UnderReview : Doctor viewing report
+    UnderReview : Analysis in progress
+    UnderReview : Diagnosis being created
+    --
+    UnderReview : reviewed_by = doctor_id
+    UnderReview : review_started = timestamp
+  }
+  
+  state Reviewed {
+    Reviewed : Doctor completed review
+    Reviewed : Diagnosis available
+    Reviewed : Patient notified
+    --
+    Reviewed : diagnosis_id = id
+    Reviewed : reviewed_at = timestamp
+    Reviewed : status = "completed"
+  }
+  
+  state Archived {
+    Archived : Report archived
+    Archived : Historical record
+    Archived : Limited access
+    --
+    Archived : archived_at = timestamp
+    Archived : archived_by = user_id
+  }
+  
+  state Deleted {
+    Deleted : Report deleted by patient
+    Deleted : Files removed from storage
+    Deleted : Database record removed
+    --
+    Deleted : deleted_at = timestamp
+    Deleted : files_cleaned = true
+  }
+}
+
+' State Transitions
+Draft --> Uploading : submit_form()
+Draft --> [*] : cancel()
+
+Uploading --> ValidationFailed : validation_error()
+Uploading --> Uploaded : upload_success()
+Uploading --> Draft : upload_cancelled()
+
+ValidationFailed --> Draft : fix_errors()
+ValidationFailed --> [*] : abandon_upload()
+
+Uploaded --> UnderReview : doctor_opens_report()
+Uploaded --> Deleted : patient_deletes()
+Uploaded --> Archived : auto_archive_old_reports()
+
+UnderReview --> Reviewed : doctor_completes_diagnosis()
+UnderReview --> Uploaded : doctor_closes_without_action()
+
+Reviewed --> Archived : archive_after_time()
+Reviewed --> Deleted : patient_deletes()
+
+Archived --> Deleted : permanent_delete()
+
+' AI Chatbot States
+state "AI Chatbot Session" as ChatbotStates {
+  
+  state Idle {
+    Idle : Waiting for user input
+    Idle : Showing welcome message
+    --
+    Idle : session_active = false
+    Idle : message_count = 0
+  }
+  
+  state Processing {
+    Processing : Analyzing user query
+    Processing : Generating response
+    Processing : Checking safety filters
+    --
+    Processing : api_call_in_progress = true
+    Processing : processing_start = timestamp
+  }
+  
+  state Responding {
+    Responding : Displaying AI response
+    Responding : Showing typing indicator
+    Responding : Streaming response
+    --
+    Responding : response_length = chars
+    Responding : confidence_score = 0-1
+  }
+  
+  state Error {
+    Error : API key missing
+    Error : Rate limit exceeded
+    Error : Network error
+    --
+    Error : error_type = string
+    Error : retry_count = number
+  }
+}
+
+[*] --> Idle : user_opens_chatbot()
+
+Idle --> Processing : user_sends_message()
+Idle --> [*] : user_closes_chatbot()
+
+Processing --> Responding : api_success()
+Processing --> Error : api_error()
+
+Responding --> Idle : response_complete()
+
+Error --> Idle : error_resolved()
+Error --> [*] : user_closes_chatbot()
+
+' Appointment States
+state "Appointment Lifecycle" as AppointmentStates {
+  
+  state Requested {
+    Requested : Patient requested appointment
+    Requested : Awaiting doctor confirmation
+    --
+    Requested : status = "pending"
+    Requested : requested_date = timestamp
+  }
+  
+  state Confirmed {
+    Confirmed : Doctor confirmed appointment
+    Confirmed : Scheduled in calendar
+    --
+    Confirmed : status = "confirmed"
+    Confirmed : confirmed_by = doctor_id
+    Confirmed : appointment_time = datetime
+  }
+  
+  state InProgress {
+    InProgress : Appointment currently happening
+    InProgress : Doctor with patient
+    --
+    InProgress : status = "in_progress"
+    InProgress : started_at = timestamp
+  }
+  
+  state Completed {
+    Completed : Appointment finished
+    Completed : Notes added
+    --
+    Completed : status = "completed"
+    Completed : completed_at = timestamp
+    Completed : notes = text
+  }
+  
+  state Cancelled {
+    Cancelled : Appointment cancelled
+    Cancelled : Reason provided
+    --
+    Cancelled : status = "cancelled"
+    Cancelled : cancelled_by = user_id
+    Cancelled : reason = text
+  }
+}
+
+[*] --> Requested : patient_books_appointment()
+
+Requested --> Confirmed : doctor_confirms()
+Requested --> Cancelled : patient_cancels() / doctor_rejects()
+
+Confirmed --> InProgress : appointment_starts()
+Confirmed --> Cancelled : patient_cancels() / doctor_cancels()
+
+InProgress --> Completed : appointment_ends()
+
+Completed --> [*]
+Cancelled --> [*]
+
+note right of Uploaded
+  Reports in this state are
+  visible to assigned doctors
+  and can be downloaded
+end note
+
+note right of Processing
+  AI responses are generated
+  using Gemini AI with
+  health-focused prompts
+end note
+
+note right of Confirmed
+  Both patient and doctor
+  receive notifications
+  about confirmed appointments
+end note
+
+@enduml
