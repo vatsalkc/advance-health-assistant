@@ -8414,3 +8414,59 @@ button.btn-lg {
 [data-theme="dark"] .latest-diagnosis-box:hover {
   background: linear-gradient(135deg, rgba(129, 140, 248, 0.15) 0%, rgba(192, 132, 252, 0.15) 100%);
 }
+
+/* Report Card Button Fixes */
+.report-card .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.report-card .d-flex.justify-content-between {
+  margin-top: auto; /* Push buttons to bottom */
+}
+
+.report-card .btn-group-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0; /* Allow shrinking */
+}
+
+.report-card .btn-group-actions .btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: auto;
+}
+
+.report-card .btn-group-actions .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Ensure trash icon is visible */
+.btn-outline-danger .bi-trash {
+  color: #dc2626;
+  font-size: 0.875rem;
+  display: inline-block;
+  visibility: visible;
+}
+
+.btn-outline-danger:hover .bi-trash {
+  color: white;
+}
+
+/* Force visibility for all Bootstrap icons in buttons */
+.btn .bi {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Specific fix for report card buttons */
+.report-card .btn-group-actions .btn .bi {
+  font-size: 0.875rem;
+  line-height: 1;
+  vertical-align: middle;
+}

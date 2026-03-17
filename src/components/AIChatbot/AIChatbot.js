@@ -2,9 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Prefer environment variable; falls back to in-code key if not set.
-const GEMINI_API_KEY =
-  process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyCrQpxMlGLi8cNdRFEcvjT667lEJTBIvMY';
+// Use environment variable only - no fallback to prevent API key exposure
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+
+// Debug logging (remove in production)
+console.log('[Chatbot] API Key available:', !!GEMINI_API_KEY);
+console.log('[Chatbot] API Key length:', GEMINI_API_KEY?.length || 0);
 
 function AIChatbot({ user, isOpen, onClose }) {
   const [messages, setMessages] = useState([
@@ -22,10 +25,29 @@ function AIChatbot({ user, isOpen, onClose }) {
     // Initialize Gemini AI
     try {
       console.log('[Chatbot] Initializing Gemini AI...');
+      console.log('[Chatbot] Environment check:', {
+        hasApiKey: !!GEMINI_API_KEY,
+        keyLength: GEMINI_API_KEY?.length || 0,
+        nodeEnv: process.env.NODE_ENV
+      });
+      
+      if (!GEMINI_API_KEY) {
+        console.error('[Chatbot] REACT_APP_GEMINI_API_KEY environment variable is not set');
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: 'I apologize, but the AI chatbot is not properly configured. The API key is missing from the environment variables. Please restart the development server after adding the API key to your .env file.'
+        }]);
+        return;
+      }
+      
       genAI.current = new GoogleGenerativeAI(GEMINI_API_KEY);
       console.log('[Chatbot] Gemini AI initialized successfully');
     } catch (error) {
       console.error('[Chatbot] Failed to initialize Gemini AI:', error);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `I apologize, but there was an error initializing the AI chatbot: ${error.message}. Please try refreshing the page or contact support.`
+      }]);
     }
   }, []);
 
@@ -50,6 +72,11 @@ function AIChatbot({ user, isOpen, onClose }) {
 
     try {
       console.log('[Chatbot] Sending message:', userMessage);
+      
+      // Check if API key is available
+      if (!GEMINI_API_KEY) {
+        throw new Error('API key not configured. Please contact administrator.');
+      }
       
       // Check if API is initialized
       if (!genAI.current) {
@@ -163,6 +190,11 @@ Answer:`;
 
     try {
       console.log('[Chatbot] Sending quick question:', question);
+      
+      // Check if API key is available
+      if (!GEMINI_API_KEY) {
+        throw new Error('API key not configured. Please contact administrator.');
+      }
       
       // Check if API is initialized
       if (!genAI.current) {

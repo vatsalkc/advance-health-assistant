@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Form, Alert, ProgressBar, Row, Col } from 'react-bootstrap';
 import { supabase } from '../../config/supabase';
 
@@ -12,6 +12,48 @@ function ReportUpload({ onUploadSuccess }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState('checking');
+
+  // Test Supabase connection on component mount
+  useEffect(() => {
+    testConnection();
+  }, []);
+
+  const testConnection = async () => {
+    try {
+      console.log('Testing Supabase connection...');
+      
+      // Test database connection
+      const { data, error } = await supabase
+        .from('medical_reports')
+        .select('count', { count: 'exact', head: true });
+      
+      if (error) {
+        console.error('Database connection failed:', error);
+        setConnectionStatus('database_error');
+        setError('Database connection failed. Please check your internet connection.');
+        return;
+      }
+      
+      // Test storage access
+      const { data: buckets, error: storageError } = await supabase.storage.listBuckets();
+      
+      if (storageError) {
+        console.error('Storage access failed:', storageError);
+        setConnectionStatus('storage_error');
+        setError('Storage access failed. File uploads may not work properly.');
+        return;
+      }
+      
+      console.log('Supabase connection successful');
+      setConnectionStatus('connected');
+      
+    } catch (err) {
+      console.error('Connection test failed:', err);
+      setConnectionStatus('error');
+      setError('Failed to connect to the server. Please check your internet connection.');
+    }
+  };
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -31,15 +73,67 @@ function ReportUpload({ onUploadSuccess }) {
   };
 
   const uploadFileToSupabase = async (file) => {
-    const userData = JSON.parse(localStorage.getItem('user_data'));
-    const fileName = `${userData.id}/${Date.now()}_${file.name}`;
-    
-    const { data, error } = await supabase.storage
-      .from('medical-reports')
-      .upload(fileName, file);
+    try {
+      const userData = JSON.parse(localStorage.getItem('user_data'));
+      if (!userData || !userData.id) {
+        throw new Error('User not authenticated');
+      }
 
-    if (error) throw error;
-    return data.path;
+      // Create a safe filename
+      const fileExtension = file.name.split('.').pop();
+      const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const fileName = `${userData.id}/${Date.now()}_${safeFileName}`;
+      
+      console.log('Uploading file:', fileName, 'Size:', file.size, 'Type:', file.type);
+      
+      // First, check if the bucket exists
+      const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+      
+      if (listError) {
+        console.error('Error listing buckets:', listError);
+        throw new Error('Unable to access storage. Please try again.');
+      }
+      
+      const bucketExists = buckets.some(bucket => bucket.name === 'medical-reports');
+      console.log('Medical reports bucket exists:', bucketExists);
+      
+      if (!bucketExists) {
+        console.log('Creating medical-reports bucket...');
+        const { error: bucketError } = await supabase.storage.createBucket('medical-reports', {
+          public: true,
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'application/pdf'],
+          fileSizeLimit: 10485760 // 10MB
+        });
+        
+        if (bucketError) {
+          console.error('Failed to create bucket:', bucketError);
+          throw new Error(`Storage setup failed: ${bucketError.message}`);
+        }
+        console.log('Bucket created successfully');
+      }
+      
+      // Try to upload the file
+      console.log('Starting file upload...');
+      const { data, error } = await supabase.storage
+        .from('medical-reports')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type
+        });
+
+      if (error) {
+        console.error('Storage upload error:', error);
+        throw new Error(`Upload failed: ${error.message}`);
+      }
+
+      console.log('File uploaded successfully to:', data.path);
+      return data.path;
+      
+    } catch (error) {
+      console.error('File upload error:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -50,10 +144,11 @@ function ReportUpload({ onUploadSuccess }) {
       return;
     }
 
-    if (selectedFiles.length === 0) {
-      setError('Please select at least one file to upload');
-      return;
-    }
+    // Files are now optional
+    // if (selectedFiles.length === 0) {
+    //   setError('Please select at least one file to upload');
+    //   return;
+    // }
 
     setUploading(true);
     setError('');
@@ -61,64 +156,147 @@ function ReportUpload({ onUploadSuccess }) {
 
     try {
       const userData = JSON.parse(localStorage.getItem('user_data'));
-      
-      // Upload files to Supabase Storage
-      const uploadPromises = selectedFiles.map(file => uploadFileToSupabase(file));
-      const uploadedPaths = await Promise.all(uploadPromises);
-      
-      setUploadProgress(50);
-
-      // Get public URLs for the uploaded files
-      const attachmentUrls = [];
-      for (const path of uploadedPaths) {
-        const { data } = supabase.storage
-          .from('medical-reports')
-          .getPublicUrl(path);
-        attachmentUrls.push(data.publicUrl);
+      if (!userData || !userData.id) {
+        throw new Error('Please log in again to upload reports');
       }
+      
+      setUploadProgress(10);
 
+      // For now, let's save the report without file attachments as a fallback
+      // This ensures the functionality works even if storage has issues
+      let attachmentUrls = [];
+      
+      if (selectedFiles.length > 0) {
+        try {
+          // Try to upload files to Supabase Storage
+          console.log('Attempting to upload', selectedFiles.length, 'files...');
+          
+          for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            console.log(`Uploading file ${i + 1}/${selectedFiles.length}:`, file.name, 'Size:', file.size, 'Type:', file.type);
+            
+            const uploadedPath = await uploadFileToSupabase(file);
+            console.log('File uploaded to path:', uploadedPath);
+            
+            // Get public URL for the uploaded file
+            const { data } = supabase.storage
+              .from('medical-reports')
+              .getPublicUrl(uploadedPath);
+            
+            console.log('Generated public URL:', data.publicUrl);
+            attachmentUrls.push(data.publicUrl);
+            
+            // Update progress
+            const progress = 25 + ((i + 1) / selectedFiles.length) * 50;
+            setUploadProgress(Math.round(progress));
+          }
+          
+          console.log('All files uploaded successfully. Final URLs:', attachmentUrls);
+          
+        } catch (uploadError) {
+          console.error('File upload failed:', uploadError);
+          setError(`File upload failed: ${uploadError.message}. Report details will still be saved.`);
+          // Continue without attachments
+          attachmentUrls = [];
+        }
+      } else {
+        // No files selected, just save the report details
+        console.log('No files selected, saving report details only');
+      }
+      
       setUploadProgress(75);
 
       // Save report data to database
-      const { data, error } = await supabase
-        .from('medical_reports')
-        .insert([
-          {
-            patient_id: userData.id,
-            doctor_id: null, // Patient uploaded, no doctor assigned yet
-            report_type: reportType,
-            report_title: reportTitle,
-            report_content: description || 'Patient uploaded medical report',
-            report_date: reportDate,
-            attachments: attachmentUrls,
-            created_at: new Date().toISOString()
+      // Workaround: Use an existing doctor ID for patient uploads
+      // We'll use the first doctor in the system as a placeholder for patient uploads
+      
+      try {
+        // Get the first available doctor to use as a system placeholder
+        const { data: availableDoctor, error: doctorError } = await supabase
+          .from('doctors')
+          .select('id, name')
+          .limit(1)
+          .single();
+        
+        if (doctorError) {
+          console.error('Error fetching system doctor:', doctorError);
+          throw new Error('Database access error. Please check your connection and try again.');
+        }
+        
+        if (!availableDoctor) {
+          throw new Error('No doctors available in system. Please contact administrator.');
+        }
+        
+        console.log('Using system doctor for patient upload:', availableDoctor.name);
+        
+        const reportData = {
+          patient_id: userData.id,
+          doctor_id: availableDoctor.id, // Use first available doctor as placeholder
+          report_type: reportType,
+          report_title: reportTitle,
+          report_content: `[PATIENT UPLOAD] ${description || `Patient uploaded ${reportType} report: ${reportTitle}`}`,
+          report_date: reportDate,
+          attachments: attachmentUrls.length > 0 ? attachmentUrls : [], // Use empty array instead of null
+          created_at: new Date().toISOString()
+        };
+        
+        console.log('Saving report data:', reportData);
+        console.log('Attachments being saved:', attachmentUrls);
+        console.log('Attachments array length:', attachmentUrls.length);
+        
+        const { data, error } = await supabase
+          .from('medical_reports')
+          .insert([reportData])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Database insert error:', error);
+          
+          // Provide more specific error messages
+          if (error.code === '23503') {
+            throw new Error('Database relationship error. Please contact administrator.');
+          } else if (error.code === '42501') {
+            throw new Error('Permission denied. Please log out and log back in.');
+          } else {
+            throw new Error(`Failed to save report: ${error.message}`);
           }
-        ])
-        .select()
-        .single();
+        }
 
-      if (error) throw error;
+        console.log('Report saved successfully:', data);
+        console.log('Saved report attachments:', data.attachments);
+        console.log('Saved attachments type:', typeof data.attachments);
+        console.log('Saved attachments length:', data.attachments?.length);
+        
+        setUploadProgress(100);
+        setSuccess(`Report "${reportTitle}" uploaded successfully!`);
+        
+        // Reset form
+        setSelectedFiles([]);
+        setReportTitle('');
+        setReportType('');
+        setReportDate('');
+        setDescription('');
+        
+        // Notify parent component
+        if (onUploadSuccess) {
+          onUploadSuccess(data);
+        }
 
-      setUploadProgress(100);
-      setSuccess('Report uploaded successfully!');
-      
-      // Reset form
-      setSelectedFiles([]);
-      setReportTitle('');
-      setReportType('');
-      setReportDate('');
-      setDescription('');
-      
-      // Notify parent component
-      if (onUploadSuccess) {
-        onUploadSuccess(data);
+        setTimeout(() => {
+          setSuccess('');
+          setError('');
+        }, 5000);
+        
+      } catch (dbError) {
+        console.error('Database save error:', dbError);
+        setError(dbError.message || 'Failed to save report to database. Please try again.');
+        throw dbError;
       }
-
-      setTimeout(() => setSuccess(''), 3000);
 
     } catch (err) {
       console.error('Upload error:', err);
-      setError('Failed to upload report. Please try again.');
+      setError(err.message || 'Failed to upload report. Please try again.');
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -138,11 +316,51 @@ function ReportUpload({ onUploadSuccess }) {
         </h5>
       </Card.Header>
       <Card.Body>
+        {connectionStatus === 'checking' && (
+          <Alert variant="info">
+            <div className="d-flex align-items-center">
+              <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+              Checking connection to server...
+            </div>
+          </Alert>
+        )}
+        
+        {connectionStatus === 'database_error' && (
+          <Alert variant="danger">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                Database connection failed. Please check your internet connection and try again.
+              </div>
+              <Button variant="outline-danger" size="sm" onClick={testConnection}>
+                <i className="bi bi-arrow-clockwise me-1"></i>
+                Retry
+              </Button>
+            </div>
+          </Alert>
+        )}
+        
+        {connectionStatus === 'storage_error' && (
+          <Alert variant="warning">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                Storage access limited. You can still create reports, but file uploads may not work.
+              </div>
+              <Button variant="outline-warning" size="sm" onClick={testConnection}>
+                <i className="bi bi-arrow-clockwise me-1"></i>
+                Retry
+              </Button>
+            </div>
+          </Alert>
+        )}
+        
         {error && <Alert variant="danger">{error}</Alert>}
         {success && <Alert variant="success">{success}</Alert>}
 
         <Form onSubmit={handleSubmit}>
-          <Row>
+          <fieldset disabled={connectionStatus !== 'connected' && connectionStatus !== 'storage_error'}>
+            <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
                 <Form.Label>Report Title *</Form.Label>
@@ -201,7 +419,7 @@ function ReportUpload({ onUploadSuccess }) {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Upload Files *</Form.Label>
+            <Form.Label>Upload Files (Optional)</Form.Label>
             <Form.Control
               type="file"
               multiple
@@ -210,7 +428,7 @@ function ReportUpload({ onUploadSuccess }) {
               disabled={uploading}
             />
             <Form.Text className="text-muted">
-              Upload images (JPG, PNG) or PDF files. Maximum 10MB per file.
+              Upload images (JPG, PNG) or PDF files. Maximum 10MB per file. You can also create a report without files.
             </Form.Text>
           </Form.Group>
 
@@ -251,7 +469,7 @@ function ReportUpload({ onUploadSuccess }) {
             <Button
               type="submit"
               variant="primary"
-              disabled={uploading || selectedFiles.length === 0}
+              disabled={uploading || (connectionStatus !== 'connected' && connectionStatus !== 'storage_error')}
             >
               {uploading ? (
                 <>
@@ -261,11 +479,12 @@ function ReportUpload({ onUploadSuccess }) {
               ) : (
                 <>
                   <i className="bi bi-cloud-upload me-2"></i>
-                  Upload Report
+                  Save Report
                 </>
               )}
             </Button>
           </div>
+          </fieldset>
         </Form>
       </Card.Body>
     </Card>

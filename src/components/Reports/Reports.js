@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Tab, Nav, Card } from 'react-bootstrap';
-import ReportUpload from './ReportUpload';
+import ReportUploadFixed from './ReportUploadFixed';
 import MyReports from './MyReports';
 
 function Reports() {
@@ -46,7 +46,7 @@ function Reports() {
                 <MyReports key={refreshReports} />
               </Tab.Pane>
               <Tab.Pane eventKey="upload">
-                <ReportUpload onUploadSuccess={handleUploadSuccess} />
+                <ReportUploadFixed onUploadSuccess={handleUploadSuccess} />
               </Tab.Pane>
             </Tab.Content>
           </Card.Body>

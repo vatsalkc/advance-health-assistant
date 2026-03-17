@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Badge, Button, Modal, Alert, ListGroup } from 'react-bootstrap';
 import { supabase } from '../../config/supabase';
+import FileViewer from './FileViewer';
+import ReportDownloader from './ReportDownloader';
 
 function MyReports() {
   const [reports, setReports] = useState([]);
@@ -8,6 +10,8 @@ function MyReports() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [deleting, setDeleting] = useState(null); // Track which report is being deleted
 
   useEffect(() => {
     fetchReports();
@@ -32,6 +36,21 @@ function MyReports() {
 
       if (error) throw error;
       setReports(data || []);
+      
+      // Debug logging
+      console.log('MyReports - Fetched reports:', data);
+      data?.forEach((report, index) => {
+        console.log(`Report ${index + 1}:`, {
+          id: report.id,
+          title: report.report_title,
+          attachments: report.attachments,
+          attachmentsType: typeof report.attachments,
+          attachmentsLength: report.attachments?.length
+        });
+      });
+      
+      // Store user data for download component
+      setUserData(userData);
     } catch (err) {
       console.error('Error fetching reports:', err);
       setError('Failed to load reports');
@@ -43,6 +62,89 @@ function MyReports() {
   const handleViewReport = (report) => {
     setSelectedReport(report);
     setShowModal(true);
+  };
+
+  const handleDeleteReport = async (reportId, reportTitle) => {
+    const reportToDelete = reports.find(r => r.id === reportId);
+    const fileCount = reportToDelete?.attachments?.length || 0;
+    
+    let confirmMessage = `Are you sure you want to delete "${reportTitle}"?`;
+    if (fileCount > 0) {
+      confirmMessage += `\n\nThis will also delete ${fileCount} attached file(s).`;
+    }
+    confirmMessage += '\n\nThis action cannot be undone.';
+    
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    setDeleting(reportId);
+    
+    try {
+      // Delete files from storage if they exist
+      if (reportToDelete?.attachments && Array.isArray(reportToDelete.attachments)) {
+        console.log('Deleting', reportToDelete.attachments.length, 'files from storage...');
+        
+        for (const url of reportToDelete.attachments) {
+          try {
+            // Extract file path from URL
+            const urlParts = url.split('/');
+            const bucketIndex = urlParts.findIndex(part => part === 'medical-reports');
+            
+            if (bucketIndex !== -1) {
+              const filePath = urlParts.slice(bucketIndex + 1).join('/');
+              console.log('Deleting file:', filePath);
+              
+              const { error: deleteError } = await supabase.storage
+                .from('medical-reports')
+                .remove([filePath]);
+              
+              if (deleteError) {
+                console.warn('Failed to delete file:', filePath, deleteError);
+              } else {
+                console.log('File deleted successfully:', filePath);
+              }
+            }
+          } catch (fileError) {
+            console.warn('Error deleting file:', fileError);
+          }
+        }
+      }
+      
+      // Delete the report from database
+      const { error } = await supabase
+        .from('medical_reports')
+        .delete()
+        .eq('id', reportId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Remove from local state
+      setReports(prevReports => prevReports.filter(report => report.id !== reportId));
+      
+      // Close modal if the deleted report was being viewed
+      if (selectedReport?.id === reportId) {
+        setShowModal(false);
+        setSelectedReport(null);
+      }
+      
+      console.log('Report deleted successfully:', reportTitle);
+      
+      // Show success message briefly
+      const successMessage = fileCount > 0 
+        ? `Report "${reportTitle}" and ${fileCount} file(s) deleted successfully.`
+        : `Report "${reportTitle}" deleted successfully.`;
+      
+      // You could add a success state here if needed
+      
+    } catch (err) {
+      console.error('Error deleting report:', err);
+      setError(`Failed to delete report: ${err.message}`);
+    } finally {
+      setDeleting(null);
+    }
   };
 
   const getReportTypeColor = (type) => {
@@ -81,7 +183,7 @@ function MyReports() {
 
   return (
     <div>
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
       
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4>
@@ -117,17 +219,36 @@ function MyReports() {
                   <h6 className="card-title">{report.report_title}</h6>
                   
                   <p className="card-text text-muted small">
-                    {report.report_content.length > 100 
-                      ? `${report.report_content.substring(0, 100)}...`
-                      : report.report_content
-                    }
+                    {(() => {
+                      let content = report.report_content;
+                      if (content.startsWith('[PATIENT UPLOAD] ')) {
+                        content = content.replace('[PATIENT UPLOAD] ', '');
+                      }
+                      return content.length > 100 
+                        ? `${content.substring(0, 100)}...`
+                        : content;
+                    })()}
                   </p>
 
-                  {report.doctors && (
+                  {report.report_content && report.report_content.startsWith('[PATIENT UPLOAD]') ? (
+                    <div className="mb-2">
+                      <small className="text-info">
+                        <i className="bi bi-upload me-1"></i>
+                        Uploaded by you
+                      </small>
+                    </div>
+                  ) : report.doctors ? (
                     <div className="mb-2">
                       <small className="text-success">
                         <i className="bi bi-person-check me-1"></i>
                         Reviewed by Dr. {report.doctors.name}
+                      </small>
+                    </div>
+                  ) : (
+                    <div className="mb-2">
+                      <small className="text-muted">
+                        <i className="bi bi-file-medical me-1"></i>
+                        System report
                       </small>
                     </div>
                   )}
@@ -145,14 +266,34 @@ function MyReports() {
                     <small className="text-muted">
                       Uploaded {formatDate(report.created_at)}
                     </small>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => handleViewReport(report)}
-                    >
-                      <i className="bi bi-eye me-1"></i>
-                      View
-                    </Button>
+                    <div className="d-flex gap-1 flex-wrap btn-group-actions">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => handleViewReport(report)}
+                      >
+                        <i className="bi bi-eye me-1"></i>
+                        Details
+                      </Button>
+                      <ReportDownloader 
+                        report={report} 
+                        patientName={userData?.name || 'Patient'}
+                      />
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDeleteReport(report.id, report.report_title)}
+                        disabled={deleting === report.id}
+                        title="Delete this report"
+                        className="flex-shrink-0"
+                      >
+                        {deleting === report.id ? (
+                          <span className="spinner-border spinner-border-sm" />
+                        ) : (
+                          <i className="bi bi-trash"></i>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </Card.Body>
               </Card>
@@ -185,7 +326,7 @@ function MyReports() {
                 </Col>
               </Row>
 
-              {selectedReport.doctors && (
+              {selectedReport.report_content && !selectedReport.report_content.startsWith('[PATIENT UPLOAD]') && selectedReport.doctors && (
                 <Row className="mb-3">
                   <Col>
                     <strong>Reviewed by:</strong>
@@ -198,10 +339,26 @@ function MyReports() {
                   </Col>
                 </Row>
               )}
+              
+              {selectedReport.report_content && selectedReport.report_content.startsWith('[PATIENT UPLOAD]') && (
+                <Row className="mb-3">
+                  <Col>
+                    <div className="alert alert-info">
+                      <i className="bi bi-info-circle me-2"></i>
+                      This report was uploaded by you and has not been reviewed by a doctor yet.
+                    </div>
+                  </Col>
+                </Row>
+              )}
 
               <div className="mb-3">
                 <strong>Description:</strong>
-                <p className="mt-2">{selectedReport.report_content}</p>
+                <p className="mt-2">
+                  {selectedReport.report_content && selectedReport.report_content.startsWith('[PATIENT UPLOAD]') 
+                    ? selectedReport.report_content.replace('[PATIENT UPLOAD] ', '')
+                    : selectedReport.report_content
+                  }
+                </p>
               </div>
 
               {selectedReport.attachments && selectedReport.attachments.length > 0 && (
@@ -214,28 +371,11 @@ function MyReports() {
                           <i className={`bi ${url.includes('.pdf') ? 'bi-file-pdf' : 'bi-image'} me-2`}></i>
                           Attachment {index + 1}
                         </div>
-                        <div>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="me-2"
-                          >
-                            <i className="bi bi-eye me-1"></i>
-                            View
-                          </Button>
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            href={url}
-                            download
-                          >
-                            <i className="bi bi-download me-1"></i>
-                            Download
-                          </Button>
-                        </div>
+                        <FileViewer 
+                          url={url} 
+                          fileName={`${selectedReport.report_title}_attachment_${index + 1}`}
+                          index={index}
+                        />
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
@@ -252,6 +392,26 @@ function MyReports() {
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Close
+          </Button>
+          <Button 
+            variant="danger" 
+            onClick={() => {
+              setShowModal(false);
+              handleDeleteReport(selectedReport.id, selectedReport.report_title);
+            }}
+            disabled={deleting === selectedReport?.id}
+          >
+            {deleting === selectedReport?.id ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-1" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <i className="bi bi-trash me-1"></i>
+                Delete Report
+              </>
+            )}
           </Button>
         </Modal.Footer>
       </Modal>

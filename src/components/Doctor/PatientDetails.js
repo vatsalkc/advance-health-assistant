@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, ListGroup, Badge, Button, Tab, Nav } from 'react-bootstrap';
 import { doctorPatientsAPI } from '../../utils/doctorApi';
+import FileViewer from '../Reports/FileViewer';
+import ReportDownloader from '../Reports/ReportDownloader';
 
 function PatientDetails({ patientId, onBack }) {
   const [patientData, setPatientData] = useState(null);
@@ -589,13 +591,25 @@ function PatientDetails({ patientId, onBack }) {
                               <h6 className="card-title">{report.report_title}</h6>
                               
                               <p className="card-text text-muted small">
-                                {report.report_content.length > 100 
-                                  ? `${report.report_content.substring(0, 100)}...`
-                                  : report.report_content
-                                }
+                                {(() => {
+                                  let content = report.report_content;
+                                  if (content.startsWith('[PATIENT UPLOAD] ')) {
+                                    content = content.replace('[PATIENT UPLOAD] ', '');
+                                  }
+                                  return content.length > 100 
+                                    ? `${content.substring(0, 100)}...`
+                                    : content;
+                                })()}
                               </p>
 
-                              {report.doctors ? (
+                              {report.report_content && report.report_content.startsWith('[PATIENT UPLOAD]') ? (
+                                <div className="mb-2">
+                                  <small className="text-info">
+                                    <i className="bi bi-upload me-1"></i>
+                                    Uploaded by patient
+                                  </small>
+                                </div>
+                              ) : report.doctors ? (
                                 <div className="mb-2">
                                   <small className="text-success">
                                     <i className="bi bi-person-check me-1"></i>
@@ -604,9 +618,9 @@ function PatientDetails({ patientId, onBack }) {
                                 </div>
                               ) : (
                                 <div className="mb-2">
-                                  <small className="text-info">
-                                    <i className="bi bi-upload me-1"></i>
-                                    Uploaded by patient
+                                  <small className="text-muted">
+                                    <i className="bi bi-file-medical me-1"></i>
+                                    System report
                                   </small>
                                 </div>
                               )}
@@ -619,18 +633,19 @@ function PatientDetails({ patientId, onBack }) {
                                   </small>
                                   <div className="mt-2">
                                     {report.attachments.map((url, index) => (
-                                      <Button
-                                        key={index}
-                                        variant="outline-primary"
-                                        size="sm"
-                                        href={url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="me-2 mb-2"
-                                      >
-                                        <i className={`bi ${url.includes('.pdf') ? 'bi-file-pdf' : 'bi-image'} me-1`}></i>
-                                        View {index + 1}
-                                      </Button>
+                                      <div key={index} className="mb-2">
+                                        <div className="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+                                          <div>
+                                            <i className={`bi ${url.includes('.pdf') ? 'bi-file-pdf' : 'bi-image'} me-2`}></i>
+                                            <span>Attachment {index + 1}</span>
+                                          </div>
+                                          <FileViewer 
+                                            url={url} 
+                                            fileName={`report_attachment_${index + 1}`}
+                                            index={index}
+                                          />
+                                        </div>
+                                      </div>
                                     ))}
                                   </div>
                                 </div>
@@ -640,6 +655,10 @@ function PatientDetails({ patientId, onBack }) {
                                 <small className="text-muted">
                                   {new Date(report.created_at).toLocaleDateString()}
                                 </small>
+                                <ReportDownloader 
+                                  report={report} 
+                                  patientName={patient.name}
+                                />
                               </div>
                             </Card.Body>
                           </Card>
