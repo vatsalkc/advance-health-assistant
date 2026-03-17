@@ -5875,3 +5875,58 @@ button.btn-lg {
   border-radius: 20px;
   font-weight: 600;
 }
+
+
+/* Prescription Item Styling */
+.prescription-item {
+  padding: 20px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.3s;
+}
+
+[data-theme="dark"] .prescription-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.prescription-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .prescription-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.prescription-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Patient Details Tabs */
+.nav-tabs .nav-link {
+  color: #64748b;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+  color: #94a3b8;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #667eea;
+}
+
+.nav-tabs .nav-link.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+  color: #818cf8;
+  border-bottom-color: #818cf8;
+}

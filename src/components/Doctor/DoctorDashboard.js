@@ -79,8 +79,11 @@ function DoctorDashboard({ doctor, onNavigate }) {
       console.log('[DoctorDashboard] Today appointments (sorted by time):', todayAppts);
       setTodayAppointments(todayAppts);
       
-      // Update stats with correct today's count (excluding rejected)
-      const todayActiveCount = todayAppts.filter(apt => apt.status !== 'Rejected').length;
+      // Update stats with correct today's count (excluding rejected and cancelled)
+      const todayActiveCount = todayAppts.filter(apt => 
+        apt.status !== 'Rejected' && apt.status !== 'Cancelled'
+      ).length;
+      console.log('[DoctorDashboard] Today active count:', todayActiveCount);
       setStats(prevStats => ({
         ...prevStats,
         todayAppointments: todayActiveCount

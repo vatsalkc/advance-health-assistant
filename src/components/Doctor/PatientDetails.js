@@ -99,13 +99,28 @@ function PatientDetails({ patientId, onBack }) {
           <Card.Header>
             <Nav variant="tabs">
               <Nav.Item>
-                <Nav.Link eventKey="appointments">Appointments</Nav.Link>
+                <Nav.Link eventKey="appointments">
+                  <i className="bi bi-calendar-check me-2"></i>
+                  Appointments ({appointments.length})
+                </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="symptoms">Symptom History</Nav.Link>
+                <Nav.Link eventKey="prescriptions">
+                  <i className="bi bi-prescription2 me-2"></i>
+                  Prescriptions ({appointments.filter(a => a.prescription).length})
+                </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="reports">Medical Reports</Nav.Link>
+                <Nav.Link eventKey="symptoms">
+                  <i className="bi bi-heart-pulse me-2"></i>
+                  Symptom History ({symptomChecks.length})
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="reports">
+                  <i className="bi bi-file-medical me-2"></i>
+                  Medical Reports ({medicalReports.length})
+                </Nav.Link>
               </Nav.Item>
             </Nav>
           </Card.Header>
@@ -114,36 +129,116 @@ function PatientDetails({ patientId, onBack }) {
               {/* Appointments Tab */}
               <Tab.Pane eventKey="appointments">
                 {appointments.length === 0 ? (
-                  <p className="text-muted">No appointments</p>
+                  <div className="text-center py-4">
+                    <i className="bi bi-calendar-x" style={{ fontSize: '3rem', color: '#94a3b8' }}></i>
+                    <p className="text-muted mt-3">No appointments</p>
+                  </div>
                 ) : (
                   <ListGroup variant="flush">
                     {appointments.map(apt => (
-                      <ListGroup.Item key={apt.id}>
-                        <div className="d-flex justify-content-between">
-                          <div>
-                            <strong>{apt.date} • {apt.time}</strong>
-                            <p className="mb-1">{apt.reason}</p>
+                      <ListGroup.Item key={apt.id} className="border-start border-4" style={{
+                        borderColor: apt.status === 'Confirmed' ? '#10b981' :
+                                   apt.status === 'Pending' ? '#f59e0b' :
+                                   apt.status === 'Rejected' ? '#ef4444' :
+                                   apt.status === 'Cancelled' ? '#6b7280' : '#94a3b8'
+                      }}>
+                        <div className="d-flex justify-content-between align-items-start">
+                          <div className="flex-grow-1">
+                            <div className="d-flex align-items-center gap-2 mb-2">
+                              <strong style={{ fontSize: '16px' }}>{apt.date} • {apt.time}</strong>
+                              <Badge bg={
+                                apt.status === 'Confirmed' ? 'success' :
+                                apt.status === 'Pending' ? 'warning' :
+                                apt.status === 'Rejected' ? 'danger' :
+                                apt.status === 'Cancelled' ? 'secondary' : 'secondary'
+                              }>
+                                {apt.status}
+                              </Badge>
+                            </div>
+                            <p className="mb-2"><strong>Reason:</strong> {apt.reason}</p>
                             {apt.diagnosis && (
-                              <p className="small text-muted mb-1">
-                                <strong>Diagnosis:</strong> {apt.diagnosis}
-                              </p>
+                              <div className="mb-2 p-2 bg-light rounded">
+                                <strong className="text-primary">Diagnosis:</strong>
+                                <p className="mb-0 mt-1">{apt.diagnosis}</p>
+                              </div>
                             )}
                             {apt.prescription && (
-                              <p className="small text-muted mb-0">
-                                <strong>Prescription:</strong> {apt.prescription}
-                              </p>
+                              <div className="mb-2 p-2 bg-light rounded">
+                                <strong className="text-success">Prescription:</strong>
+                                <p className="mb-0 mt-1">{apt.prescription}</p>
+                              </div>
+                            )}
+                            {apt.rejected_reason && (
+                              <div className="mb-0 p-2 bg-danger bg-opacity-10 rounded">
+                                <strong className="text-danger">Rejection Reason:</strong>
+                                <p className="mb-0 mt-1">{apt.rejected_reason}</p>
+                              </div>
                             )}
                           </div>
-                          <Badge bg={
-                            apt.status === 'Confirmed' ? 'success' :
-                            apt.status === 'Pending' ? 'warning' :
-                            apt.status === 'Rejected' ? 'danger' : 'secondary'
-                          }>
-                            {apt.status}
-                          </Badge>
                         </div>
                       </ListGroup.Item>
                     ))}
+                  </ListGroup>
+                )}
+              </Tab.Pane>
+
+              {/* Prescriptions Tab - NEW */}
+              <Tab.Pane eventKey="prescriptions">
+                {appointments.filter(a => a.prescription).length === 0 ? (
+                  <div className="text-center py-4">
+                    <i className="bi bi-prescription2" style={{ fontSize: '3rem', color: '#94a3b8' }}></i>
+                    <p className="text-muted mt-3">No prescriptions yet</p>
+                  </div>
+                ) : (
+                  <ListGroup variant="flush">
+                    {appointments
+                      .filter(apt => apt.prescription)
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .map(apt => (
+                        <ListGroup.Item key={apt.id} className="prescription-item">
+                          <div className="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                              <h6 className="mb-1">
+                                <i className="bi bi-calendar3 me-2 text-primary"></i>
+                                {apt.date} • {apt.time}
+                              </h6>
+                              <Badge bg={
+                                apt.status === 'Confirmed' ? 'success' :
+                                apt.status === 'Cancelled' ? 'secondary' :
+                                apt.status === 'Rejected' ? 'danger' : 'secondary'
+                              } className="me-2">
+                                {apt.status}
+                              </Badge>
+                              {(apt.status === 'Cancelled' || apt.status === 'Rejected') && (
+                                <Badge bg="info">Prescription Saved</Badge>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {apt.diagnosis && (
+                            <div className="mb-3 p-3 bg-primary bg-opacity-10 rounded">
+                              <div className="d-flex align-items-center mb-2">
+                                <i className="bi bi-clipboard2-pulse me-2 text-primary"></i>
+                                <strong className="text-primary">Diagnosis</strong>
+                              </div>
+                              <p className="mb-0">{apt.diagnosis}</p>
+                            </div>
+                          )}
+                          
+                          <div className="p-3 bg-success bg-opacity-10 rounded">
+                            <div className="d-flex align-items-center mb-2">
+                              <i className="bi bi-prescription2 me-2 text-success"></i>
+                              <strong className="text-success">Prescription</strong>
+                            </div>
+                            <p className="mb-0 prescription-text">{apt.prescription}</p>
+                          </div>
+                          
+                          <div className="mt-2 text-muted small">
+                            <i className="bi bi-info-circle me-1"></i>
+                            Reason for visit: {apt.reason}
+                          </div>
+                        </ListGroup.Item>
+                      ))}
                   </ListGroup>
                 )}
               </Tab.Pane>

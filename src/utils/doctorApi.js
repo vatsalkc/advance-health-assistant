@@ -298,13 +298,14 @@ export const doctorStatsAPI = {
         .select('user_id', { count: 'exact' })
         .eq('doctor_id', doctorId),
       
-      // Today's appointments (excluding rejected ones)
+      // Today's appointments (excluding rejected and cancelled ones)
       supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('doctor_id', doctorId)
         .eq('date', todayDate)
-        .neq('status', 'Rejected'), // Exclude rejected appointments
+        .neq('status', 'Rejected')
+        .neq('status', 'Cancelled'), // Also exclude cancelled appointments
       
       // Pending appointments
       supabase
