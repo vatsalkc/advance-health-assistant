@@ -87,17 +87,21 @@ function DoctorAppointments() {
 
   const handleSavePrescription = async () => {
     try {
+      // Always save diagnosis and prescription, even if empty
+      // This ensures the doctor's notes are preserved
       await doctorAppointmentsAPI.addPrescription(
         selectedAppointment.id,
-        prescription,
-        diagnosis
+        prescription || '', // Save empty string if no prescription
+        diagnosis || '' // Save empty string if no diagnosis
       );
       setShowModal(false);
+      setPrescription('');
+      setDiagnosis('');
       fetchAppointments();
-      alert('Prescription saved successfully');
+      alert('Prescription and diagnosis saved successfully');
     } catch (err) {
       console.error('Error saving prescription:', err);
-      alert('Failed to save prescription');
+      alert('Failed to save prescription: ' + err.message);
     }
   };
 

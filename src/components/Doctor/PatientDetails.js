@@ -47,46 +47,96 @@ function PatientDetails({ patientId, onBack }) {
   const { patient, appointments, symptomChecks, medicalReports } = patientData;
 
   return (
-    <div>
-      <Button variant="outline-secondary" onClick={onBack} className="mb-3">
+    <div className="patient-details-container">
+      <Button variant="outline-primary" onClick={onBack} className="mb-4 back-button">
         <i className="bi bi-arrow-left me-2"></i>
         Back to Patients
       </Button>
 
-      {/* Patient Info Card */}
-      <Card className="mb-4">
-        <Card.Body>
-          <Row>
-            <Col md={8}>
-              <h3>{patient.name}</h3>
-              <p className="text-muted mb-3">Patient ID: {patient.id}</p>
+      {/* Patient Info Card - Enhanced */}
+      <Card className="patient-info-card mb-4">
+        <Card.Body className="p-4">
+          <Row className="align-items-center">
+            <Col md={2} className="text-center">
+              <div className="patient-avatar-large">
+                {patient.name.charAt(0).toUpperCase()}
+              </div>
+            </Col>
+            <Col md={6}>
+              <h2 className="patient-name mb-2">{patient.name}</h2>
+              <p className="patient-id text-muted mb-3">
+                <i className="bi bi-person-badge me-2"></i>
+                Patient ID: {patient.id.substring(0, 8)}...
+              </p>
               
-              <Row>
-                <Col md={6}>
-                  <p><strong>Email:</strong> {patient.email}</p>
-                  <p><strong>Phone:</strong> {patient.phone || 'N/A'}</p>
+              <Row className="patient-info-grid">
+                <Col md={6} className="mb-3">
+                  <div className="info-item">
+                    <i className="bi bi-envelope-fill text-primary me-2"></i>
+                    <div>
+                      <small className="text-muted d-block">Email</small>
+                      <strong>{patient.email}</strong>
+                    </div>
+                  </div>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <div className="info-item">
+                    <i className="bi bi-telephone-fill text-success me-2"></i>
+                    <div>
+                      <small className="text-muted d-block">Phone</small>
+                      <strong>{patient.phone || 'N/A'}</strong>
+                    </div>
+                  </div>
                 </Col>
                 <Col md={6}>
-                  <p><strong>Age:</strong> {patient.age || 'N/A'}</p>
-                  <p><strong>Gender:</strong> {patient.gender || 'N/A'}</p>
+                  <div className="info-item">
+                    <i className="bi bi-calendar-event text-info me-2"></i>
+                    <div>
+                      <small className="text-muted d-block">Age</small>
+                      <strong>{patient.age || 'N/A'} years</strong>
+                    </div>
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <div className="info-item">
+                    <i className="bi bi-gender-ambiguous text-warning me-2"></i>
+                    <div>
+                      <small className="text-muted d-block">Gender</small>
+                      <strong>{patient.gender || 'N/A'}</strong>
+                    </div>
+                  </div>
                 </Col>
               </Row>
             </Col>
-            <Col md={4} className="text-end">
-              <div className="mb-2">
-                <Badge bg="primary" className="me-2">
-                  {appointments.length} Appointments
-                </Badge>
-              </div>
-              <div className="mb-2">
-                <Badge bg="info" className="me-2">
-                  {symptomChecks.length} Symptom Checks
-                </Badge>
-              </div>
-              <div>
-                <Badge bg="success">
-                  {medicalReports.length} Reports
-                </Badge>
+            <Col md={4}>
+              <div className="patient-stats">
+                <div className="stat-item">
+                  <div className="stat-icon bg-primary">
+                    <i className="bi bi-calendar-check"></i>
+                  </div>
+                  <div className="stat-content">
+                    <h3>{appointments.length}</h3>
+                    <p>Appointments</p>
+                  </div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-icon bg-info">
+                    <i className="bi bi-heart-pulse"></i>
+                  </div>
+                  <div className="stat-content">
+                    <h3>{symptomChecks.length}</h3>
+                    <p>Symptom Checks</p>
+                  </div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-icon bg-success">
+                    <i className="bi bi-file-medical"></i>
+                  </div>
+                  <div className="stat-content">
+                    <h3>{medicalReports.length}</h3>
+                    <p>Reports</p>
+                  </div>
+                </div>
               </div>
             </Col>
           </Row>

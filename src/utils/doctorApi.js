@@ -83,12 +83,14 @@ export const doctorAppointmentsAPI = {
 
   async addPrescription(appointmentId, prescription, diagnosis = null) {
     console.log('[doctorAppointmentsAPI] Adding prescription to appointment:', appointmentId);
+    console.log('[doctorAppointmentsAPI] Diagnosis:', diagnosis);
+    console.log('[doctorAppointmentsAPI] Prescription:', prescription);
     
     const { data, error } = await supabase
       .from('appointments')
       .update({
-        prescription,
-        diagnosis,
+        prescription: prescription || '', // Always save, even if empty
+        diagnosis: diagnosis || '', // Always save, even if empty
         updated_at: new Date().toISOString()
       })
       .eq('id', appointmentId)
@@ -100,7 +102,7 @@ export const doctorAppointmentsAPI = {
       throw error;
     }
     
-    console.log('[doctorAppointmentsAPI] Prescription added successfully');
+    console.log('[doctorAppointmentsAPI] Prescription and diagnosis saved successfully');
     return { data: { appointment: data } };
   },
 
