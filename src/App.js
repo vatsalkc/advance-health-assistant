@@ -10,6 +10,7 @@ import SymptomChecker from './components/SymptomChecker/SymptomChecker';
 import DoctorRecommendation from './components/DoctorRecommendation/DoctorRecommendation';
 import Appointments from './components/Appointments/Appointments';
 import MedicineReminder from './components/MedicineReminder/MedicineReminder';
+import Reports from './components/Reports/Reports';
 import UserHistory from './components/UserHistory/UserHistory';
 import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
@@ -213,6 +214,9 @@ function App() {
                   <Nav.Link onClick={() => setCurrentView('medicineReminder')} active={currentView === 'medicineReminder'}>
                     <i className="bi bi-capsule me-2"></i>Medicines
                   </Nav.Link>
+                  <Nav.Link onClick={() => setCurrentView('reports')} active={currentView === 'reports'}>
+                    <i className="bi bi-file-medical me-2"></i>Reports
+                  </Nav.Link>
                   <Nav.Link onClick={() => setCurrentView('userHistory')} active={currentView === 'userHistory'}>
                     <i className="bi bi-clock-history me-2"></i>History
                   </Nav.Link>
@@ -309,6 +313,10 @@ function App() {
 
         {isAuthenticated && currentView === 'medicineReminder' && (
           <MedicineReminder user={user} />
+        )}
+
+        {isAuthenticated && currentView === 'reports' && (
+          <Reports />
         )}
 
         {isAuthenticated && currentView === 'userHistory' && (

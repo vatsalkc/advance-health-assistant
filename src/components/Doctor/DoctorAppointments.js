@@ -389,34 +389,52 @@ function DoctorAppointments() {
 
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Diagnosis</Form.Label>
+              <Form.Label className="fw-bold">
+                <i className="bi bi-clipboard2-pulse me-2 text-primary"></i>
+                Diagnosis
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
                 value={diagnosis}
                 onChange={(e) => setDiagnosis(e.target.value)}
-                placeholder="Enter diagnosis..."
+                placeholder="Enter your diagnosis for this patient..."
+                className="diagnosis-textarea"
               />
+              <Form.Text className="text-muted">
+                <i className="bi bi-info-circle me-1"></i>
+                Your diagnosis will be saved and visible to the patient
+              </Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Prescription</Form.Label>
+              <Form.Label className="fw-bold">
+                <i className="bi bi-prescription2 me-2 text-success"></i>
+                Prescription
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={5}
                 value={prescription}
                 onChange={(e) => setPrescription(e.target.value)}
-                placeholder="Enter prescription details..."
+                placeholder="Enter prescription details (medications, dosage, instructions)..."
+                className="prescription-textarea"
               />
+              <Form.Text className="text-muted">
+                <i className="bi bi-info-circle me-1"></i>
+                Prescription will be saved and accessible to the patient
+              </Form.Text>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
+            <i className="bi bi-x-circle me-2"></i>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleSavePrescription}>
-            Save Prescription
+            <i className="bi bi-check-circle me-2"></i>
+            Save Diagnosis & Prescription
           </Button>
         </Modal.Footer>
       </Modal>

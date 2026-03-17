@@ -34,53 +34,102 @@ function DoctorPatients({ onViewPatient }) {
   }
 
   return (
-    <Card>
-      <Card.Header>
-        <h4>My Patients</h4>
-        <p className="text-muted mb-0">Total: {patients.length} patients</p>
+    <Card className="doctor-patients-card">
+      <Card.Header className="doctor-patients-header">
+        <div>
+          <h4 className="mb-1">
+            <i className="bi bi-people-fill me-2 text-primary"></i>
+            My Patients
+          </h4>
+          <p className="text-muted mb-0">
+            <i className="bi bi-person-badge me-1"></i>
+            Total: {patients.length} patients
+          </p>
+        </div>
       </Card.Header>
       <Card.Body>
         {patients.length === 0 ? (
           <div className="text-center py-5">
-            <p className="text-muted">No patients yet</p>
+            <i className="bi bi-people" style={{ fontSize: '4rem', color: '#94a3b8' }}></i>
+            <p className="text-muted mt-3 mb-0">No patients yet</p>
+            <small className="text-muted">Patients will appear here after appointments</small>
           </div>
         ) : (
           <div className="table-responsive">
-            <Table striped bordered hover>
+            <Table hover className="patients-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Contact</th>
-                  <th>Age</th>
-                  <th>Gender</th>
-                  <th>Actions</th>
+                  <th>
+                    <i className="bi bi-person me-2"></i>
+                    Patient
+                  </th>
+                  <th>
+                    <i className="bi bi-envelope me-2"></i>
+                    Contact
+                  </th>
+                  <th>
+                    <i className="bi bi-calendar-event me-2"></i>
+                    Age
+                  </th>
+                  <th>
+                    <i className="bi bi-gender-ambiguous me-2"></i>
+                    Gender
+                  </th>
+                  <th className="text-center">
+                    <i className="bi bi-gear me-2"></i>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {patients.map(patient => (
-                  <tr key={patient.id}>
+                  <tr key={patient.id} className="patient-row">
                     <td>
-                      <strong>{patient.name}</strong>
+                      <div className="d-flex align-items-center gap-2">
+                        <div className="patient-avatar-small">
+                          {patient.name.charAt(0).toUpperCase()}
+                        </div>
+                        <strong className="patient-name-text">{patient.name}</strong>
+                      </div>
                     </td>
                     <td>
-                      {patient.email}
-                      <br />
-                      <small className="text-muted">{patient.phone}</small>
+                      <div className="contact-info">
+                        <div className="mb-1">
+                          <i className="bi bi-envelope-fill text-primary me-2"></i>
+                          {patient.email}
+                        </div>
+                        <div>
+                          <i className="bi bi-telephone-fill text-success me-2"></i>
+                          <small className="text-muted">{patient.phone || 'N/A'}</small>
+                        </div>
+                      </div>
                     </td>
-                    <td>{patient.age || 'N/A'}</td>
+                    <td>
+                      <Badge bg="info" className="age-badge">
+                        {patient.age || 'N/A'} {patient.age ? 'yrs' : ''}
+                      </Badge>
+                    </td>
                     <td>
                       {patient.gender ? (
-                        <Badge bg="info">{patient.gender}</Badge>
+                        <Badge 
+                          bg={patient.gender.toLowerCase() === 'male' ? 'primary' : 'danger'}
+                          className="gender-badge"
+                        >
+                          <i className={`bi bi-gender-${patient.gender.toLowerCase() === 'male' ? 'male' : 'female'} me-1`}></i>
+                          {patient.gender}
+                        </Badge>
                       ) : (
-                        'N/A'
+                        <span className="text-muted">N/A</span>
                       )}
                     </td>
-                    <td>
+                    <td className="text-center">
                       <Button
                         size="sm"
                         variant="primary"
+                        className="view-details-btn"
                         onClick={() => onViewPatient(patient.id)}
                       >
+                        <i className="bi bi-eye me-2"></i>
                         View Details
                       </Button>
                     </td>

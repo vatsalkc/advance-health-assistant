@@ -216,23 +216,46 @@ export const doctorPatientsAPI = {
 
     if (symptomError) throw symptomError;
 
-    // Get patient's medical reports from this doctor
+    // Get patient's medical reports (both doctor-created and patient-uploaded)
     const { data: reports, error: reportsError } = await supabase
       .from('medical_reports')
-      .select('*')
+      .select(`
+        *,
+        doctors:doctor_id (
+          name,
+          specialization
+        )
+      `)
       .eq('patient_id', patientId)
-      .eq('doctor_id', doctorId)
       .order('report_date', { ascending: false });
 
     // Reports table might not exist yet, so don't throw error
     const medicalReports = reportsError ? [] : reports;
+
+    // Get all patient diagnoses from all doctors (for comprehensive view)
+    const { data: allDiagnoses, error: diagnosesError } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        doctors:doctor_id (
+          name,
+          specialization
+        )
+      `)
+      .eq('user_id', patientId)
+      .not('diagnosis', 'is', null)
+      .neq('diagnosis', '')
+      .order('date', { ascending: false });
+
+    const patientDiagnoses = diagnosesError ? [] : allDiagnoses;
 
     return {
       data: {
         patient,
         appointments,
         symptomChecks,
-        medicalReports
+        medicalReports,
+        patientDiagnoses // All diagnoses from all doctors
       }
     };
   }
