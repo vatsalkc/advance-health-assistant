@@ -5718,3 +5718,47 @@ button.btn-lg {
     padding: 6px 10px;
   }
 }
+
+
+/* Patient Info Contact Styling */
+.patient-info-contact {
+  font-size: 13px;
+  color: var(--text-secondary) !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.patient-info-contact i {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Appointments Management Card */
+.appointments-management-card {
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.appointments-management-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 32px;
+  border: none;
+}
+
+.appointments-management-header h4 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.appointments-count-badge {
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+}

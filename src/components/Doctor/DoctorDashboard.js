@@ -40,7 +40,16 @@ function DoctorDashboard({ doctor, onNavigate }) {
       
       // Calculate rejected and modified counts
       const rejectedCount = allAppointments.filter(apt => apt.status === 'Rejected').length;
-      const today = new Date().toISOString().split('T')[0];
+      
+      // Get local date in YYYY-MM-DD format (not UTC)
+      const todayObj = new Date();
+      const year = todayObj.getFullYear();
+      const month = String(todayObj.getMonth() + 1).padStart(2, '0');
+      const day = String(todayObj.getDate()).padStart(2, '0');
+      const today = `${year}-${month}-${day}`;
+      
+      console.log('[DoctorDashboard] Today date for filtering:', today);
+      
       const modifiedCount = allAppointments.filter(apt => {
         const createdDate = new Date(apt.created_at).toISOString().split('T')[0];
         const updatedDate = new Date(apt.updated_at).toISOString().split('T')[0];
@@ -58,10 +67,24 @@ function DoctorDashboard({ doctor, onNavigate }) {
       console.log('[DoctorDashboard] Pending appointments:', pendingResponse.data.appointments);
       setPendingAppointments(pendingResponse.data.appointments || []);
 
-      // Get today's appointments (all statuses)
-      const todayAppts = allAppointments.filter(apt => apt.date === today);
-      console.log('[DoctorDashboard] Today appointments:', todayAppts);
+      // Get today's appointments (all statuses) and sort by time
+      const todayAppts = allAppointments
+        .filter(apt => apt.date === today)
+        .sort((a, b) => {
+          // Sort by time (ascending)
+          const timeA = a.time || '00:00:00';
+          const timeB = b.time || '00:00:00';
+          return timeA.localeCompare(timeB);
+        });
+      console.log('[DoctorDashboard] Today appointments (sorted by time):', todayAppts);
       setTodayAppointments(todayAppts);
+      
+      // Update stats with correct today's count (excluding rejected)
+      const todayActiveCount = todayAppts.filter(apt => apt.status !== 'Rejected').length;
+      setStats(prevStats => ({
+        ...prevStats,
+        todayAppointments: todayActiveCount
+      }));
 
       // Fetch upcoming confirmed appointments (excluding today)
       const confirmedResponse = await doctorAppointmentsAPI.getAll('Confirmed');

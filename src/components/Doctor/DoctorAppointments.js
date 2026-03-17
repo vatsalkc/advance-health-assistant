@@ -192,9 +192,20 @@ function DoctorAppointments() {
 
   return (
     <div>
-      <Card>
-        <Card.Header className="doctor-appointments-header">
-          <h4>Appointment Management</h4>
+      <Card className="appointments-management-card">
+        <Card.Header className="appointments-management-header">
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 className="mb-0">
+                <i className="bi bi-calendar-check-fill me-2"></i>
+                Appointment Management
+              </h4>
+              <small className="text-white-50">Manage all your patient appointments</small>
+            </div>
+            <Badge bg="light" text="dark" className="appointments-count-badge">
+              {appointments.length} Total
+            </Badge>
+          </div>
         </Card.Header>
         <Card.Body>
           {/* Filter Tabs */}
@@ -263,12 +274,14 @@ function DoctorAppointments() {
                             <div className="patient-info-name">
                               {apt.patient_name || apt.users?.name || 'Unknown Patient'}
                             </div>
-                            <div className="patient-info-email">
-                              {apt.users?.email || 'No email'}
-                            </div>
                             {(apt.patient_phone || apt.users?.phone) && (
-                              <div className="patient-info-email">
-                                📞 {apt.patient_phone || apt.users?.phone}
+                              <div className="patient-info-contact">
+                                <i className="bi bi-telephone-fill"></i> {apt.patient_phone || apt.users?.phone}
+                              </div>
+                            )}
+                            {apt.users?.email && (
+                              <div className="patient-info-contact">
+                                <i className="bi bi-envelope-fill"></i> {apt.users.email}
                               </div>
                             )}
                           </div>

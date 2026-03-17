@@ -282,7 +282,14 @@ export const doctorStatsAPI = {
   async get() {
     const doctorId = await getCurrentDoctorId();
     
-    const today = new Date().toISOString().split('T')[0];
+    // Get local date in YYYY-MM-DD format (not UTC)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayDate = `${year}-${month}-${day}`;
+    
+    console.log('[doctorStatsAPI] Today date:', todayDate);
 
     const [totalPatientsResult, todayAppointmentsResult, pendingAppointmentsResult] = await Promise.all([
       // Total unique patients
@@ -291,12 +298,13 @@ export const doctorStatsAPI = {
         .select('user_id', { count: 'exact' })
         .eq('doctor_id', doctorId),
       
-      // Today's appointments
+      // Today's appointments (excluding rejected ones)
       supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('doctor_id', doctorId)
-        .eq('date', today),
+        .eq('date', todayDate)
+        .neq('status', 'Rejected'), // Exclude rejected appointments
       
       // Pending appointments
       supabase
@@ -305,6 +313,9 @@ export const doctorStatsAPI = {
         .eq('doctor_id', doctorId)
         .eq('status', 'Pending')
     ]);
+
+    console.log('[doctorStatsAPI] Today appointments count (excluding rejected):', todayAppointmentsResult.count);
+    console.log('[doctorStatsAPI] Pending appointments count:', pendingAppointmentsResult.count);
 
     // Count unique patients
     const uniquePatients = new Set(totalPatientsResult.data?.map(a => a.user_id) || []);
