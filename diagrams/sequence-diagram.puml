@@ -1,4 +1,4 @@
-@startuml Health Assistant Sequence Diagram
+@startuml Health Assistant Core Activities Sequence Diagram
 !theme plain
 skinparam participant {
   BackgroundColor #E8F5E8
@@ -9,180 +9,49 @@ skinparam actor {
   BorderColor #1976D2
 }
 
-title Health Assistant System - Sequence Diagram (Complete Patient-Doctor Interaction)
+title Health Assistant System - Core Activities Sequence Diagram
 
 actor Patient as P
-participant "Web App" as WA
-participant "Auth Service" as AS
-participant "File Storage" as FS
-participant "Database" as DB
-participant "AI Chatbot" as AI
 actor Doctor as D
-participant "Notification Service" as NS
+participant System as S
+participant Database as DB
+participant AI as AI
 
-== Patient Registration & Login ==
-P -> WA: Open application
-WA -> AS: Check authentication
-AS -> WA: Not authenticated
-WA -> P: Show login form
+== Activity 1: Patient Registration ==
+P -> S: Register with details
+S -> DB: Save patient data
+DB -> S: Registration successful
+S -> P: Account created
 
-P -> WA: Enter credentials
-WA -> AS: authenticate(email, password)
-AS -> DB: Verify user credentials
-DB -> AS: User data
-AS -> WA: Authentication token
-WA -> P: Redirect to dashboard
+== Activity 2: Patient Upload Report ==
+P -> S: Login
+S -> P: Dashboard
+P -> S: Upload medical report
+S -> DB: Store report
+DB -> S: Report saved
+S -> P: Upload successful
 
-== Patient Uploads Medical Report ==
-P -> WA: Navigate to Reports
-WA -> P: Show upload form
+== Activity 3: AI Symptom Check ==
+P -> S: Enter symptoms
+S -> AI: Analyze symptoms
+AI -> S: Health recommendations
+S -> P: Show AI advice
 
-P -> WA: Fill report details + select files
-WA -> WA: Validate form data
-WA -> FS: Upload files
-FS -> FS: Store files securely
-FS -> WA: File URLs
+== Activity 4: Doctor Review Patient ==
+D -> S: Login as doctor
+S -> DB: Get patient list
+DB -> S: Patient data
+S -> D: Show patients
+D -> S: Select patient
+S -> DB: Get patient reports
+DB -> S: Report details
+S -> D: Display patient info
 
-WA -> DB: Save report metadata
-activate DB
-DB -> DB: Insert medical_report record
-DB -> WA: Report ID
-deactivate DB
-
-WA -> P: Show success message
-WA -> P: Display in "My Reports"
-
-== Patient Uses AI Chatbot ==
-P -> WA: Click AI chatbot
-WA -> AI: Initialize chatbot session
-AI -> P: Show welcome message
-
-P -> AI: "I have headache and fever"
-AI -> AI: Process health query
-AI -> AI: Generate response with Gemini API
-AI -> P: Health advice + recommend doctor visit
-
-== Doctor Reviews Patient Report ==
-D -> WA: Login to doctor portal
-WA -> AS: Authenticate doctor
-AS -> WA: Doctor session
-
-D -> WA: View patient list
-WA -> DB: Fetch patients for doctor
-DB -> WA: Patient list
-WA -> D: Display patients
-
-D -> WA: Select patient
-WA -> DB: Fetch patient details
-activate DB
-DB -> DB: Get patient info
-DB -> DB: Get medical reports
-DB -> DB: Get appointment history
-DB -> WA: Complete patient data
-deactivate DB
-
-WA -> D: Show patient details with reports
-
-D -> WA: Click on medical report
-WA -> DB: Fetch report details
-DB -> WA: Report metadata + file URLs
-WA -> FS: Request file access
-FS -> WA: Secure file URLs
-WA -> D: Display report with downloadable files
-
-== Doctor Creates Diagnosis ==
-D -> WA: Click "Create Diagnosis"
-WA -> D: Show diagnosis form
-
-D -> WA: Enter diagnosis details
-WA -> DB: Save diagnosis
-activate DB
-DB -> DB: Insert diagnosis record
-DB -> DB: Link to patient
-DB -> DB: Update patient history
-DB -> WA: Diagnosis saved
-deactivate DB
-
-WA -> NS: Send notification to patient
-NS -> P: "New diagnosis available"
-WA -> D: Show success message
-
-== Patient Views Diagnosis ==
-P -> WA: Check notifications
-WA -> DB: Fetch latest diagnoses
-DB -> WA: Diagnosis data
-WA -> P: Display new diagnosis
-
-== Patient Deletes Report ==
-P -> WA: Go to "My Reports"
-WA -> DB: Fetch patient reports
-DB -> WA: Report list
-WA -> P: Show reports with delete buttons
-
-P -> WA: Click delete on report
-WA -> P: Show confirmation dialog
-P -> WA: Confirm deletion
-
-WA -> FS: Delete associated files
-activate FS
-FS -> FS: Remove files from storage
-FS -> WA: Files deleted
-deactivate FS
-
-WA -> DB: Delete report record
-activate DB
-DB -> DB: Remove from medical_reports
-DB -> WA: Record deleted
-deactivate DB
-
-WA -> P: Show success message
-WA -> P: Update reports list
-
-== Error Handling Scenarios ==
-
-alt File Upload Fails
-  P -> WA: Upload large file
-  WA -> FS: Attempt upload
-  FS -> WA: Error: File too large
-  WA -> P: Show error message
-  P -> WA: Select smaller file
-end
-
-alt AI Chatbot API Error
-  P -> AI: Send message
-  AI -> AI: Call Gemini API
-  AI -> AI: API Error (rate limit/key issue)
-  AI -> P: "Service temporarily unavailable"
-end
-
-alt Database Connection Error
-  D -> WA: Request patient data
-  WA -> DB: Query patient info
-  DB -> WA: Connection timeout
-  WA -> D: "Unable to load data, please try again"
-end
-
-== Security & Authentication ==
-
-note over AS
-  All API calls include
-  authentication tokens.
-  Expired tokens trigger
-  automatic re-authentication.
-end note
-
-note over FS
-  File access is controlled
-  by RLS policies. Only
-  authorized users can
-  access patient files.
-end note
-
-note over DB
-  Database operations use
-  Row Level Security (RLS)
-  to ensure data isolation
-  between patients.
-end note
+== Activity 5: Doctor Create Diagnosis ==
+D -> S: Create diagnosis
+S -> DB: Save diagnosis
+DB -> S: Diagnosis saved
+S -> D: Success message
+S -> P: Notify patient
 
 @enduml

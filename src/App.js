@@ -191,69 +191,113 @@ function App() {
       
       <Navbar expand="lg" className="navbar-custom">
         <Container>
-          <Navbar.Brand href="#home">
-            <i className="bi bi-heart-pulse-fill"></i>
+          <Navbar.Brand href="#home" className="fw-bold">
+            <i className="bi bi-heart-pulse-fill me-2"></i>
             Health Assistant
           </Navbar.Brand>
+          
           {isAuthenticated && (
             <>
               <Navbar.Toggle aria-controls="basic-navbar-nav">
                 <i className="bi bi-list" style={{ fontSize: '1.5rem', color: 'var(--text-primary)' }}></i>
               </Navbar.Toggle>
+              
               <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto ms-lg-4">
-                  <Nav.Link onClick={() => setCurrentView('dashboard')} active={currentView === 'dashboard'}>
-                    <i className="bi bi-grid-fill me-2"></i>Dashboard
+                <Nav className="me-auto ms-lg-3">
+                  <Nav.Link 
+                    onClick={() => setCurrentView('dashboard')} 
+                    active={currentView === 'dashboard'}
+                    className="nav-item-custom"
+                  >
+                    <i className="bi bi-grid-fill me-2"></i>
+                    <span>Dashboard</span>
                   </Nav.Link>
-                  <Nav.Link onClick={() => setCurrentView('symptomChecker')} active={currentView === 'symptomChecker'}>
-                    <i className="bi bi-activity me-2"></i>Symptom Checker
+                  
+                  <Nav.Link 
+                    onClick={() => setCurrentView('symptomChecker')} 
+                    active={currentView === 'symptomChecker'}
+                    className="nav-item-custom"
+                  >
+                    <i className="bi bi-activity me-2"></i>
+                    <span>Symptom Checker</span>
                   </Nav.Link>
-                  <Nav.Link onClick={() => setCurrentView('appointments')} active={currentView === 'appointments'}>
-                    <i className="bi bi-calendar-check me-2"></i>Appointments
+                  
+                  <Nav.Link 
+                    onClick={() => setCurrentView('appointments')} 
+                    active={currentView === 'appointments'}
+                    className="nav-item-custom"
+                  >
+                    <i className="bi bi-calendar-check me-2"></i>
+                    <span>Appointments</span>
                   </Nav.Link>
-                  <Nav.Link onClick={() => setCurrentView('medicineReminder')} active={currentView === 'medicineReminder'}>
-                    <i className="bi bi-capsule me-2"></i>Medicines
+                  
+                  <Nav.Link 
+                    onClick={() => setCurrentView('medicineReminder')} 
+                    active={currentView === 'medicineReminder'}
+                    className="nav-item-custom"
+                  >
+                    <i className="bi bi-capsule me-2"></i>
+                    <span>Medicines</span>
                   </Nav.Link>
-                  <Nav.Link onClick={() => setCurrentView('reports')} active={currentView === 'reports'}>
-                    <i className="bi bi-file-medical me-2"></i>Reports
+                  
+                  <Nav.Link 
+                    onClick={() => setCurrentView('reports')} 
+                    active={currentView === 'reports'}
+                    className="nav-item-custom"
+                  >
+                    <i className="bi bi-file-medical me-2"></i>
+                    <span>Reports</span>
                   </Nav.Link>
-                  <Nav.Link onClick={() => setCurrentView('userHistory')} active={currentView === 'userHistory'}>
-                    <i className="bi bi-clock-history me-2"></i>History
+                  
+                  <Nav.Link 
+                    onClick={() => setCurrentView('userHistory')} 
+                    active={currentView === 'userHistory'}
+                    className="nav-item-custom"
+                  >
+                    <i className="bi bi-clock-history me-2"></i>
+                    <span>History</span>
                   </Nav.Link>
                 </Nav>
-                <Nav className="align-items-lg-center">
+                
+                <Nav className="navbar-actions">
                   <Button 
                     variant="link" 
-                    className="nav-theme-toggle"
+                    className="nav-action-btn"
                     onClick={() => setDarkMode(!darkMode)}
-                    title={darkMode ? 'Light Mode' : 'Dark Mode'}
+                    title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                   >
                     <i className={`bi bi-${darkMode ? 'sun' : 'moon'}-fill`}></i>
                   </Button>
+                  
                   <Button 
                     variant="link" 
-                    className="nav-ai-chatbot"
+                    className="nav-action-btn"
                     onClick={() => setChatbotOpen(true)}
                     title="AI Health Assistant"
                   >
                     <i className="bi bi-robot"></i>
                   </Button>
+                  
+                  <div className="navbar-divider d-none d-lg-block"></div>
+                  
                   <Button
                     variant="link"
                     className="nav-profile-btn"
                     onClick={() => setCurrentView('profile')}
                     title="View Profile"
                   >
-                    <i className="bi bi-person-circle me-2"></i>
-                    <span>{user?.name}</span>
+                    <i className="bi bi-person-circle me-1"></i>
+                    <span className="d-none d-md-inline">{user?.name}</span>
                   </Button>
+                  
                   <Button
                     variant="outline-primary"
                     size="sm"
                     className="nav-logout-btn"
                     onClick={handleLogout}
                   >
-                    <i className="bi bi-box-arrow-right me-1"></i>Logout
+                    <i className="bi bi-box-arrow-right me-1"></i>
+                    <span className="d-none d-sm-inline">Logout</span>
                   </Button>
                 </Nav>
               </Navbar.Collapse>

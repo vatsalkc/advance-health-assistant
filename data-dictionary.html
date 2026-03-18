@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Assistant System - Data Dictionary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: white;
+            color: black;
+        }
+        h1, h2, h3 {
+            border-bottom: 1px solid black;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .table-container {
+            margin: 20px 0;
+        }
+        .enum-list {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .section {
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Health Assistant System - Data Dictionary</h1>
+    
+    <h2>Overview</h2>
+    <p>This document defines all data entities, attributes, and relationships in the Health Assistant System.</p>
+    <div class="section">
+        <h2>Core Entities</h2>
+        
+        <h3>1. USERS Table</h3>
+        <p><strong>Purpose:</strong> Stores basic information for all system users</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Length</th>
+                        <th>Constraints</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>PRIMARY KEY, NOT NULL</td>
+                        <td>Unique identifier for user</td>
+                    </tr>
+                    <tr>
+                        <td>email</td>
+                        <td>VARCHAR</td>
+                        <td>255</td>
+                        <td>UNIQUE, NOT NULL</td>
+                        <td>User's email address</td>
+                    </tr>
+                    <tr>
+                        <td>password</td>
+                        <td>VARCHAR</td>
+                        <td>255</td>
+                        <td>NOT NULL</td>
+                        <td>Encrypted password</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>VARCHAR</td>
+                        <td>100</td>
+                        <td>NOT NULL</td>
+                        <td>Full name of user</td>
+                    </tr>
+                    <tr>
+                        <td>phone</td>
+                        <td>VARCHAR</td>
+                        <td>20</td>
+                        <td>-</td>
+                        <td>Contact phone number</td>
+                    </tr>
+                    <tr>
+                        <td>user_type</td>
+                        <td>ENUM</td>
+                        <td>-</td>
+                        <td>NOT NULL</td>
+                        <td>'patient', 'doctor', 'admin'</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td>TIMESTAMP</td>
+                        <td>-</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Account creation date</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td>TIMESTAMP</td>
+                        <td>-</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Last update timestamp</td>
+                    </tr>
+                    <tr>
+                        <td>is_active</td>
+                        <td>BOOLEAN</td>
+                        <td>-</td>
+                        <td>DEFAULT TRUE</td>
+                        <td>Account status</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="section">
+        <h3>2. PATIENTS Table</h3>
+        <p><strong>Purpose:</strong> Extended information specific to patients</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Length</th>
+                        <th>Constraints</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>PRIMARY KEY, NOT NULL</td>
+                        <td>Patient unique identifier</td>
+                    </tr>
+                    <tr>
+                        <td>user_id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>FOREIGN KEY, NOT NULL</td>
+                        <td>Reference to users.id</td>
+                    </tr>
+                    <tr>
+                        <td>date_of_birth</td>
+                        <td>DATE</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Patient's birth date</td>
+                    </tr>
+                    <tr>
+                        <td>gender</td>
+                        <td>ENUM</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>'male', 'female', 'other'</td>
+                    </tr>
+                    <tr>
+                        <td>address</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Home address</td>
+                    </tr>
+                    <tr>
+                        <td>emergency_contact</td>
+                        <td>VARCHAR</td>
+                        <td>100</td>
+                        <td>-</td>
+                        <td>Emergency contact person</td>
+                    </tr>
+                    <tr>
+                        <td>emergency_phone</td>
+                        <td>VARCHAR</td>
+                        <td>20</td>
+                        <td>-</td>
+                        <td>Emergency contact number</td>
+                    </tr>
+                    <tr>
+                        <td>blood_group</td>
+                        <td>VARCHAR</td>
+                        <td>5</td>
+                        <td>-</td>
+                        <td>Blood type (A+, B-, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>allergies</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Known allergies</td>
+                    </tr>
+                    <tr>
+                        <td>medical_history</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Previous medical conditions</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="section">
+        <h3>3. DOCTORS Table</h3>
+        <p><strong>Purpose:</strong> Extended information specific to doctors</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Length</th>
+                        <th>Constraints</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>PRIMARY KEY, NOT NULL</td>
+                        <td>Doctor unique identifier</td>
+                    </tr>
+                    <tr>
+                        <td>user_id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>FOREIGN KEY, NOT NULL</td>
+                        <td>Reference to users.id</td>
+                    </tr>
+                    <tr>
+                        <td>specialization</td>
+                        <td>VARCHAR</td>
+                        <td>100</td>
+                        <td>NOT NULL</td>
+                        <td>Medical specialization</td>
+                    </tr>
+                    <tr>
+                        <td>license_number</td>
+                        <td>VARCHAR</td>
+                        <td>50</td>
+                        <td>UNIQUE, NOT NULL</td>
+                        <td>Medical license number</td>
+                    </tr>
+                    <tr>
+                        <td>qualification</td>
+                        <td>VARCHAR</td>
+                        <td>200</td>
+                        <td>-</td>
+                        <td>Educational qualifications</td>
+                    </tr>
+                    <tr>
+                        <td>experience_years</td>
+                        <td>INTEGER</td>
+                        <td>-</td>
+                        <td>DEFAULT 0</td>
+                        <td>Years of experience</td>
+                    </tr>
+                    <tr>
+                        <td>consultation_fee</td>
+                        <td>DECIMAL</td>
+                        <td>10,2</td>
+                        <td>-</td>
+                        <td>Consultation charges</td>
+                    </tr>
+                    <tr>
+                        <td>availability</td>
+                        <td>JSON</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Available time slots</td>
+                    </tr>
+                    <tr>
+                        <td>hospital_affiliation</td>
+                        <td>VARCHAR</td>
+                        <td>200</td>
+                        <td>-</td>
+                        <td>Associated hospital/clinic</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="section">
+        <h3>4. MEDICAL_REPORTS Table</h3>
+        <p><strong>Purpose:</strong> Stores patient medical reports and documents</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Length</th>
+                        <th>Constraints</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>PRIMARY KEY, NOT NULL</td>
+                        <td>Report unique identifier</td>
+                    </tr>
+                    <tr>
+                        <td>patient_id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>FOREIGN KEY, NOT NULL</td>
+                        <td>Reference to patients.id</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>FOREIGN KEY</td>
+                        <td>Reviewing doctor (nullable)</td>
+                    </tr>
+                    <tr>
+                        <td>report_title</td>
+                        <td>VARCHAR</td>
+                        <td>200</td>
+                        <td>NOT NULL</td>
+                        <td>Title of the report</td>
+                    </tr>
+                    <tr>
+                        <td>report_type</td>
+                        <td>ENUM</td>
+                        <td>-</td>
+                        <td>NOT NULL</td>
+                        <td>'Blood Test', 'X-Ray', 'MRI', etc.</td>
+                    </tr>
+                    <tr>
+                        <td>report_content</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Report description/notes</td>
+                    </tr>
+                    <tr>
+                        <td>report_date</td>
+                        <td>DATE</td>
+                        <td>-</td>
+                        <td>NOT NULL</td>
+                        <td>Date of medical test/report</td>
+                    </tr>
+                    <tr>
+                        <td>attachments</td>
+                        <td>JSON</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Array of file URLs</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>ENUM</td>
+                        <td>-</td>
+                        <td>DEFAULT 'uploaded'</td>
+                        <td>'uploaded', 'reviewed', 'archived'</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td>TIMESTAMP</td>
+                        <td>-</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Upload timestamp</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td>TIMESTAMP</td>
+                        <td>-</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Last modification</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="section">
+        <h3>5. DIAGNOSES Table</h3>
+        <p><strong>Purpose:</strong> Stores doctor diagnoses for patients</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Data Type</th>
+                        <th>Length</th>
+                        <th>Constraints</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>PRIMARY KEY, NOT NULL</td>
+                        <td>Diagnosis unique identifier</td>
+                    </tr>
+                    <tr>
+                        <td>patient_id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>FOREIGN KEY, NOT NULL</td>
+                        <td>Reference to patients.id</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_id</td>
+                        <td>UUID</td>
+                        <td>-</td>
+                        <td>FOREIGN KEY, NOT NULL</td>
+                        <td>Reference to doctors.id</td>
+                    </tr>
+                    <tr>
+                        <td>diagnosis_text</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>NOT NULL</td>
+                        <td>Detailed diagnosis</td>
+                    </tr>
+                    <tr>
+                        <td>symptoms</td>
+                        <td>JSON</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Array of reported symptoms</td>
+                    </tr>
+                    <tr>
+                        <td>recommendations</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Doctor's recommendations</td>
+                    </tr>
+                    <tr>
+                        <td>prescription</td>
+                        <td>TEXT</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Prescribed medications</td>
+                    </tr>
+                    <tr>
+                        <td>follow_up_date</td>
+                        <td>DATE</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>Next appointment date</td>
+                    </tr>
+                    <tr>
+                        <td>severity</td>
+                        <td>ENUM</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>'low', 'medium', 'high', 'critical'</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td>TIMESTAMP</td>
+                        <td>-</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Diagnosis creation date</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="section">
+        <h2>Relationships Summary</h2>
+        
+        <h3>One-to-One Relationships</h3>
+        <ul>
+            <li>users ↔ patients (via user_id)</li>
+            <li>users ↔ doctors (via user_id)</li>
+        </ul>
+        
+        <h3>One-to-Many Relationships</h3>
+        <ul>
+            <li>patients → medical_reports (one patient, many reports)</li>
+            <li>doctors → medical_reports (one doctor reviews many reports)</li>
+            <li>patients → diagnoses (one patient, many diagnoses)</li>
+            <li>doctors → diagnoses (one doctor creates many diagnoses)</li>
+        </ul>
+        
+        <h3>Many-to-Many Relationships</h3>
+        <ul>
+            <li>patients ↔ doctors (through appointments and diagnoses)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Data Types Reference</h2>
+        
+        <h3>Standard Types</h3>
+        <ul>
+            <li><strong>UUID:</strong> Universally Unique Identifier (36 characters)</li>
+            <li><strong>VARCHAR(n):</strong> Variable character string, max n characters</li>
+            <li><strong>TEXT:</strong> Large text field, unlimited length</li>
+            <li><strong>INTEGER:</strong> Whole numbers (-2,147,483,648 to 2,147,483,647)</li>
+            <li><strong>DECIMAL(p,s):</strong> Fixed-point number (p=precision, s=scale)</li>
+            <li><strong>BOOLEAN:</strong> True/false values</li>
+            <li><strong>DATE:</strong> Date only (YYYY-MM-DD)</li>
+            <li><strong>TIMESTAMP:</strong> Date and time with timezone</li>
+            <li><strong>JSON:</strong> JavaScript Object Notation data</li>
+        </ul>
+    </div>
+    <div class="section">
+        <h3>Custom ENUM Values</h3>
+        
+        <h4>user_type</h4>
+        <ul class="enum-list">
+            <li>'patient' - Regular patient user</li>
+            <li>'doctor' - Medical professional</li>
+            <li>'admin' - System administrator</li>
+        </ul>
+        
+        <h4>gender</h4>
+        <ul class="enum-list">
+            <li>'male' - Male</li>
+            <li>'female' - Female</li>
+            <li>'other' - Other/prefer not to say</li>
+        </ul>
+        
+        <h4>report_type</h4>
+        <ul class="enum-list">
+            <li>'Blood Test' - Laboratory blood analysis</li>
+            <li>'X-Ray' - X-ray imaging</li>
+            <li>'MRI' - Magnetic Resonance Imaging</li>
+            <li>'CT Scan' - Computed Tomography</li>
+            <li>'Ultrasound' - Ultrasound imaging</li>
+            <li>'ECG' - Electrocardiogram</li>
+            <li>'Prescription' - Medication prescription</li>
+            <li>'Discharge Summary' - Hospital discharge document</li>
+            <li>'Other' - Other medical documents</li>
+        </ul>
+        
+        <h4>status (reports)</h4>
+        <ul class="enum-list">
+            <li>'uploaded' - Recently uploaded, awaiting review</li>
+            <li>'reviewed' - Reviewed by doctor</li>
+            <li>'archived' - Archived for historical reference</li>
+        </ul>
+        
+        <h4>severity</h4>
+        <ul class="enum-list">
+            <li>'low' - Minor condition</li>
+            <li>'medium' - Moderate condition requiring attention</li>
+            <li>'high' - Serious condition requiring prompt care</li>
+            <li>'critical' - Emergency condition</li>
+        </ul>
+    </div>
+    <div class="section">
+        <h2>Security Considerations</h2>
+        
+        <h3>Data Protection</h3>
+        <ul>
+            <li>All passwords are encrypted using bcrypt</li>
+            <li>Personal health information (PHI) is encrypted at rest</li>
+            <li>File attachments are stored with access controls</li>
+            <li>Row Level Security (RLS) ensures data isolation</li>
+        </ul>
+        
+        <h3>Access Control</h3>
+        <ul>
+            <li>Patients can only access their own data</li>
+            <li>Doctors can only access assigned patients</li>
+            <li>Admins have system-wide read access</li>
+            <li>AI sessions are user-specific</li>
+        </ul>
+        
+        <h3>Audit Trail</h3>
+        <ul>
+            <li>All data modifications are timestamped</li>
+            <li>User actions are logged for compliance</li>
+            <li>File access is tracked and monitored</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Performance Optimization</h2>
+        
+        <h3>Indexes</h3>
+        <ul>
+            <li>Primary keys on all tables</li>
+            <li>Foreign key indexes for joins</li>
+            <li>Composite indexes on frequently queried columns</li>
+            <li>Full-text search indexes on text fields</li>
+        </ul>
+        
+        <h3>Partitioning</h3>
+        <ul>
+            <li>Large tables partitioned by date</li>
+            <li>Historical data archived periodically</li>
+            <li>File storage optimized for quick retrieval</li>
+        </ul>
+    </div>
+
+    <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid black;">
+        <p><strong>Last Updated:</strong> Current Date</p>
+        <p><strong>Version:</strong> 1.0</p>
+        <p><strong>Maintained By:</strong> Development Team</p>
+    </footer>
+
+</body>
+</html>

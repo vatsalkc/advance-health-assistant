@@ -205,7 +205,7 @@ function MyReports() {
         <Row>
           {reports.map(report => (
             <Col md={6} lg={4} key={report.id} className="mb-4">
-              <Card className="h-100 report-card">
+              <Card className="h-100 report-card" style={{ cursor: 'pointer' }} onClick={() => handleViewReport(report)}>
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-start mb-3">
                     <Badge bg={getReportTypeColor(report.report_type)}>
@@ -266,15 +266,7 @@ function MyReports() {
                     <small className="text-muted">
                       Uploaded {formatDate(report.created_at)}
                     </small>
-                    <div className="d-flex gap-1 flex-wrap btn-group-actions">
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => handleViewReport(report)}
-                      >
-                        <i className="bi bi-eye me-1"></i>
-                        Details
-                      </Button>
+                    <div className="d-flex gap-2 btn-group-actions" onClick={(e) => e.stopPropagation()}>
                       <ReportDownloader 
                         report={report} 
                         patientName={userData?.name || 'Patient'}
@@ -282,7 +274,10 @@ function MyReports() {
                       <Button
                         variant="outline-danger"
                         size="sm"
-                        onClick={() => handleDeleteReport(report.id, report.report_title)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteReport(report.id, report.report_title);
+                        }}
                         disabled={deleting === report.id}
                         title="Delete this report"
                         className="flex-shrink-0"
