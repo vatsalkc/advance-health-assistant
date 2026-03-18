@@ -50,8 +50,6 @@ function AIChatbot({ user, isOpen, onClose }) {
       }]);
     }
   }, []);
-    }
-  }, []);
 
   useEffect(() => {
     // Scroll to bottom when messages change
