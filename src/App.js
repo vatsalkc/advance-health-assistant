@@ -119,6 +119,27 @@ function App() {
     const initializeAuth = async () => {
       console.log('[App] Initializing auth...');
       
+      // Check if coming from landing page with login/register data
+      const loginData = sessionStorage.getItem('loginData');
+      const registerData = sessionStorage.getItem('registerData');
+      
+      if (loginData) {
+        // Auto-fill login form
+        const data = JSON.parse(loginData);
+        sessionStorage.removeItem('loginData');
+        console.log('[App] Auto-filling login from landing page');
+        // The login component will handle this
+      } else if (registerData) {
+        // Auto-fill register form
+        const data = JSON.parse(registerData);
+        sessionStorage.removeItem('registerData');
+        console.log('[App] Auto-filling register from landing page');
+        setCurrentView('register');
+        setViewHistory(['register']);
+        // The register component will handle this
+        return;
+      }
+      
       try {
         if (authService.isAuthenticated()) {
           console.log('[App] Found existing session, validating...');
@@ -163,6 +184,8 @@ function App() {
     setIsAuthenticated(true);
     setViewHistory(['dashboard']);
     navigateToView('dashboard');
+    // Clear the fromLanding flag after successful login
+    sessionStorage.removeItem('fromLanding');
   };
 
   const handleLogout = async () => {
@@ -173,10 +196,11 @@ function App() {
       
       await authService.logout();
       
-      // Clear all state
+      // Clear all state and session flags
       setUser(null);
       setIsAuthenticated(false);
       setPredictionResult(null);
+      sessionStorage.removeItem('fromLanding');
       setSelectedDoctor(null);
       setViewHistory(['login']);
       setCurrentView('login');
@@ -287,7 +311,11 @@ function App() {
           <Navbar.Brand 
             className="fw-bold"
             style={{ cursor: 'pointer' }}
-            onClick={() => isAuthenticated && navigateToView('dashboard')}
+            onClick={() => {
+              if (isAuthenticated) {
+                navigateToView('dashboard');
+              }
+            }}
           >
             <i className="bi bi-heart-pulse-fill me-2"></i>
             Health Assistant

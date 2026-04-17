@@ -9,7 +9,7 @@ function AIChatbot({ user, isOpen, onClose }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Hello! I\'m your AI Health Assistant powered by Gemini. I can help answer your health-related questions, provide general medical information, and guide you on when to seek professional care. How can I assist you today?'
+      content: 'Hello! I\'m your AI Health Assistant for the Advanced Health Assistant platform. I can help you with:\n\n• Understanding platform features (Symptom Checker, Appointments, Medicine Reminders)\n• Answering health-related questions\n• Guiding you on how to use the platform\n• Providing general medical information\n\nHow can I assist you today?'
     }
   ]);
   const [input, setInput] = useState('');
@@ -96,18 +96,64 @@ function AIChatbot({ user, isOpen, onClose }) {
         model: 'gemini-flash-latest',
       });
       
-      // Create health-focused prompt
-      const prompt = `You are a helpful AI health assistant. Answer this health question accurately and empathetically:
+      // Create health-focused prompt with website context
+      const websiteContext = `
+WEBSITE CONTEXT:
+You are the AI assistant for "Advanced Health Assistant" - a comprehensive healthcare platform with the following features:
+
+CORE FEATURES:
+1. AI Symptom Checker: Analyzes symptoms and predicts diseases from 34 conditions across 16 medical specializations
+2. Smart Appointments: Book appointments with verified doctors, track status in real-time
+3. Medicine Reminders: Automated medication schedules with notifications
+4. Doctor Recommendations: AI-powered specialist suggestions based on symptoms
+5. Health History: Complete timeline of appointments, medicines, and health checks
+6. Medical Reports: Upload and manage medical documents
+7. 24/7 AI Chatbot: Instant health support (that's you!)
+
+AVAILABLE SPECIALIZATIONS:
+- General Physician, Cardiologist, Dermatologist, Neurologist, Orthopedic
+- Pediatrician, Psychiatrist, ENT Specialist, Ophthalmologist, Gynecologist
+- Dentist, Pulmonologist, Gastroenterologist, Urologist, Endocrinologist, Nephrologist
+
+USER PORTALS:
+- Patient Portal: Symptom checking, appointments, medicine reminders, health history
+- Doctor Portal: Manage appointments, patient records, prescriptions
+- Admin Portal: User management, doctor approvals, system oversight
+
+TECHNOLOGY:
+- AI-powered disease prediction with 34 diseases coverage
+- Real-time appointment tracking and notifications
+- Secure authentication with Row Level Security
+- Google Gemini AI for chatbot support
+
+HOW TO USE THE PLATFORM:
+- Symptom Checker: Enter symptoms → Get disease prediction → Receive doctor recommendations
+- Book Appointment: Select doctor → Choose date/time → Track status
+- Medicine Reminders: Add medicine → Set schedule → Receive notifications
+- View History: Access complete health timeline with all activities
+
+When answering questions:
+- If asked about platform features, explain them clearly
+- If asked how to use something, provide step-by-step guidance
+- For health questions, provide medical information as usual
+- Always be helpful and guide users to the right features
+`;
+
+      const prompt = `${websiteContext}
+
+You are a helpful AI health assistant for the Advanced Health Assistant platform. Answer this question accurately and empathetically:
 
 Question: ${userMessage}
 
 Guidelines:
-- Provide clear, accurate health information
+- If the question is about the platform/website, explain features and how to use them
+- If it's a health question, provide clear, accurate health information
 - Be supportive and understanding
 - Remind users you're not a replacement for professional medical advice
 - Suggest consulting healthcare providers for serious concerns
-- If discussing symptoms, mention appropriate medical specializations
+- If discussing symptoms, mention appropriate medical specializations available on the platform
 - Keep responses concise (2-3 paragraphs maximum)
+- Guide users to relevant platform features when appropriate
 
 Answer:`;
 
@@ -180,11 +226,11 @@ Answer:`;
   };
 
   const quickQuestions = [
-    'What are common symptoms of flu?',
-    'When should I see a doctor?',
-    'How to manage stress?',
-    'Tips for better sleep',
-    'Healthy diet recommendations'
+    'How do I use the Symptom Checker?',
+    'How to book an appointment?',
+    'What features does this platform have?',
+    'How do medicine reminders work?',
+    'What specializations are available?'
   ];
 
   const handleQuickQuestion = async (question) => {
@@ -221,18 +267,64 @@ Answer:`;
         model: 'gemini-flash-latest',
       });
       
-      // Create health-focused prompt
-      const prompt = `You are a helpful AI health assistant. Answer this health question accurately and empathetically:
+      // Create health-focused prompt with website context
+      const websiteContext = `
+WEBSITE CONTEXT:
+You are the AI assistant for "Advanced Health Assistant" - a comprehensive healthcare platform with the following features:
+
+CORE FEATURES:
+1. AI Symptom Checker: Analyzes symptoms and predicts diseases from 34 conditions across 16 medical specializations
+2. Smart Appointments: Book appointments with verified doctors, track status in real-time
+3. Medicine Reminders: Automated medication schedules with notifications
+4. Doctor Recommendations: AI-powered specialist suggestions based on symptoms
+5. Health History: Complete timeline of appointments, medicines, and health checks
+6. Medical Reports: Upload and manage medical documents
+7. 24/7 AI Chatbot: Instant health support (that's you!)
+
+AVAILABLE SPECIALIZATIONS:
+- General Physician, Cardiologist, Dermatologist, Neurologist, Orthopedic
+- Pediatrician, Psychiatrist, ENT Specialist, Ophthalmologist, Gynecologist
+- Dentist, Pulmonologist, Gastroenterologist, Urologist, Endocrinologist, Nephrologist
+
+USER PORTALS:
+- Patient Portal: Symptom checking, appointments, medicine reminders, health history
+- Doctor Portal: Manage appointments, patient records, prescriptions
+- Admin Portal: User management, doctor approvals, system oversight
+
+TECHNOLOGY:
+- AI-powered disease prediction with 34 diseases coverage
+- Real-time appointment tracking and notifications
+- Secure authentication with Row Level Security
+- Google Gemini AI for chatbot support
+
+HOW TO USE THE PLATFORM:
+- Symptom Checker: Enter symptoms → Get disease prediction → Receive doctor recommendations
+- Book Appointment: Select doctor → Choose date/time → Track status
+- Medicine Reminders: Add medicine → Set schedule → Receive notifications
+- View History: Access complete health timeline with all activities
+
+When answering questions:
+- If asked about platform features, explain them clearly
+- If asked how to use something, provide step-by-step guidance
+- For health questions, provide medical information as usual
+- Always be helpful and guide users to the right features
+`;
+
+      const prompt = `${websiteContext}
+
+You are a helpful AI health assistant for the Advanced Health Assistant platform. Answer this question accurately and empathetically:
 
 Question: ${question}
 
 Guidelines:
-- Provide clear, accurate health information
+- If the question is about the platform/website, explain features and how to use them
+- If it's a health question, provide clear, accurate health information
 - Be supportive and understanding
 - Remind users you're not a replacement for professional medical advice
 - Suggest consulting healthcare providers for serious concerns
-- If discussing symptoms, mention appropriate medical specializations
+- If discussing symptoms, mention appropriate medical specializations available on the platform
 - Keep responses concise (2-3 paragraphs maximum)
+- Guide users to relevant platform features when appropriate
 
 Answer:`;
 

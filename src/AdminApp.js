@@ -125,6 +125,8 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
     setIsAuthenticated(true);
     setViewHistory(['dashboard']);
     navigateToView('dashboard');
+    // Clear the fromLanding flag after successful login
+    sessionStorage.removeItem('fromLanding');
   };
 
   const handleLogout = async () => {
@@ -135,11 +137,12 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
       
       await adminAuthService.logout();
       
-      // Clear all state
+      // Clear all state and session flags
       setAdmin(null);
       setIsAuthenticated(false);
       setViewHistory(['login']);
       setCurrentView('login');
+      sessionStorage.removeItem('fromLanding');
       
       setTimeout(() => {
         window.isLoggingOut = false;
@@ -156,6 +159,7 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
       setIsAuthenticated(false);
       setViewHistory(['login']);
       setCurrentView('login');
+      sessionStorage.removeItem('fromLanding');
     }
   };
 
@@ -171,9 +175,13 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
           <Navbar.Brand 
             className="fw-bold"
             style={{ cursor: 'pointer' }}
-            onClick={() => isAuthenticated && navigateToView('dashboard')}
+            onClick={() => {
+              if (isAuthenticated) {
+                navigateToView('dashboard');
+              }
+            }}
           >
-            <i className="bi bi-shield-lock-fill"></i>
+            <i className="bi bi-shield-lock-fill me-2"></i>
             Admin Portal
           </Navbar.Brand>
           {isAuthenticated && (

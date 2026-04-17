@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Alert, Row, Col } from 'react-bootstrap';
 import doctorAuthService from '../../services/doctorAuthService';
 
@@ -34,6 +34,35 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
     'Urologist',
     'Endocrinologist'
   ];
+
+  useEffect(() => {
+    // Check if coming from landing page with register data
+    const registerData = sessionStorage.getItem('registerData');
+    if (registerData) {
+      const data = JSON.parse(registerData);
+      if (data.role === 'doctor') {
+        setFormData({
+          name: data.name || '',
+          email: data.email || '',
+          password: data.password || '',
+          confirmPassword: data.password || '',
+          phone: data.phone || '',
+          specialization: data.specialization || '',
+          qualification: data.qualification || '',
+          license_number: data.license || '',
+          experience: data.experience || ''
+        });
+        sessionStorage.removeItem('registerData');
+        
+        // Auto-submit if we have complete data
+        if (data.name && data.email && data.password) {
+          setTimeout(() => {
+            document.getElementById('doctorRegisterForm')?.requestSubmit();
+          }, 100);
+        }
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,7 +106,7 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
 
           {error && <Alert variant="danger">{error}</Alert>}
 
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} id="doctorRegisterForm">
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
 import doctorAuthService from '../../services/doctorAuthService';
 
@@ -9,6 +9,26 @@ function DoctorLogin({ onLogin, onSwitchToRegister, onSwitchToPatient, darkMode 
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if coming from landing page with login data
+    const loginData = sessionStorage.getItem('loginData');
+    if (loginData) {
+      const data = JSON.parse(loginData);
+      if (data.role === 'doctor') {
+        setFormData({
+          email: data.email,
+          password: data.password
+        });
+        sessionStorage.removeItem('loginData');
+        
+        // Auto-submit
+        setTimeout(() => {
+          document.getElementById('doctorLoginForm')?.requestSubmit();
+        }, 100);
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,7 +61,7 @@ function DoctorLogin({ onLogin, onSwitchToRegister, onSwitchToPatient, darkMode 
 
           {error && <Alert variant="danger">{error}</Alert>}
 
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} id="doctorLoginForm">
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control

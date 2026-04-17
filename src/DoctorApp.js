@@ -87,6 +87,27 @@ function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
     const initializeAuth = async () => {
       console.log('[DoctorApp] Initializing auth...');
       
+      // Check if coming from landing page with login/register data
+      const loginData = sessionStorage.getItem('loginData');
+      const registerData = sessionStorage.getItem('registerData');
+      
+      if (loginData) {
+        const data = JSON.parse(loginData);
+        if (data.role === 'doctor') {
+          sessionStorage.removeItem('loginData');
+          console.log('[DoctorApp] Auto-filling login from landing page');
+        }
+      } else if (registerData) {
+        const data = JSON.parse(registerData);
+        if (data.role === 'doctor') {
+          sessionStorage.removeItem('registerData');
+          console.log('[DoctorApp] Auto-filling register from landing page');
+          setCurrentView('register');
+          setViewHistory(['register']);
+          return;
+        }
+      }
+      
       try {
         if (doctorAuthService.isAuthenticated()) {
           console.log('[DoctorApp] Found existing session, validating...');
@@ -127,6 +148,8 @@ function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
     setDoctor(doctorData);
     setIsAuthenticated(true);
     navigateToView('dashboard');
+    // Clear the fromLanding flag after successful login
+    sessionStorage.removeItem('fromLanding');
   };
 
   const handleLogout = async () => {
@@ -139,6 +162,8 @@ function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
       setIsAuthenticated(false);
       setCurrentView('login');
       setViewHistory(['login']);
+      // Clear session flags
+      sessionStorage.removeItem('fromLanding');
       
       console.log('[DoctorApp] Logout complete');
     } catch (error) {
@@ -148,6 +173,7 @@ function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
       setIsAuthenticated(false);
       setCurrentView('login');
       setViewHistory(['login']);
+      sessionStorage.removeItem('fromLanding');
     }
   };
 
@@ -172,7 +198,11 @@ function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
           <Navbar.Brand 
             className="fw-bold" 
             style={{ cursor: 'pointer' }}
-            onClick={() => isAuthenticated && navigateToView('dashboard')}
+            onClick={() => {
+              if (isAuthenticated) {
+                navigateToView('dashboard');
+              }
+            }}
           >
             <i className="bi bi-hospital me-2"></i>
             Doctor Portal

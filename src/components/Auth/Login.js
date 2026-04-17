@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
 import authService from '../../services/authService';
 
@@ -7,6 +7,22 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if coming from landing page with login data
+    const loginData = sessionStorage.getItem('loginData');
+    if (loginData) {
+      const data = JSON.parse(loginData);
+      setEmail(data.email);
+      setPassword(data.password);
+      sessionStorage.removeItem('loginData');
+      
+      // Auto-submit if we have the data
+      setTimeout(() => {
+        document.getElementById('loginForm')?.requestSubmit();
+      }, 100);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +56,7 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToDoctor, onSwitchToAdmin,
           
           {error && <Alert variant="danger">{error}</Alert>}
           
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} id="loginForm">
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control

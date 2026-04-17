@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Alert } from 'react-bootstrap';
 import authService from '../../services/authService';
 
@@ -14,6 +14,33 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if coming from landing page with register data
+    const registerData = sessionStorage.getItem('registerData');
+    if (registerData) {
+      const data = JSON.parse(registerData);
+      if (data.role === 'patient') {
+        setFormData({
+          name: data.name || '',
+          email: data.email || '',
+          password: data.password || '',
+          confirmPassword: data.password || '',
+          phone: data.phone || '',
+          age: data.age || '',
+          gender: data.gender || ''
+        });
+      }
+      sessionStorage.removeItem('registerData');
+      
+      // Auto-submit if we have complete data
+      if (data.name && data.email && data.password) {
+        setTimeout(() => {
+          document.getElementById('registerForm')?.requestSubmit();
+        }, 100);
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,7 +103,7 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
           
           {error && <Alert variant="danger">{error}</Alert>}
           
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} id="registerForm">
             <Form.Group className="mb-3">
               <Form.Label>Name <span className="text-danger">*</span></Form.Label>
               <Form.Control

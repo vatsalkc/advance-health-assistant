@@ -99,6 +99,142 @@
         .btn-primary-custom:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            background: transparent;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 2rem;
+            border: none;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-modal {
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .modal-footer {
+            border: none;
+            padding: 0 2rem 2rem;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+            color: var(--text-light);
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .role-option:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .role-option.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .role-option i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-option .role-name {
+            font-weight: 600;
         }
 
         /* Hero Section */
@@ -381,9 +517,14 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="./" onclick="sessionStorage.setItem('fromLanding', 'true')">
-                            <button class="btn btn-primary-custom">Login</button>
-                        </a>
+                        <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            <i class="bi bi-person-plus me-1"></i>Sign Up
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -398,9 +539,9 @@
                     <h1 class="hero-title">Your Personal Healthcare Companion</h1>
                     <p class="hero-subtitle">AI-powered health assistant for symptom checking, doctor appointments, and medicine reminders - all in one place.</p>
                     <div class="hero-buttons">
-                        <a href="./" class="btn-hero btn-hero-primary" onclick="sessionStorage.setItem('fromLanding', 'true')">
+                        <button class="btn-hero btn-hero-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
                             <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
-                        </a>
+                        </button>
                         <a href="#features" class="btn-hero btn-hero-secondary">
                             <i class="bi bi-play-circle me-2"></i>Learn More
                         </a>
@@ -672,6 +813,276 @@
         </div>
     </footer>
 
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Welcome Back
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Role Selector -->
+                    <div class="role-selector">
+                        <div class="role-option active" data-role="patient">
+                            <i class="bi bi-person"></i>
+                            <div class="role-name">Patient</div>
+                        </div>
+                        <div class="role-option" data-role="doctor">
+                            <i class="bi bi-hospital"></i>
+                            <div class="role-name">Doctor</div>
+                        </div>
+                        <div class="role-option" data-role="admin">
+                            <i class="bi bi-shield-lock"></i>
+                            <div class="role-name">Admin</div>
+                        </div>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary-custom btn-modal">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>Don't have an account?</span>
+                    </div>
+
+                    <button class="btn btn-outline-primary btn-modal" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">
+                        <i class="bi bi-person-plus me-2"></i>Create Your Account
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Role Selector -->
+                    <div class="role-selector">
+                        <div class="role-option active" data-role="patient">
+                            <i class="bi bi-person"></i>
+                            <div class="role-name">Patient</div>
+                        </div>
+                        <div class="role-option" data-role="doctor">
+                            <i class="bi bi-hospital"></i>
+                            <div class="role-name">Doctor</div>
+                        </div>
+                    </div>
+
+                    <form id="registerForm">
+                        <!-- Patient Fields -->
+                        <div id="patientFields">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="registerName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="registerName" placeholder="Enter your name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="registerEmail" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="registerEmail" placeholder="Enter your email" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="registerPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="registerPassword" placeholder="Create a password" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="registerAge" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="registerAge" placeholder="Enter your age" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="registerGender" class="form-label">Gender</label>
+                                    <select class="form-select" id="registerGender" required>
+                                        <option value="">Select gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="registerPhone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="registerPhone" placeholder="Enter phone number" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doctor Fields (Hidden by default) -->
+                        <div id="doctorFields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="doctorName" placeholder="Dr. John Doe">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorEmail" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="doctorEmail" placeholder="doctor@example.com">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="doctorPassword" placeholder="Create a password">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorSpecialization" class="form-label">Specialization</label>
+                                    <input type="text" class="form-control" id="doctorSpecialization" placeholder="e.g., Cardiologist">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorQualification" class="form-label">Qualification</label>
+                                    <input type="text" class="form-control" id="doctorQualification" placeholder="e.g., MBBS, MD">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorExperience" class="form-label">Experience (years)</label>
+                                    <input type="number" class="form-control" id="doctorExperience" placeholder="Years of experience">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorLicense" class="form-label">License Number</label>
+                                    <input type="text" class="form-control" id="doctorLicense" placeholder="Medical license number">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="doctorPhone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="doctorPhone" placeholder="Contact number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-custom btn-modal">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>Already have an account?</span>
+                    </div>
+
+                    <button class="btn btn-outline-primary btn-modal" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Login Instead
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Role selection for login
+        document.querySelectorAll('#loginModal .role-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('#loginModal .role-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Role selection for register
+        document.querySelectorAll('#registerModal .role-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('#registerModal .role-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                const role = this.dataset.role;
+                const patientFields = document.getElementById('patientFields');
+                const doctorFields = document.getElementById('doctorFields');
+                
+                if (role === 'doctor') {
+                    patientFields.style.display = 'none';
+                    doctorFields.style.display = 'block';
+                    // Make doctor fields required
+                    doctorFields.querySelectorAll('input, select').forEach(field => field.required = true);
+                    patientFields.querySelectorAll('input, select').forEach(field => field.required = false);
+                } else {
+                    patientFields.style.display = 'block';
+                    doctorFields.style.display = 'none';
+                    // Make patient fields required
+                    patientFields.querySelectorAll('input, select').forEach(field => field.required = true);
+                    doctorFields.querySelectorAll('input, select').forEach(field => field.required = false);
+                }
+            });
+        });
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = document.querySelector('#loginModal .role-option.active').dataset.role;
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Store role and set flag
+            localStorage.setItem('user_role', role);
+            sessionStorage.setItem('fromLanding', 'true');
+            sessionStorage.setItem('loginData', JSON.stringify({ email, password, role }));
+            
+            // Redirect to main app
+            window.location.href = './';
+        });
+
+        // Register form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = document.querySelector('#registerModal .role-option.active').dataset.role;
+            
+            let registerData = { role };
+            
+            if (role === 'patient') {
+                registerData = {
+                    ...registerData,
+                    name: document.getElementById('registerName').value,
+                    email: document.getElementById('registerEmail').value,
+                    password: document.getElementById('registerPassword').value,
+                    age: document.getElementById('registerAge').value,
+                    gender: document.getElementById('registerGender').value,
+                    phone: document.getElementById('registerPhone').value
+                };
+            } else if (role === 'doctor') {
+                registerData = {
+                    ...registerData,
+                    name: document.getElementById('doctorName').value,
+                    email: document.getElementById('doctorEmail').value,
+                    password: document.getElementById('doctorPassword').value,
+                    specialization: document.getElementById('doctorSpecialization').value,
+                    qualification: document.getElementById('doctorQualification').value,
+                    experience: document.getElementById('doctorExperience').value,
+                    license: document.getElementById('doctorLicense').value,
+                    phone: document.getElementById('doctorPhone').value
+                };
+            }
+            
+            // Store role and set flag
+            localStorage.setItem('user_role', role);
+            sessionStorage.setItem('fromLanding', 'true');
+            sessionStorage.setItem('registerData', JSON.stringify(registerData));
+            
+            // Redirect to main app
+            window.location.href = './';
+        });
+    </script>
 </body>
 </html>
