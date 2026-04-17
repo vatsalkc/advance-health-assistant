@@ -23,18 +23,21 @@ self.addEventListener('notificationclick', (event) => {
   
   event.notification.close();
   
+  // Get the base URL (works for both localhost and GitHub Pages)
+  const baseUrl = self.location.origin + (self.registration.scope || '/');
+  
   // Open or focus the app
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       // If a window is already open, focus it
       for (const client of clientList) {
-        if ('focus' in client) {
+        if (client.url.startsWith(baseUrl) && 'focus' in client) {
           return client.focus();
         }
       }
       // Otherwise, open a new window
       if (self.clients.openWindow) {
-        return self.clients.openWindow('/');
+        return self.clients.openWindow(baseUrl);
       }
     })
   );

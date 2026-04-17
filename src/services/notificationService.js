@@ -12,16 +12,30 @@ class NotificationService {
   async registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        // Determine the correct service worker path
+        // For GitHub Pages: /advance-health-assistant/service-worker.js
+        // For localhost: /service-worker.js
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const basePath = isGitHubPages ? '/advance-health-assistant' : '';
+        const swPath = `${basePath}/service-worker.js`;
+        
+        console.log('[NotificationService] Registering service worker at:', swPath);
+        
+        const registration = await navigator.serviceWorker.register(swPath, {
+          scope: basePath || '/'
+        });
         this.serviceWorkerRegistration = registration;
-        console.log('[NotificationService] Service Worker registered:', registration);
+        console.log('[NotificationService] Service Worker registered successfully:', registration);
         
         // Wait for service worker to be ready
         await navigator.serviceWorker.ready;
         console.log('[NotificationService] Service Worker is ready');
       } catch (error) {
         console.error('[NotificationService] Service Worker registration failed:', error);
+        console.log('[NotificationService] Notifications will still work but only when browser is open');
       }
+    } else {
+      console.log('[NotificationService] Service Workers not supported in this browser');
     }
   }
 

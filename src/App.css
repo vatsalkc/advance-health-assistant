@@ -12785,6 +12785,60 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Toast text visibility in dark mode */
+[data-theme="dark"] .toast {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+}
+
+[data-theme="dark"] .toast-header {
+  background-color: #111827;
+  border-bottom-color: #374151;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .toast-body {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .toast .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Ensure toast text is visible in light mode */
+[data-theme="light"] .toast {
+  background-color: #ffffff;
+}
+
+[data-theme="light"] .toast-header {
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+[data-theme="light"] .toast-body {
+  color: #111827;
+}
+
+/* Success toast */
+.toast.bg-success .toast-body {
+  color: #ffffff !important;
+}
+
+/* Danger toast */
+.toast.bg-danger .toast-body {
+  color: #ffffff !important;
+}
+
+/* Warning toast */
+.toast.bg-warning .toast-body {
+  color: #000000 !important;
+}
+
+/* Info toast */
+.toast.bg-info .toast-body {
+  color: #000000 !important;
+}
+
 /* Ensure cancelled badge is readable in light mode */
 .badge.bg-danger,
 .appointment-status.cancelled,
