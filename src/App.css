@@ -12552,3 +12552,184 @@ body {
 }
 
 
+
+/* ===================================
+   ADMIN PORTAL - TABLE FIXES
+   =================================== */
+
+/* Fix table layout and prevent content overflow */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 100%;
+  table-layout: auto;
+}
+
+/* Fix table cell content wrapping */
+.table td, .table th {
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 12px 8px;
+}
+
+/* Allow text wrapping for name and email columns */
+.table td:first-child,
+.table td:nth-child(2) {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+/* Fix gender badge visibility */
+.table td .badge {
+  font-size: 0.85rem;
+  padding: 0.35em 0.65em;
+  font-weight: 600;
+  color: #fff !important;
+}
+
+.table td .badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: #fff !important;
+}
+
+.table td .badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+}
+
+.table td .badge.bg-success {
+  background-color: #198754 !important;
+  color: #fff !important;
+}
+
+.table td .badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Fix action buttons layout */
+.table td .d-flex {
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+}
+
+.table td .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Fix rating display */
+.table td .text-warning {
+  color: #ffc107 !important;
+  font-weight: 600;
+}
+
+/* Improve table header */
+.table thead th {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Fix table striping in dark mode */
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Fix table borders */
+.table-bordered > :not(caption) > * {
+  border-width: 1px;
+  border-color: var(--border-color);
+}
+
+.table-bordered > :not(caption) > * > * {
+  border-width: 0 1px;
+  border-color: var(--border-color);
+}
+
+/* Improve table hover effect */
+.table-hover > tbody > tr:hover > * {
+  background-color: var(--hover-bg);
+  cursor: pointer;
+}
+
+/* Fix card body padding for tables */
+.card-body .table-responsive {
+  margin: -1rem;
+  padding: 0;
+}
+
+.card-body .table {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .table td, .table th {
+    font-size: 0.875rem;
+    padding: 8px 4px;
+  }
+  
+  .table td:first-child,
+  .table td:nth-child(2) {
+    max-width: 150px;
+  }
+  
+  .table td .btn-sm {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
+  }
+  
+  .table td .badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+  }
+}
+
+/* Fix empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Fix loading state */
+.loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.loading-state .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+}
+
+.loading-state p {
+  color: var(--text-secondary);
+  margin: 0;
+}
