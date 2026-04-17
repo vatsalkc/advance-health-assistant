@@ -20,6 +20,16 @@ function MedicineReminder({ user }) {
     if (user) {
       fetchMedicines();
       checkNotificationPermission();
+      
+      // Automatically prompt for notification permission on first visit
+      const hasPromptedBefore = localStorage.getItem('notificationPrompted');
+      if (!hasPromptedBefore && notificationService.getPermissionStatus() === 'default') {
+        // Wait a bit for the page to load
+        setTimeout(() => {
+          localStorage.setItem('notificationPrompted', 'true');
+          requestNotificationPermission();
+        }, 1000);
+      }
     }
   }, [user]);
 
@@ -99,13 +109,10 @@ function MedicineReminder({ user }) {
       await fetchMedicines();
       
       // Show notification permission request if not granted
-      if (notificationPermission !== 'granted') {
-        const shouldEnable = window.confirm(
-          'Would you like to enable notifications for medicine reminders? They will work even when the browser is closed!'
-        );
-        if (shouldEnable) {
-          await requestNotificationPermission();
-        }
+      if (notificationPermission !== 'granted' && notificationPermission !== 'denied') {
+        setTimeout(() => {
+          requestNotificationPermission();
+        }, 500);
       }
     } catch (err) {
       console.error('Error creating medicine:', err);
@@ -140,20 +147,36 @@ function MedicineReminder({ user }) {
   return (
     <div>
       {/* Notification Permission Banner */}
-      {notificationPermission !== 'granted' && (
-        <Alert variant="warning" className="mb-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <i className="bi bi-bell-slash me-2"></i>
-              <strong>Enable Notifications</strong> to receive medicine reminders
+      {notificationPermission !== 'granted' && notificationPermission !== 'denied' && (
+        <Alert variant="info" className="mb-3">
+          <div className="d-flex justify-content-between align-items-center flex-wrap">
+            <div className="mb-2 mb-md-0">
+              <i className="bi bi-bell me-2"></i>
+              <strong>Enable Browser Notifications</strong>
+              <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
+                Get medicine reminders even when the browser is closed. Click "Enable Now" and allow notifications in the browser prompt.
+              </p>
             </div>
             <Button 
-              variant="warning" 
+              variant="info" 
               size="sm"
               onClick={requestNotificationPermission}
             >
+              <i className="bi bi-bell-fill me-1"></i>
               Enable Now
             </Button>
+          </div>
+        </Alert>
+      )}
+
+      {notificationPermission === 'denied' && (
+        <Alert variant="danger" className="mb-3">
+          <div>
+            <i className="bi bi-bell-slash me-2"></i>
+            <strong>Notifications Blocked</strong>
+            <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
+              You have blocked notifications. To enable them, click the lock icon in your browser's address bar and allow notifications for this site.
+            </p>
           </div>
         </Alert>
       )}
