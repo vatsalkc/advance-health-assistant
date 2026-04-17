@@ -7,6 +7,7 @@ import DoctorApproval from './components/Admin/DoctorApproval';
 import DoctorManagement from './components/Admin/DoctorManagement';
 import UserManagement from './components/Admin/UserManagement';
 import AppointmentManagement from './components/Admin/AppointmentManagement';
+import ToastNotification from './components/Toast/ToastNotification';
 
 function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
   const [currentView, setCurrentView] = useState('login');
@@ -160,6 +161,7 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
 
   return (
     <div className="App">
+      <ToastNotification />
       <Navbar 
         expand="lg" 
         className={`navbar-custom navbar-sticky ${showNavbar ? 'navbar-visible' : 'navbar-hidden'}`}

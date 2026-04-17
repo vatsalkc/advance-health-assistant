@@ -9,6 +9,7 @@ import DoctorPatients from './components/Doctor/DoctorPatients';
 import PatientDetails from './components/Doctor/PatientDetails';
 import DoctorProfile from './components/Doctor/DoctorProfile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
+import ToastNotification from './components/Toast/ToastNotification';
 
 function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
   const [currentView, setCurrentView] = useState('login');
@@ -157,6 +158,7 @@ function DoctorApp({ onSwitchToPatient, darkMode, setDarkMode }) {
 
   return (
     <div className="App">
+      <ToastNotification />
       <NetworkStatus />
       
       <Navbar 

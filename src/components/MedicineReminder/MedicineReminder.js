@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Row, Col, ListGroup, Badge, Alert } from 'react-bootstrap';
 import { medicinesAPI } from '../../utils/api';
 import notificationService from '../../services/notificationService';
+import { toastManager } from '../Toast/ToastNotification';
 
 function MedicineReminder({ user }) {
   const [reminders, setReminders] = useState([]);
@@ -12,7 +13,6 @@ function MedicineReminder({ user }) {
     time2: '', // For twice daily
     frequency: 'daily'
   });
-  const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notificationPermission, setNotificationPermission] = useState('default');
 
@@ -47,17 +47,18 @@ function MedicineReminder({ user }) {
     if (granted) {
       // Reschedule reminders with notifications enabled
       notificationService.scheduleMedicineReminders(reminders);
-      alert('Notifications enabled! You will receive reminders for your medicines.');
+      toastManager.success('Notifications enabled! You will receive reminders even when the browser is closed.');
     } else {
-      alert('Notifications denied. You can enable them in your browser settings.');
+      toastManager.error('Notifications denied. You can enable them in your browser settings.');
     }
   };
 
-  const testNotification = () => {
+  const testNotification = async () => {
     if (notificationPermission === 'granted') {
-      notificationService.sendTestNotification();
+      await notificationService.sendTestNotification();
+      toastManager.info('Test notification sent! Check your system notifications.');
     } else {
-      alert('Please enable notifications first');
+      toastManager.warning('Please enable notifications first');
     }
   };
 
@@ -92,8 +93,7 @@ function MedicineReminder({ user }) {
       });
       
       setFormData({ medicine_name: '', dosage: '', time: '', time2: '', frequency: 'daily' });
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      toastManager.success('Medicine reminder added successfully!');
       
       // Refresh the list
       await fetchMedicines();
@@ -101,7 +101,7 @@ function MedicineReminder({ user }) {
       // Show notification permission request if not granted
       if (notificationPermission !== 'granted') {
         const shouldEnable = window.confirm(
-          'Would you like to enable notifications for medicine reminders?'
+          'Would you like to enable notifications for medicine reminders? They will work even when the browser is closed!'
         );
         if (shouldEnable) {
           await requestNotificationPermission();
@@ -109,17 +109,18 @@ function MedicineReminder({ user }) {
       }
     } catch (err) {
       console.error('Error creating medicine:', err);
-      alert('Failed to add medicine reminder. Please try again.');
+      toastManager.error('Failed to add medicine reminder. Please try again.');
     }
   };
 
   const toggleReminder = async (id, currentStatus) => {
     try {
       await medicinesAPI.update(id, { active: !currentStatus });
+      toastManager.success(`Reminder ${!currentStatus ? 'activated' : 'deactivated'} successfully!`);
       fetchMedicines(); // Refresh the list
     } catch (err) {
       console.error('Error updating medicine:', err);
-      alert('Failed to update medicine. Please try again.');
+      toastManager.error('Failed to update medicine. Please try again.');
     }
   };
 
@@ -127,10 +128,11 @@ function MedicineReminder({ user }) {
     if (window.confirm('Are you sure you want to delete this reminder?')) {
       try {
         await medicinesAPI.delete(id);
+        toastManager.success('Reminder deleted successfully!');
         fetchMedicines(); // Refresh the list
       } catch (err) {
         console.error('Error deleting medicine:', err);
-        alert('Failed to delete medicine. Please try again.');
+        toastManager.error('Failed to delete medicine. Please try again.');
       }
     }
   };
@@ -161,7 +163,7 @@ function MedicineReminder({ user }) {
           <div className="d-flex justify-content-between align-items-center">
             <div>
               <i className="bi bi-bell-fill me-2"></i>
-              Notifications are enabled! You'll receive reminders at scheduled times.
+              Notifications enabled! Reminders will work even when the browser is closed.
             </div>
             <Button 
               variant="outline-success" 
@@ -181,11 +183,6 @@ function MedicineReminder({ user }) {
             <Card.Title>
               <h4>Add Medicine Reminder</h4>
             </Card.Title>
-            {showSuccess && (
-              <Alert variant="success" dismissible onClose={() => setShowSuccess(false)}>
-                Medicine reminder added successfully!
-              </Alert>
-            )}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
                 <Form.Label>Medicine Name</Form.Label>

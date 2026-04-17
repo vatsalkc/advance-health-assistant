@@ -12741,6 +12741,19 @@ body {
    SIMPLE TEXT READABILITY FIXES
    =================================== */
 
+/* Fixed position toast notifications */
+.toast-container {
+  position: fixed !important;
+  top: 80px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+}
+
+.toast {
+  min-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* Ensure cancelled badge is readable in light mode */
 .badge.bg-danger,
 .appointment-status.cancelled,

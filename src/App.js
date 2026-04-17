@@ -15,6 +15,7 @@ import UserHistory from './components/UserHistory/UserHistoryEnhanced';
 import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
 import AIChatbot from './components/AIChatbot/AIChatbot';
+import ToastNotification from './components/Toast/ToastNotification';
 import DoctorApp from './DoctorApp';
 import AdminApp from './AdminApp';
 
@@ -274,6 +275,7 @@ function App() {
   // Patient mode (default)
   return (
     <div className="App">
+      <ToastNotification />
       <NetworkStatus />
       
       <Navbar 

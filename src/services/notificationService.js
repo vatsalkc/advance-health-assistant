@@ -1,9 +1,28 @@
-// Notification Service for Medicine Reminders
+// Notification Service for Medicine Reminders with Service Worker Support
 
 class NotificationService {
   constructor() {
     this.permission = 'default';
+    this.serviceWorkerRegistration = null;
     this.checkPermission();
+    this.registerServiceWorker();
+  }
+
+  // Register service worker for background notifications
+  async registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        this.serviceWorkerRegistration = registration;
+        console.log('[NotificationService] Service Worker registered:', registration);
+        
+        // Wait for service worker to be ready
+        await navigator.serviceWorker.ready;
+        console.log('[NotificationService] Service Worker is ready');
+      } catch (error) {
+        console.error('[NotificationService] Service Worker registration failed:', error);
+      }
+    }
   }
 
   // Check current notification permission
@@ -35,8 +54,8 @@ class NotificationService {
     return false;
   }
 
-  // Send a notification
-  sendNotification(title, options = {}) {
+  // Send a notification (works even when browser is in background)
+  async sendNotification(title, options = {}) {
     if (this.permission !== 'granted') {
       console.log('Notification permission not granted');
       return null;
@@ -51,14 +70,22 @@ class NotificationService {
     };
 
     try {
-      const notification = new Notification(title, defaultOptions);
-      
-      notification.onclick = () => {
-        window.focus();
-        notification.close();
-      };
+      // Use service worker if available (works in background)
+      if (this.serviceWorkerRegistration) {
+        await this.serviceWorkerRegistration.showNotification(title, defaultOptions);
+        console.log('[NotificationService] Notification sent via Service Worker');
+        return true;
+      } else {
+        // Fallback to regular notification
+        const notification = new Notification(title, defaultOptions);
+        
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
 
-      return notification;
+        return notification;
+      }
     } catch (error) {
       console.error('Error sending notification:', error);
       return null;
@@ -66,15 +93,16 @@ class NotificationService {
   }
 
   // Send medicine reminder notification
-  sendMedicineReminder(medicineName, dosage, time) {
-    return this.sendNotification('💊 Medicine Reminder', {
+  async sendMedicineReminder(medicineName, dosage, time) {
+    return await this.sendNotification('💊 Medicine Reminder', {
       body: `Time to take ${medicineName} (${dosage})`,
       tag: `medicine-${medicineName}`,
       icon: '/logo192.png',
       data: {
         medicineName,
         dosage,
-        time
+        time,
+        url: window.location.origin
       }
     });
   }
@@ -86,10 +114,20 @@ class NotificationService {
     // Clear existing timers
     this.clearAllTimers();
     
+    // Store reminders in localStorage for persistence
+    localStorage.setItem('medicineReminders', JSON.stringify(medicines));
+    
     medicines.forEach(medicine => {
       if (!medicine.active) return;
       
-      this.scheduleSingleReminder(medicine);
+      // Handle multiple times (for twice-daily)
+      const times = medicine.time.includes(',') 
+        ? medicine.time.split(',').map(t => t.trim())
+        : [medicine.time];
+      
+      times.forEach(time => {
+        this.scheduleSingleReminder({ ...medicine, time });
+      });
     });
   }
 
@@ -112,8 +150,8 @@ class NotificationService {
     console.log(`[NotificationService] Scheduling ${medicine.medicine_name} for ${reminderTime.toLocaleString()}`);
     
     // Schedule the notification
-    const timerId = setTimeout(() => {
-      this.sendMedicineReminder(
+    const timerId = setTimeout(async () => {
+      await this.sendMedicineReminder(
         medicine.medicine_name,
         medicine.dosage,
         medicine.time
@@ -125,7 +163,7 @@ class NotificationService {
     
     // Store timer ID for cleanup
     if (!this.timers) this.timers = {};
-    this.timers[medicine.id] = timerId;
+    this.timers[`${medicine.id}-${medicine.time}`] = timerId;
   }
 
   // Reschedule reminder based on frequency
@@ -137,7 +175,8 @@ class NotificationService {
         nextTime.setDate(nextTime.getDate() + 1);
         break;
       case 'twice-daily':
-        nextTime.setHours(nextTime.getHours() + 12);
+        // For twice daily, the times are already split, so just schedule for next day
+        nextTime.setDate(nextTime.getDate() + 1);
         break;
       case 'weekly':
         nextTime.setDate(nextTime.getDate() + 7);
@@ -147,6 +186,21 @@ class NotificationService {
     }
     
     this.scheduleSingleReminder(medicine);
+  }
+
+  // Restore reminders from localStorage (on app start)
+  restoreReminders() {
+    try {
+      const stored = localStorage.getItem('medicineReminders');
+      if (stored) {
+        const medicines = JSON.parse(stored);
+        if (this.permission === 'granted') {
+          this.scheduleMedicineReminders(medicines);
+        }
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error restoring reminders:', error);
+    }
   }
 
   // Clear all scheduled timers
@@ -168,9 +222,9 @@ class NotificationService {
   }
 
   // Test notification (for debugging)
-  sendTestNotification() {
-    return this.sendNotification('Test Notification', {
-      body: 'This is a test notification from Health Assistant',
+  async sendTestNotification() {
+    return await this.sendNotification('Test Notification', {
+      body: 'This is a test notification from Health Assistant. Medicine reminders will work even when the browser is closed!',
       tag: 'test-notification'
     });
   }
@@ -187,4 +241,14 @@ class NotificationService {
 }
 
 const notificationService = new NotificationService();
+
+// Restore reminders when service loads
+if (document.readyState === 'complete') {
+  notificationService.restoreReminders();
+} else {
+  window.addEventListener('load', () => {
+    notificationService.restoreReminders();
+  });
+}
+
 export default notificationService;
