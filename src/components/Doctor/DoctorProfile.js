@@ -13,7 +13,8 @@ function DoctorProfile({ doctor, onUpdateDoctor, onLogout }) {
     consultation_fee: doctor.consultation_fee || '',
     available_days: doctor.available_days || [],
     available_time_start: doctor.available_time_start || '',
-    available_time_end: doctor.available_time_end || ''
+    available_time_end: doctor.available_time_end || '',
+    address: doctor.address || ''
   });
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -71,7 +72,8 @@ function DoctorProfile({ doctor, onUpdateDoctor, onLogout }) {
       consultation_fee: doctor.consultation_fee || '',
       available_days: doctor.available_days || [],
       available_time_start: doctor.available_time_start || '',
-      available_time_end: doctor.available_time_end || ''
+      available_time_end: doctor.available_time_end || '',
+      address: doctor.address || ''
     });
     setIsEditing(false);
     setError('');
@@ -192,6 +194,19 @@ function DoctorProfile({ doctor, onUpdateDoctor, onLogout }) {
                 onChange={handleChange}
                 disabled={!isEditing}
                 placeholder="Tell patients about yourself..."
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Clinic/Hospital Address</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={2}
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                disabled={!isEditing}
+                placeholder="Enter your clinic or hospital address..."
               />
             </Form.Group>
 

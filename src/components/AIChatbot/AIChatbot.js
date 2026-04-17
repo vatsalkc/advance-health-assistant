@@ -91,9 +91,9 @@ function AIChatbot({ user, isOpen, onClose }) {
         throw new Error('Gemini AI not initialized');
       }
 
-      // Get Gemini model (current recommended flash model)
+      // Get Gemini model
       const model = genAI.current.getGenerativeModel({ 
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-latest',
       });
       
       // Create health-focused prompt
@@ -116,7 +116,7 @@ Answer:`;
       // Generate response
       const result = await model.generateContent(prompt);
       
-      console.log('[Chatbot] Result received:', result);
+      console.log('[Chatbot] Result received');
       
       // Check if response exists
       if (!result || !result.response) {
@@ -133,7 +133,7 @@ Answer:`;
       // Get text from response
       const text = response.text();
       
-      console.log('[Chatbot] Response text:', text);
+      console.log('[Chatbot] Response received successfully');
 
       if (!text || text.trim() === '') {
         throw new Error('Empty response from Gemini API');
@@ -147,7 +147,7 @@ Answer:`;
       
       let errorMessage = 'I apologize, but I encountered an error processing your request. ';
       
-      if (error.message.includes('API key')) {
+      if (error.message.includes('API key') || error.message.includes('API_KEY')) {
         errorMessage += 'There seems to be an issue with the API configuration. ';
       } else if (error.message.includes('quota')) {
         errorMessage += 'The API quota has been exceeded. ';
@@ -216,9 +216,9 @@ Answer:`;
         throw new Error('Gemini AI not initialized');
       }
 
-      // Get Gemini model (current recommended flash model)
+      // Get Gemini model
       const model = genAI.current.getGenerativeModel({ 
-        model: 'gemini-2.5-flash',
+        model: 'gemini-flash-latest',
       });
       
       // Create health-focused prompt
@@ -270,7 +270,7 @@ Answer:`;
       
       let errorMessage = 'I apologize, but I encountered an error processing your request. ';
       
-      if (error.message.includes('API key')) {
+      if (error.message.includes('API key') || error.message.includes('API_KEY')) {
         errorMessage += 'There seems to be an issue with the API configuration. ';
       } else if (error.message.includes('quota')) {
         errorMessage += 'The API quota has been exceeded. ';
@@ -420,3 +420,9 @@ Answer:`;
 }
 
 export default AIChatbot;
+
+
+
+
+
+

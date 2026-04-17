@@ -11,7 +11,7 @@ import DoctorRecommendation from './components/DoctorRecommendation/DoctorRecomm
 import Appointments from './components/Appointments/Appointments';
 import MedicineReminder from './components/MedicineReminder/MedicineReminder';
 import Reports from './components/Reports/Reports';
-import UserHistory from './components/UserHistory/UserHistory';
+import UserHistory from './components/UserHistory/UserHistoryEnhanced';
 import Profile from './components/Profile/Profile';
 import NetworkStatus from './components/NetworkStatus/NetworkStatus';
 import AIChatbot from './components/AIChatbot/AIChatbot';
@@ -27,17 +27,80 @@ function App() {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [symptomCheckTrigger, setSymptomCheckTrigger] = useState(0);
   const [chatbotOpen, setChatbotOpen] = useState(false);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [viewHistory, setViewHistory] = useState(['login']);
   const [darkMode, setDarkMode] = useState(() => {
     // Load dark mode preference from localStorage
     const savedMode = localStorage.getItem('darkMode');
     return savedMode === 'true';
   });
 
+  // Update view and manage history
+  const navigateToView = (view) => {
+    setCurrentView(view);
+    setViewHistory(prev => [...prev, view]);
+    window.history.pushState({ view }, '', window.location.href);
+  };
+
   useEffect(() => {
     // Apply dark mode to body and save preference
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
+
+  useEffect(() => {
+    // Handle browser back button to navigate between tabs
+    const handlePopState = (e) => {
+      if (viewHistory.length > 1) {
+        // Navigate to previous view
+        const newHistory = [...viewHistory];
+        newHistory.pop(); // Remove current view
+        const previousView = newHistory[newHistory.length - 1] || 'dashboard';
+        
+        setViewHistory(newHistory);
+        setCurrentView(previousView);
+        
+        // Push state back to prevent leaving the app
+        window.history.pushState({ view: previousView }, '', window.location.href);
+      } else {
+        // If no history, stay on current view
+        window.history.pushState({ view: currentView }, '', window.location.href);
+      }
+    };
+
+    // Push initial state
+    window.history.pushState({ view: currentView }, '', window.location.href);
+    
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [viewHistory, currentView]);
+
+  useEffect(() => {
+    // Navbar scroll behavior - show on scroll up
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < 10) {
+        setShowNavbar(true);
+      } else if (currentScrollY < lastScrollY) {
+        setShowNavbar(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setShowNavbar(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     // Check which mode to use based on stored data
@@ -66,23 +129,27 @@ function App() {
             console.log('[App] Session valid, user:', currentUser?.email);
             setUser(currentUser);
             setIsAuthenticated(true);
+            setViewHistory(['dashboard']);
             setCurrentView('dashboard');
           } else {
             console.log('[App] Session invalid, showing login');
             setUser(null);
             setIsAuthenticated(false);
+            setViewHistory(['login']);
             setCurrentView('login');
           }
         } else {
           console.log('[App] No session found, showing login');
           setUser(null);
           setIsAuthenticated(false);
+          setViewHistory(['login']);
           setCurrentView('login');
         }
       } catch (error) {
         console.error('[App] Auth initialization error:', error);
         setUser(null);
         setIsAuthenticated(false);
+        setViewHistory(['login']);
         setCurrentView('login');
       }
     };
@@ -93,12 +160,15 @@ function App() {
   const handleLogin = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
-    setCurrentView('dashboard');
+    setViewHistory(['dashboard']);
+    navigateToView('dashboard');
   };
 
   const handleLogout = async () => {
     try {
       console.log('[App] Logging out...');
+      
+      window.isLoggingOut = true;
       
       await authService.logout();
       
@@ -107,17 +177,25 @@ function App() {
       setIsAuthenticated(false);
       setPredictionResult(null);
       setSelectedDoctor(null);
+      setViewHistory(['login']);
       setCurrentView('login');
+      
+      setTimeout(() => {
+        window.isLoggingOut = false;
+      }, 100);
       
       console.log('[App] Logout complete');
     } catch (error) {
       console.error('[App] Logout error:', error);
+      
+      window.isLoggingOut = false;
       
       // Force clear state even if there's an error
       setUser(null);
       setIsAuthenticated(false);
       setPredictionResult(null);
       setSelectedDoctor(null);
+      setViewHistory(['login']);
       setCurrentView('login');
     }
   };
@@ -126,20 +204,23 @@ function App() {
     const result = fullResult || { disease, specialization };
     setPredictionResult(result);
     setSymptomCheckTrigger(prev => prev + 1); // Trigger dashboard refresh
-    setCurrentView('doctorRecommendation');
+    navigateToView('doctorRecommendation');
   };
 
   const handleBookAppointment = (doctor) => {
     setSelectedDoctor(doctor);
-    setCurrentView('appointments');
+    navigateToView('appointments');
   };
 
   const handleSwitchToDoctor = () => {
     // Clear patient auth
     authService.logout();
+    localStorage.removeItem('user_role');
+    localStorage.setItem('user_role', 'doctor');
     setUser(null);
     setIsAuthenticated(false);
     setAppMode('doctor');
+    setViewHistory(['login']);
     setCurrentView('login');
   };
 
@@ -147,18 +228,24 @@ function App() {
     // Clear doctor/admin auth
     doctorAuthService.logout();
     adminAuthService.logout();
+    localStorage.removeItem('user_role');
+    localStorage.setItem('user_role', 'patient');
     setUser(null);
     setIsAuthenticated(false);
     setAppMode('patient');
+    setViewHistory(['login']);
     setCurrentView('login');
   };
 
   const handleSwitchToAdmin = () => {
     // Clear patient auth
     authService.logout();
+    localStorage.removeItem('user_role');
+    localStorage.setItem('user_role', 'admin');
     setUser(null);
     setIsAuthenticated(false);
     setAppMode('admin');
+    setViewHistory(['login']);
     setCurrentView('login');
   };
 
@@ -189,9 +276,17 @@ function App() {
     <div className="App">
       <NetworkStatus />
       
-      <Navbar expand="lg" className="navbar-custom">
+      <Navbar 
+        expand="lg" 
+        className={`navbar-custom navbar-sticky ${showNavbar ? 'navbar-visible' : 'navbar-hidden'}`}
+        fixed="top"
+      >
         <Container>
-          <Navbar.Brand href="#home" className="fw-bold">
+          <Navbar.Brand 
+            className="fw-bold"
+            style={{ cursor: 'pointer' }}
+            onClick={() => isAuthenticated && navigateToView('dashboard')}
+          >
             <i className="bi bi-heart-pulse-fill me-2"></i>
             Health Assistant
           </Navbar.Brand>
@@ -205,7 +300,7 @@ function App() {
               <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto ms-lg-3">
                   <Nav.Link 
-                    onClick={() => setCurrentView('dashboard')} 
+                    onClick={() => navigateToView('dashboard')} 
                     active={currentView === 'dashboard'}
                     className="nav-item-custom"
                   >
@@ -214,7 +309,7 @@ function App() {
                   </Nav.Link>
                   
                   <Nav.Link 
-                    onClick={() => setCurrentView('symptomChecker')} 
+                    onClick={() => navigateToView('symptomChecker')} 
                     active={currentView === 'symptomChecker'}
                     className="nav-item-custom"
                   >
@@ -223,7 +318,7 @@ function App() {
                   </Nav.Link>
                   
                   <Nav.Link 
-                    onClick={() => setCurrentView('appointments')} 
+                    onClick={() => navigateToView('appointments')} 
                     active={currentView === 'appointments'}
                     className="nav-item-custom"
                   >
@@ -232,7 +327,7 @@ function App() {
                   </Nav.Link>
                   
                   <Nav.Link 
-                    onClick={() => setCurrentView('medicineReminder')} 
+                    onClick={() => navigateToView('medicineReminder')} 
                     active={currentView === 'medicineReminder'}
                     className="nav-item-custom"
                   >
@@ -241,7 +336,7 @@ function App() {
                   </Nav.Link>
                   
                   <Nav.Link 
-                    onClick={() => setCurrentView('reports')} 
+                    onClick={() => navigateToView('reports')} 
                     active={currentView === 'reports'}
                     className="nav-item-custom"
                   >
@@ -250,7 +345,7 @@ function App() {
                   </Nav.Link>
                   
                   <Nav.Link 
-                    onClick={() => setCurrentView('userHistory')} 
+                    onClick={() => navigateToView('userHistory')} 
                     active={currentView === 'userHistory'}
                     className="nav-item-custom"
                   >
@@ -283,7 +378,7 @@ function App() {
                   <Button
                     variant="link"
                     className="nav-profile-btn"
-                    onClick={() => setCurrentView('profile')}
+                    onClick={() => navigateToView('profile')}
                     title="View Profile"
                   >
                     <i className="bi bi-person-circle me-1"></i>
@@ -310,7 +405,7 @@ function App() {
         {!isAuthenticated && currentView === 'login' && (
           <Login 
             onLogin={handleLogin} 
-            onSwitchToRegister={() => setCurrentView('register')} 
+            onSwitchToRegister={() => navigateToView('register')} 
             onSwitchToDoctor={handleSwitchToDoctor}
             onSwitchToAdmin={handleSwitchToAdmin}
             darkMode={darkMode} 
@@ -320,7 +415,7 @@ function App() {
         {!isAuthenticated && currentView === 'register' && (
           <Register 
             onRegister={handleLogin} 
-            onSwitchToLogin={() => setCurrentView('login')} 
+            onSwitchToLogin={() => navigateToView('login')} 
             onSwitchToDoctor={handleSwitchToDoctor}
             onSwitchToAdmin={handleSwitchToAdmin}
             darkMode={darkMode} 
@@ -330,7 +425,7 @@ function App() {
         {isAuthenticated && currentView === 'dashboard' && (
           <Dashboard 
             user={user}
-            onNavigate={setCurrentView}
+            onNavigate={navigateToView}
             onSymptomResult={handleSymptomResult}
             symptomCheckTrigger={symptomCheckTrigger}
           />

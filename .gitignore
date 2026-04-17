@@ -2,5 +2,8 @@ node_modules/
 .env
 .env.local
 .env.production
+.env.development
 build/
 dist/
+*.log
+.DS_Store

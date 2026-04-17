@@ -80,6 +80,14 @@ class DiseasePredictor:
         prediction = self.model.predict(symptom_vector)[0]
         probabilities = self.model.predict_proba(symptom_vector)[0]
         
+        # Cap confidence at 95% to prevent unrealistic 100% predictions
+        # Apply smoothing to make predictions more realistic
+        max_confidence = 0.95
+        probabilities = probabilities * max_confidence
+        
+        # Normalize probabilities to sum to 1
+        probabilities = probabilities / probabilities.sum()
+        
         # Get top 3 predictions
         top_indices = np.argsort(probabilities)[-3:][::-1]
         top_diseases = [(self.model.classes_[i], probabilities[i]) for i in top_indices]

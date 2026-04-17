@@ -1,57 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Badge, Button, Modal, Form, Nav, Alert } from 'react-bootstrap';
+import { Card, Badge, Button, Modal, Form, Row, Col, Container } from 'react-bootstrap';
 import { doctorAppointmentsAPI } from '../../utils/doctorApi';
 
 function DoctorAppointments() {
   const [appointments, setAppointments] = useState([]);
-  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const [todayAppointments, setTodayAppointments] = useState([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [pendingAppointments, setPendingAppointments] = useState([]);
+  const [pastAppointments, setPastAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all');
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [prescription, setPrescription] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [showModifyModal, setShowModifyModal] = useState(false);
-  const [modifyFormData, setModifyFormData] = useState({
-    date: '',
-    time: '',
-    reason: ''
-  });
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
-  useEffect(() => {
-    filterAppointments();
-  }, [activeTab, appointments]);
-
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      console.log('Fetching appointments...');
       const response = await doctorAppointmentsAPI.getAll();
-      console.log('Appointments response:', response);
-      console.log('Appointments data:', response.data.appointments);
-      setAppointments(response.data.appointments || []);
+      const allAppointments = response.data.appointments || [];
+      
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Separate appointments
+      const todayAppts = allAppointments.filter(apt => 
+        apt.date === today && apt.status !== 'Rejected' && apt.status !== 'Cancelled'
+      ).sort((a, b) => a.time.localeCompare(b.time));
+      
+      const upcomingAppts = allAppointments.filter(apt => 
+        apt.date > today && (apt.status === 'Confirmed' || apt.status === 'Pending')
+      ).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      const pendingAppts = allAppointments.filter(apt => 
+        apt.status === 'Pending'
+      ).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      const pastAppts = allAppointments.filter(apt => 
+        apt.date < today || apt.status === 'Completed' || apt.status === 'Rejected' || apt.status === 'Cancelled'
+      ).sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      setAppointments(allAppointments);
+      setTodayAppointments(todayAppts);
+      setUpcomingAppointments(upcomingAppts);
+      setPendingAppointments(pendingAppts);
+      setPastAppointments(pastAppts);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching appointments:', err);
-      console.error('Error details:', err.message);
-      alert('Failed to load appointments: ' + err.message);
-      setAppointments([]);
+      alert('Failed to load appointments');
       setLoading(false);
-    }
-  };
-
-  const filterAppointments = () => {
-    if (activeTab === 'all') {
-      setFilteredAppointments(appointments);
-    } else {
-      setFilteredAppointments(
-        appointments.filter(apt => apt.status.toLowerCase() === activeTab)
-      );
     }
   };
 
@@ -60,21 +61,28 @@ function DoctorAppointments() {
       await doctorAppointmentsAPI.updateStatus(appointmentId, 'Confirmed');
       fetchAppointments();
     } catch (err) {
-      console.error('Error accepting appointment:', err);
       alert('Failed to accept appointment');
     }
   };
 
   const handleReject = async (appointmentId) => {
-    const reason = prompt('Please provide a reason for rejection:');
+    const reason = prompt('Reason for rejection:');
     if (!reason) return;
 
     try {
       await doctorAppointmentsAPI.updateStatus(appointmentId, 'Rejected', null, reason);
       fetchAppointments();
     } catch (err) {
-      console.error('Error rejecting appointment:', err);
       alert('Failed to reject appointment');
+    }
+  };
+
+  const handleMarkCompleted = async (appointmentId) => {
+    try {
+      await doctorAppointmentsAPI.updateStatus(appointmentId, 'Completed');
+      fetchAppointments();
+    } catch (err) {
+      alert('Failed to mark as completed');
     }
   };
 
@@ -82,520 +90,303 @@ function DoctorAppointments() {
     setSelectedAppointment(appointment);
     setPrescription(appointment.prescription || '');
     setDiagnosis(appointment.diagnosis || '');
-    setShowModal(true);
+    setShowPrescriptionModal(true);
   };
 
   const handleSavePrescription = async () => {
     try {
-      // Always save diagnosis and prescription, even if empty
-      // This ensures the doctor's notes are preserved
       await doctorAppointmentsAPI.addPrescription(
         selectedAppointment.id,
-        prescription || '', // Save empty string if no prescription
-        diagnosis || '' // Save empty string if no diagnosis
+        prescription,
+        diagnosis
       );
-      setShowModal(false);
+      setShowPrescriptionModal(false);
       setPrescription('');
       setDiagnosis('');
       fetchAppointments();
-      alert('Prescription and diagnosis saved successfully');
+      alert('Saved successfully!');
     } catch (err) {
-      console.error('Error saving prescription:', err);
-      alert('Failed to save prescription: ' + err.message);
-    }
-  };
-
-  const handleCancelClick = (appointment) => {
-    setSelectedAppointment(appointment);
-    setShowCancelModal(true);
-  };
-
-  const handleConfirmCancel = async () => {
-    try {
-      console.log('[DoctorAppointments] Cancelling appointment:', selectedAppointment.id);
-      await doctorAppointmentsAPI.delete(selectedAppointment.id);
-      setShowCancelModal(false);
-      setSelectedAppointment(null);
-      fetchAppointments();
-      alert('Appointment cancelled successfully');
-    } catch (err) {
-      console.error('[DoctorAppointments] Error cancelling appointment:', err);
-      console.error('[DoctorAppointments] Error message:', err.message);
-      
-      let errorMessage = 'Failed to cancel appointment. ';
-      if (err.message && err.message.includes('permission')) {
-        errorMessage += 'Permission denied. Please run FIX_DOCTOR_PERMISSIONS.sql script.';
-      } else if (err.message) {
-        errorMessage += err.message;
-      }
-      
-      alert(errorMessage);
-    }
-  };
-
-  const handleModifyClick = (appointment) => {
-    setSelectedAppointment(appointment);
-    setModifyFormData({
-      date: appointment.date,
-      time: appointment.time,
-      reason: appointment.reason
-    });
-    setShowModifyModal(true);
-  };
-
-  const handleModifySubmit = async (e) => {
-    e.preventDefault();
-    try {
-      console.log('[DoctorAppointments] Modifying appointment:', selectedAppointment.id);
-      await doctorAppointmentsAPI.update(selectedAppointment.id, {
-        date: modifyFormData.date,
-        time: modifyFormData.time,
-        reason: modifyFormData.reason,
-        status: 'Confirmed' // Keep confirmed status for doctor modifications
-      });
-      setShowModifyModal(false);
-      setSelectedAppointment(null);
-      setModifyFormData({ date: '', time: '', reason: '' });
-      fetchAppointments();
-      alert('Appointment modified successfully');
-    } catch (err) {
-      console.error('[DoctorAppointments] Error modifying appointment:', err);
-      console.error('[DoctorAppointments] Error message:', err.message);
-      
-      let errorMessage = 'Failed to modify appointment. ';
-      if (err.message && err.message.includes('permission')) {
-        errorMessage += 'Permission denied. Please run FIX_DOCTOR_PERMISSIONS.sql script.';
-      } else if (err.message) {
-        errorMessage += err.message;
-      }
-      
-      alert(errorMessage);
+      alert('Failed to save');
     }
   };
 
   const getStatusBadge = (status) => {
-    const variants = {
-      'Pending': 'warning',
-      'Confirmed': 'success',
-      'Rejected': 'danger',
-      'Completed': 'info'
+    const badges = {
+      'Pending': <Badge bg="warning" className="status-badge-new">Pending</Badge>,
+      'Confirmed': <Badge bg="success" className="status-badge-new">Confirmed</Badge>,
+      'Completed': <Badge bg="info" className="status-badge-new">Completed</Badge>,
+      'Rejected': <Badge bg="danger" className="status-badge-new">Rejected</Badge>,
+      'Cancelled': <Badge bg="secondary" className="status-badge-new">Cancelled</Badge>
     };
-    return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
+    return badges[status] || <Badge bg="secondary">{status}</Badge>;
   };
 
   if (loading) {
     return (
-      <div className="appointments-loading">
+      <Container className="text-center py-5">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p>Loading appointments...</p>
-      </div>
+      </Container>
     );
   }
 
   return (
-    <div>
-      <Card className="appointments-management-card">
-        <Card.Header className="appointments-management-header">
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h4 className="mb-0">
-                <i className="bi bi-calendar-check-fill me-2"></i>
-                Appointment Management
-              </h4>
-              <small className="text-white-50">Manage all your patient appointments</small>
-            </div>
-            <Badge bg="light" text="dark" className="appointments-count-badge">
-              {appointments.length} Total
-            </Badge>
-          </div>
-        </Card.Header>
-        <Card.Body>
-          {/* Filter Tabs */}
-          <Nav variant="pills" className="mb-4" style={{ marginTop: '20px' }}>
-            <Nav.Item>
-              <Nav.Link 
-                active={activeTab === 'all'} 
-                onClick={() => setActiveTab('all')}
-              >
-                All ({appointments.length})
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link 
-                active={activeTab === 'pending'} 
-                onClick={() => setActiveTab('pending')}
-              >
-                Pending ({appointments.filter(a => a.status === 'Pending').length})
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link 
-                active={activeTab === 'confirmed'} 
-                onClick={() => setActiveTab('confirmed')}
-              >
-                Confirmed ({appointments.filter(a => a.status === 'Confirmed').length})
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link 
-                active={activeTab === 'rejected'} 
-                onClick={() => setActiveTab('rejected')}
-              >
-                Rejected ({appointments.filter(a => a.status === 'Rejected').length})
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
+    <Container fluid className="appointments-page-new">
+      {/* Header */}
+      <div className="page-header-new mb-4">
+        <h2><i className="bi bi-calendar-check me-2"></i>Appointments Management</h2>
+        <p className="text-muted">Manage your patient appointments efficiently</p>
+      </div>
 
-          {/* Appointments Table */}
-          {filteredAppointments.length === 0 ? (
-            <div className="appointments-empty-state">
-              <i className="bi bi-calendar-x"></i>
-              <p>No appointments found</p>
+      {/* Today's Appointments - Priority Section */}
+      {todayAppointments.length > 0 && (
+        <Card className="today-section-card mb-4">
+          <Card.Header className="today-header">
+            <div className="d-flex justify-content-between align-items-center">
+              <div>
+                <h4 className="mb-0">
+                  <i className="bi bi-calendar-day me-2"></i>
+                  Today's Appointments
+                </h4>
+                <small>All appointments scheduled for today</small>
+              </div>
+              <Badge bg="primary" className="count-badge">
+                {todayAppointments.length}
+              </Badge>
             </div>
-          ) : (
-            <div className="table-responsive">
-              <Table striped bordered hover className="doctor-appointments-table">
-                <thead>
-                  <tr>
-                    <th>Patient</th>
-                    <th>Date & Time</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredAppointments.map(apt => (
-                    <tr key={apt.id}>
-                      <td>
-                        <div className="patient-info-cell">
-                          <div className="patient-info-avatar">
-                            {(apt.patient_name || apt.users?.name || 'U').charAt(0).toUpperCase()}
-                          </div>
-                          <div className="patient-info-details">
-                            <div className="patient-info-name">
-                              {apt.patient_name || apt.users?.name || 'Unknown Patient'}
-                            </div>
-                            {(apt.patient_phone || apt.users?.phone) && (
-                              <div className="patient-info-contact">
-                                <i className="bi bi-telephone-fill"></i> {apt.patient_phone || apt.users?.phone}
-                              </div>
-                            )}
-                            {apt.users?.email && (
-                              <div className="patient-info-contact">
-                                <i className="bi bi-envelope-fill"></i> {apt.users.email}
-                              </div>
-                            )}
-                          </div>
+          </Card.Header>
+          <Card.Body className="p-0">
+            <div className="appointments-grid-new">
+              {todayAppointments.map(apt => (
+                <div key={apt.id} className="appointment-card-new today-card">
+                  <div className="card-header-new">
+                    <div className="patient-info-new">
+                      <div className="avatar-new">
+                        {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h5>{apt.patient_name || apt.users?.name || 'Unknown'}</h5>
+                        <small className="text-muted">
+                          <i className="bi bi-clock me-1"></i>{apt.time}
+                        </small>
+                      </div>
+                    </div>
+                    {getStatusBadge(apt.status)}
+                  </div>
+
+                  <div className="card-body-new">
+                    <div className="info-row-new">
+                      <i className="bi bi-telephone"></i>
+                      <span>{apt.patient_phone || apt.users?.phone || 'N/A'}</span>
+                    </div>
+                    <div className="info-row-new">
+                      <i className="bi bi-file-text"></i>
+                      <span>{apt.reason}</span>
+                    </div>
+                  </div>
+
+                  <div className="card-actions-new">
+                    {apt.status === 'Pending' && (
+                      <>
+                        <Button size="sm" variant="success" onClick={() => handleAccept(apt.id)}>
+                          <i className="bi bi-check-lg me-1"></i>Accept
+                        </Button>
+                        <Button size="sm" variant="danger" onClick={() => handleReject(apt.id)}>
+                          <i className="bi bi-x-lg me-1"></i>Reject
+                        </Button>
+                      </>
+                    )}
+                    {apt.status === 'Confirmed' && (
+                      <>
+                        <Button size="sm" variant="primary" onClick={() => handleAddPrescription(apt)}>
+                          <i className="bi bi-prescription2 me-1"></i>Add Prescription
+                        </Button>
+                        <Button size="sm" variant="info" onClick={() => handleMarkCompleted(apt.id)}>
+                          <i className="bi bi-check-circle me-1"></i>Mark Completed
+                        </Button>
+                      </>
+                    )}
+                    {apt.status === 'Completed' && apt.prescription && (
+                      <Button size="sm" variant="outline-primary" onClick={() => handleAddPrescription(apt)}>
+                        <i className="bi bi-eye me-1"></i>View Details
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card.Body>
+        </Card>
+      )}
+
+      <Row>
+        {/* Pending Requests */}
+        {pendingAppointments.length > 0 && (
+          <Col lg={6} className="mb-4">
+            <Card className="section-card-new">
+              <Card.Header className="section-header-new pending-header">
+                <h5><i className="bi bi-clock-history me-2"></i>Pending Requests</h5>
+                <Badge bg="warning" text="dark">{pendingAppointments.length}</Badge>
+              </Card.Header>
+              <Card.Body className="p-0">
+                <div className="appointments-list-new">
+                  {pendingAppointments.slice(0, 5).map(apt => (
+                    <div key={apt.id} className="appointment-item-new">
+                      <div className="item-header-new">
+                        <div className="avatar-small-new">
+                          {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
                         </div>
-                      </td>
-                      <td>
-                        <strong>{apt.date}</strong>
-                        <br />
-                        <small>{apt.time}</small>
-                      </td>
-                      <td>{apt.reason}</td>
-                      <td>{getStatusBadge(apt.status)}</td>
-                      <td>
-                        {apt.status === 'Pending' && (
-                          <div className="appointment-actions">
-                            <Button
-                              size="sm"
-                              variant="success"
-                              onClick={() => handleAccept(apt.id)}
-                            >
-                              <i className="bi bi-check-circle me-1"></i>
-                              Accept
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="danger"
-                              onClick={() => handleReject(apt.id)}
-                            >
-                              <i className="bi bi-x-circle me-1"></i>
-                              Reject
-                            </Button>
-                          </div>
-                        )}
-                        {apt.status === 'Confirmed' && (
-                          <div className="appointment-actions">
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              onClick={() => handleAddPrescription(apt)}
-                            >
-                              <i className="bi bi-prescription2 me-1"></i>
-                              {apt.prescription ? 'Edit' : 'Add'} Prescription
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline-secondary"
-                              onClick={() => handleModifyClick(apt)}
-                              className="mt-1"
-                            >
-                              <i className="bi bi-pencil me-1"></i>
-                              Modify
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline-danger"
-                              onClick={() => handleCancelClick(apt)}
-                              className="mt-1"
-                            >
-                              <i className="bi bi-x-lg me-1"></i>
-                              Cancel
-                            </Button>
-                          </div>
-                        )}
-                        {apt.status === 'Rejected' && apt.rejected_reason && (
+                        <div className="flex-grow-1">
+                          <h6>{apt.patient_name || apt.users?.name || 'Unknown'}</h6>
                           <small className="text-muted">
-                            <i className="bi bi-info-circle me-1"></i>
-                            Reason: {apt.rejected_reason}
+                            <i className="bi bi-calendar3 me-1"></i>{apt.date} • {apt.time}
                           </small>
-                        )}
-                      </td>
-                    </tr>
+                        </div>
+                      </div>
+                      <div className="item-actions-new">
+                        <Button size="sm" variant="success" onClick={() => handleAccept(apt.id)}>
+                          Accept
+                        </Button>
+                        <Button size="sm" variant="danger" onClick={() => handleReject(apt.id)}>
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </Table>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        )}
+
+        {/* Upcoming Appointments */}
+        {upcomingAppointments.length > 0 && (
+          <Col lg={6} className="mb-4">
+            <Card className="section-card-new">
+              <Card.Header className="section-header-new upcoming-header">
+                <h5><i className="bi bi-calendar-week me-2"></i>Upcoming</h5>
+                <Badge bg="light" text="dark">{upcomingAppointments.length}</Badge>
+              </Card.Header>
+              <Card.Body className="p-0">
+                <div className="appointments-list-new">
+                  {upcomingAppointments.slice(0, 5).map(apt => (
+                    <div key={apt.id} className="appointment-item-new">
+                      <div className="item-header-new">
+                        <div className="avatar-small-new">
+                          {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-grow-1">
+                          <h6>{apt.patient_name || apt.users?.name || 'Unknown'}</h6>
+                          <small className="text-muted">
+                            <i className="bi bi-calendar3 me-1"></i>{apt.date} • {apt.time}
+                          </small>
+                        </div>
+                        {getStatusBadge(apt.status)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        )}
+      </Row>
+
+      {/* Past Appointments */}
+      {pastAppointments.length > 0 && (
+        <Card className="section-card-new mb-4">
+          <Card.Header className="section-header-new past-header">
+            <h5><i className="bi bi-archive me-2"></i>Past Appointments</h5>
+            <Badge bg="light" text="dark">{pastAppointments.length}</Badge>
+          </Card.Header>
+          <Card.Body className="p-0">
+            <div className="appointments-list-new">
+              {pastAppointments.slice(0, 10).map(apt => (
+                <div key={apt.id} className="appointment-item-new">
+                  <div className="item-header-new">
+                    <div className="avatar-small-new past-avatar">
+                      {(apt.patient_name || apt.users?.name || 'P').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-grow-1">
+                      <h6>{apt.patient_name || apt.users?.name || 'Unknown'}</h6>
+                      <small className="text-muted">
+                        <i className="bi bi-calendar3 me-1"></i>{apt.date} • {apt.time}
+                      </small>
+                    </div>
+                    {getStatusBadge(apt.status)}
+                  </div>
+                  {apt.prescription && (
+                    <div className="mt-2">
+                      <Button size="sm" variant="outline-secondary" onClick={() => handleAddPrescription(apt)}>
+                        <i className="bi bi-eye me-1"></i>View Details
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
-        </Card.Body>
-      </Card>
+          </Card.Body>
+        </Card>
+      )}
 
       {/* Prescription Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" className="prescription-modal">
-        <Modal.Header closeButton>
+      <Modal show={showPrescriptionModal} onHide={() => setShowPrescriptionModal(false)} size="lg" centered>
+        <Modal.Header closeButton className="prescription-modal-header">
           <Modal.Title>
             <i className="bi bi-prescription2 me-2"></i>
-            Add Prescription
+            Add Prescription & Diagnosis
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedAppointment && (
-            <div className="patient-summary">
-              <div><strong>Patient:</strong> {selectedAppointment.patient_name || selectedAppointment.users?.name || 'Unknown Patient'}</div>
-              <div><strong>Date:</strong> {selectedAppointment.date} {selectedAppointment.time}</div>
-              {selectedAppointment.users?.email && (
-                <div><strong>Email:</strong> {selectedAppointment.users.email}</div>
-              )}
-              {(selectedAppointment.patient_phone || selectedAppointment.users?.phone) && (
-                <div><strong>Phone:</strong> {selectedAppointment.patient_phone || selectedAppointment.users.phone}</div>
-              )}
+            <div className="patient-info-modal mb-3">
+              <div className="avatar-large-new">
+                {(selectedAppointment.patient_name || selectedAppointment.users?.name || 'P').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h5>{selectedAppointment.patient_name || selectedAppointment.users?.name}</h5>
+                <small className="text-muted">
+                  {selectedAppointment.date} • {selectedAppointment.time}
+                </small>
+              </div>
             </div>
           )}
 
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">
-                <i className="bi bi-clipboard2-pulse me-2 text-primary"></i>
-                Diagnosis
-              </Form.Label>
+              <Form.Label><i className="bi bi-clipboard-pulse me-2"></i>Diagnosis</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
                 value={diagnosis}
                 onChange={(e) => setDiagnosis(e.target.value)}
-                placeholder="Enter your diagnosis for this patient..."
-                className="diagnosis-textarea"
+                placeholder="Enter diagnosis..."
               />
-              <Form.Text className="text-muted">
-                <i className="bi bi-info-circle me-1"></i>
-                Your diagnosis will be saved and visible to the patient
-              </Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">
-                <i className="bi bi-prescription2 me-2 text-success"></i>
-                Prescription
-              </Form.Label>
+              <Form.Label><i className="bi bi-prescription2 me-2"></i>Prescription</Form.Label>
               <Form.Control
                 as="textarea"
-                rows={5}
+                rows={4}
                 value={prescription}
                 onChange={(e) => setPrescription(e.target.value)}
-                placeholder="Enter prescription details (medications, dosage, instructions)..."
-                className="prescription-textarea"
+                placeholder="Enter prescription details..."
               />
-              <Form.Text className="text-muted">
-                <i className="bi bi-info-circle me-1"></i>
-                Prescription will be saved and accessible to the patient
-              </Form.Text>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            <i className="bi bi-x-circle me-2"></i>
+          <Button variant="secondary" onClick={() => setShowPrescriptionModal(false)}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleSavePrescription}>
-            <i className="bi bi-check-circle me-2"></i>
-            Save Diagnosis & Prescription
+            <i className="bi bi-save me-2"></i>Save
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Modify Appointment Modal */}
-      <Modal
-        show={showModifyModal}
-        onHide={() => {
-          setShowModifyModal(false);
-          setSelectedAppointment(null);
-          setModifyFormData({ date: '', time: '', reason: '' });
-        }}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <i className="bi bi-pencil-square me-2"></i>
-            Modify Appointment
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedAppointment && (
-            <div className="patient-summary mb-3">
-              <div><strong>Patient:</strong> {selectedAppointment.patient_name || selectedAppointment.users?.name || 'Unknown Patient'}</div>
-              <div><strong>Email:</strong> {selectedAppointment.users?.email || 'No email'}</div>
-              {(selectedAppointment.patient_phone || selectedAppointment.users?.phone) && (
-                <div><strong>Phone:</strong> {selectedAppointment.patient_phone || selectedAppointment.users?.phone}</div>
-              )}
-            </div>
-          )}
-
-          <Form onSubmit={handleModifySubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <i className="bi bi-calendar3 me-2"></i>
-                Date
-              </Form.Label>
-              <Form.Control
-                type="date"
-                value={modifyFormData.date}
-                onChange={(e) => setModifyFormData({ ...modifyFormData, date: e.target.value })}
-                min={new Date().toISOString().split('T')[0]}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <i className="bi bi-clock me-2"></i>
-                Time
-              </Form.Label>
-              <Form.Control
-                type="time"
-                value={modifyFormData.time}
-                onChange={(e) => setModifyFormData({ ...modifyFormData, time: e.target.value })}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <i className="bi bi-file-text me-2"></i>
-                Reason
-              </Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={modifyFormData.reason}
-                onChange={(e) => setModifyFormData({ ...modifyFormData, reason: e.target.value })}
-                required
-              />
-            </Form.Group>
-
-            <div className="d-flex gap-2">
-              <Button
-                variant="outline-secondary"
-                onClick={() => {
-                  setShowModifyModal(false);
-                  setSelectedAppointment(null);
-                  setModifyFormData({ date: '', time: '', reason: '' });
-                }}
-                className="flex-fill"
-              >
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit" className="flex-fill">
-                <i className="bi bi-check-lg me-2"></i>
-                Save Changes
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
-
-      {/* Cancel Confirmation Modal */}
-      <Modal
-        show={showCancelModal}
-        onHide={() => {
-          setShowCancelModal(false);
-          setSelectedAppointment(null);
-        }}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <i className="bi bi-exclamation-triangle me-2 text-warning"></i>
-            Confirm Cancellation
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedAppointment && (
-            <>
-              <p>Are you sure you want to cancel this appointment?</p>
-              <div className="appointment-details-box p-3 bg-light rounded">
-                <div className="mb-2">
-                  <strong>Patient:</strong> {selectedAppointment.patient_name || selectedAppointment.users?.name || 'Unknown Patient'}
-                </div>
-                {selectedAppointment.users?.email && (
-                  <div className="mb-2">
-                    <strong>Email:</strong> {selectedAppointment.users.email}
-                  </div>
-                )}
-                {(selectedAppointment.patient_phone || selectedAppointment.users?.phone) && (
-                  <div className="mb-2">
-                    <strong>Phone:</strong> {selectedAppointment.patient_phone || selectedAppointment.users.phone}
-                  </div>
-                )}
-                <div className="mb-2">
-                  <strong>Date:</strong> {selectedAppointment.date}
-                </div>
-                <div className="mb-2">
-                  <strong>Time:</strong> {selectedAppointment.time}
-                </div>
-                <div>
-                  <strong>Reason:</strong> {selectedAppointment.reason}
-                </div>
-              </div>
-              <Alert variant="warning" className="mt-3 mb-0">
-                <i className="bi bi-info-circle me-2"></i>
-                This action cannot be undone. The patient will be notified of the cancellation.
-              </Alert>
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="outline-secondary"
-            onClick={() => {
-              setShowCancelModal(false);
-              setSelectedAppointment(null);
-            }}
-          >
-            Keep Appointment
-          </Button>
-          <Button variant="danger" onClick={handleConfirmCancel}>
-            <i className="bi bi-x-lg me-2"></i>
-            Yes, Cancel Appointment
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+    </Container>
   );
 }
 

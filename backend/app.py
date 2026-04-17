@@ -335,12 +335,31 @@ def symptom_check(current_user):
         db.session.add(symptom_check)
         db.session.commit()
         
+        # Prepare recommended doctors list
+        # Always include General Physician as a secondary recommendation
+        recommended_doctors = [
+            {
+                'specialization': disease_info['specialization'],
+                'reason': 'Primary recommendation based on symptoms',
+                'priority': 'primary'
+            }
+        ]
+        
+        # Add General Physician if it's not already the primary recommendation
+        if disease_info['specialization'].lower() != 'general physician':
+            recommended_doctors.append({
+                'specialization': 'General Physician',
+                'reason': 'Can provide general consultation and referrals',
+                'priority': 'secondary'
+            })
+        
         return jsonify({
             'disease': predicted_disease,
             'confidence': float(top_diseases[0][1]) * 100,
             'specialization': disease_info['specialization'],
             'description': disease_info['description'],
             'precautions': disease_info['precautions'],
+            'recommended_doctors': recommended_doctors,
             'top_predictions': [
                 {
                     'disease': disease,

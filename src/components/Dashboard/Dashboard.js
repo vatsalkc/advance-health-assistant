@@ -129,10 +129,15 @@ function Dashboard({ user, onNavigate, onSymptomResult, symptomCheckTrigger }) {
         </div>
       ) : (
         <>
-          {/* Stats Overview */}
+          {/* Stats Overview - Clickable Cards */}
           <Row className="g-4 mb-4">
             <Col lg={4} md={6}>
-              <div className="stat-card-modern stat-purple">
+              <div 
+                className="stat-card-modern stat-purple clickable-card" 
+                onClick={() => onNavigate('appointments')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="stat-icon">
                   <i className="bi bi-calendar-check-fill"></i>
                 </div>
@@ -141,12 +146,17 @@ function Dashboard({ user, onNavigate, onSymptomResult, symptomCheckTrigger }) {
                   <p className="stat-label">Appointments</p>
                 </div>
                 <div className="stat-trend">
-                  <i className="bi bi-graph-up"></i>
+                  <i className="bi bi-arrow-right"></i>
                 </div>
               </div>
             </Col>
             <Col lg={4} md={6}>
-              <div className="stat-card-modern stat-blue">
+              <div 
+                className="stat-card-modern stat-blue clickable-card" 
+                onClick={() => onNavigate('medicineReminder')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="stat-icon">
                   <i className="bi bi-capsule-pill"></i>
                 </div>
@@ -155,12 +165,17 @@ function Dashboard({ user, onNavigate, onSymptomResult, symptomCheckTrigger }) {
                   <p className="stat-label">Active Medicines</p>
                 </div>
                 <div className="stat-trend">
-                  <i className="bi bi-graph-up"></i>
+                  <i className="bi bi-arrow-right"></i>
                 </div>
               </div>
             </Col>
             <Col lg={4} md={6}>
-              <div className="stat-card-modern stat-green">
+              <div 
+                className="stat-card-modern stat-green clickable-card" 
+                onClick={() => onNavigate('symptomChecker')}
+                role="button"
+                tabIndex={0}
+              >
                 <div className="stat-icon">
                   <i className="bi bi-heart-pulse-fill"></i>
                 </div>
@@ -169,7 +184,7 @@ function Dashboard({ user, onNavigate, onSymptomResult, symptomCheckTrigger }) {
                   <p className="stat-label">Health Checks</p>
                 </div>
                 <div className="stat-trend">
-                  <i className="bi bi-graph-up"></i>
+                  <i className="bi bi-arrow-right"></i>
                 </div>
               </div>
             </Col>

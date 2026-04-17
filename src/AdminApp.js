@@ -12,6 +12,62 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
   const [currentView, setCurrentView] = useState('login');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [admin, setAdmin] = useState(null);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    // Prevent browser back button from exiting the app - ENHANCED
+    const handlePopState = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.history.pushState(null, '', window.location.href);
+      return false;
+    };
+
+    const handleBeforeUnload = (e) => {
+      if (!window.isLoggingOut) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    window.onpopstate = function () {
+      window.history.pushState(null, null, window.location.href);
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.onpopstate = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Navbar scroll behavior
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < 10) {
+        setShowNavbar(true);
+      } else if (currentScrollY < lastScrollY) {
+        setShowNavbar(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setShowNavbar(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -62,6 +118,8 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
     try {
       console.log('[AdminApp] Logging out...');
       
+      window.isLoggingOut = true;
+      
       await adminAuthService.logout();
       
       // Clear all state
@@ -69,9 +127,15 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
       setIsAuthenticated(false);
       setCurrentView('login');
       
+      setTimeout(() => {
+        window.isLoggingOut = false;
+      }, 100);
+      
       console.log('[AdminApp] Logout complete');
     } catch (error) {
       console.error('[AdminApp] Logout error:', error);
+      
+      window.isLoggingOut = false;
       
       // Force clear state even if there's an error
       setAdmin(null);
@@ -82,9 +146,17 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
 
   return (
     <div className="App">
-      <Navbar expand="lg" className="navbar-custom">
+      <Navbar 
+        expand="lg" 
+        className={`navbar-custom navbar-sticky ${showNavbar ? 'navbar-visible' : 'navbar-hidden'}`}
+        fixed="top"
+      >
         <Container>
-          <Navbar.Brand href="#home">
+          <Navbar.Brand 
+            className="fw-bold"
+            style={{ cursor: 'pointer' }}
+            onClick={() => isAuthenticated && setCurrentView('dashboard')}
+          >
             <i className="bi bi-shield-lock-fill"></i>
             Admin Portal
           </Navbar.Brand>
@@ -127,6 +199,18 @@ function AdminApp({ onSwitchToPatient, darkMode, setDarkMode }) {
                   >
                     <i className="bi bi-shield-check me-2"></i>
                     <span>{admin?.name}</span>
+                  </Button>
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    className="me-2"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSwitchToPatient();
+                    }}
+                    title="Switch to Patient Portal"
+                  >
+                    <i className="bi bi-arrow-left me-1"></i>Back to Patient
                   </Button>
                   <Button
                     variant="outline-primary"

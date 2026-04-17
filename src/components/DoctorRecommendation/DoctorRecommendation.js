@@ -4,6 +4,7 @@ import { doctorsAPI } from '../../utils/api';
 
 function DoctorRecommendation({ predictionResult, onBookAppointment }) {
   const [doctors, setDoctors] = useState([]);
+  const [generalPhysicians, setGeneralPhysicians] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,8 +16,16 @@ function DoctorRecommendation({ predictionResult, onBookAppointment }) {
   const fetchDoctors = async () => {
     setLoading(true);
     try {
+      // Fetch primary specialist doctors
       const response = await doctorsAPI.getAll(predictionResult.specialization);
       setDoctors(response.data.doctors);
+      
+      // Fetch General Physicians if primary is not General Physician
+      if (predictionResult.specialization.toLowerCase() !== 'general physician') {
+        const gpResponse = await doctorsAPI.getAll('General Physician');
+        setGeneralPhysicians(gpResponse.data.doctors);
+      }
+      
       setLoading(false);
     } catch (error) {
       console.error('Error fetching doctors:', error);
@@ -172,6 +181,50 @@ function DoctorRecommendation({ predictionResult, onBookAppointment }) {
           )}
         </Card.Body>
       </Card>
+
+      {/* General Physicians - Always show if not primary */}
+      {generalPhysicians.length > 0 && (
+        <Card className="mt-3">
+          <Card.Body>
+            <div className="doctors-section-header">
+              <h4>
+                <i className="bi bi-people-fill"></i>
+                General Physicians
+              </h4>
+              <p>Can provide general consultation and referrals</p>
+            </div>
+
+            <Row>
+              {generalPhysicians.map((doctor) => (
+                <Col md={4} key={doctor.id} className="mb-3">
+                  <div className="doctor-card-result">
+                    <h5>{doctor.name}</h5>
+                    <div className="doctor-specialization-badge">
+                      {doctor.specialization}
+                    </div>
+                    <div className="doctor-info-item">
+                      <strong>Experience:</strong> {doctor.experience}
+                    </div>
+                    <div className="doctor-info-item">
+                      <strong>Rating:</strong> 
+                      <span className="doctor-rating ms-1">
+                        <i className="bi bi-star-fill"></i> {doctor.rating}/5
+                      </span>
+                    </div>
+                    <button 
+                      className="book-appointment-btn"
+                      onClick={() => onBookAppointment(doctor)}
+                    >
+                      <i className="bi bi-calendar-plus me-1"></i>
+                      Book Appointment
+                    </button>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </Card.Body>
+        </Card>
+      )}
     </div>
   );
 }
