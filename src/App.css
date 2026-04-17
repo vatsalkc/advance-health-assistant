@@ -3303,8 +3303,9 @@ button.btn-lg {
 }
 
 .appointment-status.cancelled {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #dc3545;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 [data-theme="dark"] .appointment-status.confirmed {
@@ -3318,8 +3319,9 @@ button.btn-lg {
 }
 
 [data-theme="dark"] .appointment-status.cancelled {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
+  background: #dc3545;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .appointment-card-body {
@@ -12732,4 +12734,279 @@ body {
 .loading-state p {
   color: var(--text-secondary);
   margin: 0;
+}
+
+/* ===================================
+   COMPREHENSIVE DARK MODE IMPROVEMENTS
+   =================================== */
+
+/* Admin Portal Dark Mode */
+[data-theme="dark"] .card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .card-header {
+  background-color: #111827;
+  border-bottom-color: #374151;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .table {
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .table thead th {
+  background-color: #111827;
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .table-bordered > :not(caption) > * {
+  border-color: #374151;
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Badge improvements for dark mode */
+[data-theme="dark"] .badge {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .badge.bg-info {
+  background-color: #0ea5e9 !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .badge.bg-success {
+  background-color: #10b981 !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .badge.bg-warning {
+  background-color: #f59e0b !important;
+  color: #000 !important;
+}
+
+[data-theme="dark"] .badge.bg-danger {
+  background-color: #ef4444 !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .badge.bg-secondary {
+  background-color: #6b7280 !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .badge.bg-primary {
+  background-color: #3b82f6 !important;
+  color: #fff !important;
+}
+
+/* Button improvements for dark mode */
+[data-theme="dark"] .btn-outline-primary {
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+[data-theme="dark"] .btn-outline-primary:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+  color: #9ca3af;
+  border-color: #6b7280;
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+  background-color: #6b7280;
+  border-color: #6b7280;
+  color: #fff;
+}
+
+/* Modal improvements for dark mode */
+[data-theme="dark"] .modal-content {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .modal-header {
+  background-color: #111827;
+  border-bottom-color: #374151;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .modal-footer {
+  border-top-color: #374151;
+}
+
+[data-theme="dark"] .modal-body {
+  color: #f9fafb;
+}
+
+/* Form improvements for dark mode */
+[data-theme="dark"] .form-control {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .form-control:focus {
+  background-color: #374151;
+  border-color: #60a5fa;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .form-label {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .form-text {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .form-select {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Alert improvements for dark mode */
+[data-theme="dark"] .alert-success {
+  background-color: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .alert-danger {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .alert-warning {
+  background-color: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .alert-info {
+  background-color: rgba(14, 165, 233, 0.2);
+  border-color: #0ea5e9;
+  color: #7dd3fc;
+}
+
+/* Dropdown improvements for dark mode */
+[data-theme="dark"] .dropdown-menu {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: #374151;
+  color: #fff;
+}
+
+/* Navbar improvements for dark mode */
+[data-theme="dark"] .navbar-custom {
+  background-color: #111827;
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .nav-link {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .nav-link:hover,
+[data-theme="dark"] .nav-link.active {
+  color: #60a5fa !important;
+}
+
+/* Dashboard card improvements */
+[data-theme="dark"] .stat-card {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border-color: #374151;
+}
+
+[data-theme="dark"] .stat-card:hover {
+  border-color: #60a5fa;
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2);
+}
+
+/* Empty state improvements */
+[data-theme="dark"] .empty-state {
+  color: #9ca3af;
+}
+
+/* Loading state improvements */
+[data-theme="dark"] .loading-state {
+  color: #9ca3af;
+}
+
+/* Ensure all text is readable in dark mode */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] div {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] strong {
+  color: #f9fafb;
+}
+
+/* Fix any remaining readability issues */
+[data-theme="dark"] .text-muted {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .text-dark {
+  color: #f9fafb !important;
+}
+
+/* Ensure status badges are always readable */
+.badge.bg-danger,
+.appointment-status.cancelled,
+.appointment-status.rejected {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .badge.bg-danger,
+[data-theme="dark"] .appointment-status.cancelled,
+[data-theme="dark"] .appointment-status.rejected {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Light mode - ensure cancelled is readable */
+[data-theme="light"] .badge.bg-danger,
+[data-theme="light"] .appointment-status.cancelled,
+[data-theme="light"] .appointment-status.rejected {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+  font-weight: 600;
 }
