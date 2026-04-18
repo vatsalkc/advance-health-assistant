@@ -71,10 +71,26 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
       return false;
     }
 
+    // Name validation - only letters and spaces
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      setError('Name must contain only letters and spaces');
+      return false;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError('Please enter a valid email address');
       return false;
+    }
+
+    // Phone validation - exactly 10 digits (if provided)
+    if (formData.phone) {
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        setError('Phone number must be exactly 10 digits');
+        return false;
+      }
     }
 
     // Strong password validation
@@ -152,6 +168,8 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handleChange}
+                pattern="[a-zA-Z\s]+"
+                title="Name must contain only letters and spaces"
                 required
               />
             </Form.Group>
@@ -173,9 +191,12 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
               <Form.Control
                 type="tel"
                 name="phone"
-                placeholder="Enter phone number"
+                placeholder="Enter 10 digit phone number"
                 value={formData.phone}
                 onChange={handleChange}
+                pattern="\d{10}"
+                title="Phone number must be exactly 10 digits"
+                maxLength="10"
               />
             </Form.Group>
 

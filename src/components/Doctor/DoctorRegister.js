@@ -91,6 +91,22 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
     e.preventDefault();
     setError('');
 
+    // Name validation - only letters and spaces
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      setError('Name must contain only letters and spaces');
+      return;
+    }
+
+    // Phone validation - exactly 10 digits (if provided)
+    if (formData.phone) {
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        setError('Phone number must be exactly 10 digits');
+        return;
+      }
+    }
+
     // Strong password validation
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters long');
@@ -157,6 +173,8 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Dr. John Doe"
+                    pattern="[a-zA-Z\s]+"
+                    title="Name must contain only letters and spaces"
                     required
                     className={darkMode ? 'bg-dark text-light' : ''}
                   />
@@ -245,7 +263,10 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+1234567890"
+                    placeholder="10 digit number"
+                    pattern="\d{10}"
+                    title="Phone number must be exactly 10 digits"
+                    maxLength="10"
                     className={darkMode ? 'bg-dark text-light' : ''}
                   />
                 </Form.Group>
