@@ -1,0 +1,475 @@
+ADVANCED HEALTH ASSISTANT - TECHNOLOGY STACK & SYSTEM REQUIREMENTS
+
+═══════════════════════════════════════════════════════════════════════════════
+TECHNOLOGY STACK
+═══════════════════════════════════════════════════════════════════════════════
+
+FRONTEND TECHNOLOGIES
+─────────────────────────────────────────────────────────────────────────────
+
+• React.js 18.x
+  - Modern JavaScript library for building user interfaces
+  - Component-based architecture with functional components
+  - Hooks (useState, useEffect, useContext) for state management
+  - Virtual DOM for optimal rendering performance
+  - Single Page Application (SPA) architecture
+
+• Bootstrap 5.3
+  - Responsive CSS framework for consistent UI design
+  - Pre-built components (Navbar, Cards, Forms, Modals)
+  - Grid system for responsive layouts
+  - Utility classes for rapid development
+  - Mobile-first design approach
+
+• React Bootstrap
+  - React components for Bootstrap framework
+  - Seamless integration with React ecosystem
+  - Type-safe component props
+  - Improved accessibility features
+
+• Bootstrap Icons 1.11
+  - Comprehensive icon library with 2000+ icons
+  - SVG-based icons for scalability
+  - Consistent design language across platform
+
+• CSS3 & Custom Styling
+  - CSS Variables for theme management (dark/light mode)
+  - Flexbox and Grid for modern layouts
+  - Transitions and animations for smooth UX
+  - Media queries for responsive design
+
+
+BACKEND TECHNOLOGIES
+─────────────────────────────────────────────────────────────────────────────
+
+• Supabase
+  - Open-source Firebase alternative
+  - PostgreSQL database with real-time capabilities
+  - Built-in authentication and authorization
+  - Row Level Security (RLS) policies
+  - RESTful API auto-generation
+  - Real-time subscriptions for live updates
+
+• PostgreSQL
+  - Relational database management system
+  - ACID compliance for data integrity
+  - Advanced indexing and query optimization
+  - JSON support for flexible data structures
+  - Triggers and stored procedures
+
+• Supabase Auth
+  - JWT-based authentication system
+  - Email/password authentication
+  - Session management with token refresh
+  - Role-based access control (RBAC)
+  - Secure password hashing with bcrypt
+
+
+ARTIFICIAL INTELLIGENCE & MACHINE LEARNING
+─────────────────────────────────────────────────────────────────────────────
+
+• Google Gemini AI API
+  - Advanced language model for chatbot functionality
+  - Natural language understanding and generation
+  - Context-aware conversational responses
+  - Real-time API integration
+  - Multi-turn dialogue support
+
+• Python 3.x (ML Model)
+  - Backend language for machine learning model
+  - scikit-learn for model training
+  - pandas for data processing
+  - NumPy for numerical computations
+
+• Flask/FastAPI
+  - Python web framework for ML model API
+  - RESTful endpoints for predictions
+  - JSON request/response handling
+  - CORS support for cross-origin requests
+
+• Machine Learning Model
+  - Trained on 34 diseases dataset
+  - 132 symptom features
+  - Classification algorithm (Random Forest/Decision Tree)
+  - Confidence score calculation
+  - Serialized model (.pkl format)
+
+
+API & COMMUNICATION
+─────────────────────────────────────────────────────────────────────────────
+
+• Axios
+  - Promise-based HTTP client
+  - Request/response interceptors
+  - Automatic JSON transformation
+  - Error handling and retry logic
+  - Base URL configuration
+
+• RESTful API Architecture
+  - Standard HTTP methods (GET, POST, PUT, DELETE)
+  - JSON data format
+  - Stateless communication
+  - Resource-based URL structure
+
+• WebSocket (Supabase Realtime)
+  - Real-time data synchronization
+  - Live appointment updates
+  - Instant notification delivery
+  - Bi-directional communication
+
+
+PROGRESSIVE WEB APP (PWA) FEATURES
+─────────────────────────────────────────────────────────────────────────────
+
+• Service Workers
+  - Background script for offline functionality
+  - Push notification support
+  - Caching strategies for performance
+  - Background sync capabilities
+
+• Web Notification API
+  - Browser-level notifications
+  - Permission management
+  - Notification actions and interactions
+  - Badge and icon customization
+
+• LocalStorage & SessionStorage
+  - Client-side data persistence
+  - Theme preferences storage
+  - Session management
+  - Offline data caching
+
+
+DEVELOPMENT TOOLS & ENVIRONMENT
+─────────────────────────────────────────────────────────────────────────────
+
+• Node.js 18.x or higher
+  - JavaScript runtime environment
+  - npm package manager
+  - Development server
+
+• Create React App
+  - React project scaffolding tool
+  - Webpack configuration
+  - Babel transpilation
+  - Hot module replacement
+
+• Git & GitHub
+  - Version control system
+  - Repository hosting
+  - Collaboration and code review
+  - CI/CD integration
+
+• VS Code (Recommended IDE)
+  - IntelliSense for code completion
+  - Debugging tools
+  - Extensions for React development
+  - Integrated terminal
+
+
+DEPLOYMENT & HOSTING
+─────────────────────────────────────────────────────────────────────────────
+
+• GitHub Pages
+  - Static site hosting
+  - Automatic deployment from repository
+  - Custom domain support
+  - HTTPS enabled by default
+
+• Vercel/Netlify (Alternative)
+  - Serverless deployment platform
+  - Automatic builds and deployments
+  - Environment variable management
+  - CDN for global distribution
+
+
+SECURITY TECHNOLOGIES
+─────────────────────────────────────────────────────────────────────────────
+
+• JWT (JSON Web Tokens)
+  - Secure authentication tokens
+  - Stateless session management
+  - Token expiration and refresh
+  - Signature verification
+
+• HTTPS/TLS
+  - Encrypted data transmission
+  - SSL certificates
+  - Secure communication protocol
+
+• bcrypt
+  - Password hashing algorithm
+  - Salt generation
+  - Secure credential storage
+
+• Row Level Security (RLS)
+  - Database-level access control
+  - User-specific data filtering
+  - Policy-based permissions
+  - SQL injection prevention
+
+
+═══════════════════════════════════════════════════════════════════════════════
+SYSTEM REQUIREMENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+MINIMUM HARDWARE REQUIREMENTS (CLIENT SIDE)
+─────────────────────────────────────────────────────────────────────────────
+
+• Processor: Dual-core CPU (2.0 GHz or higher)
+• RAM: 2 GB minimum, 4 GB recommended
+• Storage: 100 MB free disk space for browser cache
+• Display: 1024x768 resolution minimum
+• Network: Stable internet connection (2 Mbps minimum)
+
+
+RECOMMENDED HARDWARE REQUIREMENTS (CLIENT SIDE)
+─────────────────────────────────────────────────────────────────────────────
+
+• Processor: Quad-core CPU (2.5 GHz or higher)
+• RAM: 8 GB or more
+• Storage: 500 MB free disk space
+• Display: 1920x1080 resolution or higher
+• Network: Broadband internet connection (10 Mbps or higher)
+
+
+SUPPORTED WEB BROWSERS
+─────────────────────────────────────────────────────────────────────────────
+
+• Google Chrome 90+ (Recommended)
+  - Full feature support including Service Workers
+  - Best performance and compatibility
+  - Push notification support
+
+• Mozilla Firefox 88+
+  - Complete feature compatibility
+  - Service Worker support
+  - Notification API support
+
+• Microsoft Edge 90+ (Chromium-based)
+  - Full feature support
+  - Excellent performance
+  - PWA capabilities
+
+• Safari 14+ (macOS/iOS)
+  - Core features supported
+  - Limited Service Worker support
+  - Notification support on macOS only
+
+• Opera 76+
+  - Full feature compatibility
+  - Chromium-based engine
+
+Note: Internet Explorer is NOT supported
+
+
+MOBILE DEVICE REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Android Devices
+  - Android 8.0 (Oreo) or higher
+  - Chrome 90+ or Firefox 88+
+  - 2 GB RAM minimum
+  - Touch screen support
+
+• iOS Devices
+  - iOS 14.0 or higher
+  - Safari 14+ or Chrome for iOS
+  - iPhone 6s or newer
+  - iPad (5th generation) or newer
+
+
+DEVELOPMENT ENVIRONMENT REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Operating System
+  - Windows 10/11 (64-bit)
+  - macOS 10.15 (Catalina) or higher
+  - Linux (Ubuntu 20.04 LTS or equivalent)
+
+• Node.js & npm
+  - Node.js version 18.x or higher
+  - npm version 9.x or higher
+  - npx for package execution
+
+• Python (for ML Model)
+  - Python 3.8 or higher
+  - pip package manager
+  - Virtual environment (venv/conda)
+
+• Git
+  - Git version 2.30 or higher
+  - GitHub account for repository access
+
+• Code Editor
+  - VS Code (recommended)
+  - WebStorm
+  - Sublime Text
+  - Atom
+
+
+SERVER REQUIREMENTS (BACKEND/ML MODEL)
+─────────────────────────────────────────────────────────────────────────────
+
+• Processor: Quad-core CPU (2.5 GHz or higher)
+• RAM: 4 GB minimum, 8 GB recommended
+• Storage: 10 GB free disk space
+• Operating System: Linux (Ubuntu 20.04 LTS recommended)
+• Python: 3.8 or higher with required packages
+• Network: Static IP address or domain name
+• SSL Certificate: For HTTPS communication
+
+
+NETWORK REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Internet Connection
+  - Minimum: 2 Mbps download, 1 Mbps upload
+  - Recommended: 10 Mbps download, 5 Mbps upload
+  - Latency: Less than 100ms for optimal performance
+
+• Firewall Configuration
+  - Allow HTTPS (port 443) for secure communication
+  - Allow WebSocket connections for real-time features
+  - Allow Service Worker registration
+
+• API Access
+  - Access to Supabase API endpoints
+  - Access to Google Gemini AI API
+  - Access to ML model prediction API
+
+
+THIRD-PARTY SERVICE REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Supabase Account
+  - Free tier or paid subscription
+  - Project with PostgreSQL database
+  - API keys and project URL
+  - Row Level Security policies configured
+
+• Google Gemini AI API
+  - Google Cloud account
+  - Gemini API key
+  - API quota and rate limits
+  - Billing enabled (if using paid tier)
+
+• GitHub Account (for deployment)
+  - Repository access
+  - GitHub Pages enabled
+  - Actions for CI/CD (optional)
+
+
+BROWSER PERMISSIONS REQUIRED
+─────────────────────────────────────────────────────────────────────────────
+
+• Notifications
+  - Required for medicine reminders
+  - User must grant permission
+  - Works in background with Service Workers
+
+• LocalStorage
+  - Required for theme preferences
+  - Session data storage
+  - Offline functionality
+
+• Cookies
+  - Required for authentication
+  - Session management
+  - JWT token storage
+
+• JavaScript
+  - Must be enabled
+  - Required for all functionality
+  - No fallback for disabled JavaScript
+
+
+ACCESSIBILITY REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Screen Reader Support
+  - ARIA labels and roles
+  - Semantic HTML structure
+  - Keyboard navigation support
+
+• Color Contrast
+  - WCAG 2.1 Level AA compliance
+  - High contrast mode support
+  - Dark/light theme options
+
+• Font Scaling
+  - Responsive text sizing
+  - Support for browser zoom (up to 200%)
+  - Readable at various screen sizes
+
+
+SECURITY REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• HTTPS Protocol
+  - SSL/TLS certificate required
+  - Secure data transmission
+  - Mixed content prevention
+
+• Authentication
+  - Strong password requirements (8+ characters)
+  - Email verification
+  - Session timeout after inactivity
+
+• Data Protection
+  - HIPAA compliance for health data
+  - Encrypted data storage
+  - Secure API communication
+  - Regular security audits
+
+
+PERFORMANCE REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Page Load Time
+  - Initial load: Less than 3 seconds
+  - Subsequent loads: Less than 1 second (with caching)
+  - API response time: Less than 500ms
+
+• Concurrent Users
+  - Support for 100+ simultaneous users
+  - Scalable architecture for growth
+  - Load balancing for high traffic
+
+• Database Performance
+  - Query execution: Less than 100ms
+  - Real-time updates: Less than 500ms latency
+  - Indexed queries for optimization
+
+
+BACKUP & RECOVERY REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• Database Backup
+  - Daily automated backups
+  - Point-in-time recovery capability
+  - Backup retention for 30 days minimum
+
+• Disaster Recovery
+  - Recovery Time Objective (RTO): 4 hours
+  - Recovery Point Objective (RPO): 24 hours
+  - Documented recovery procedures
+
+
+COMPLIANCE REQUIREMENTS
+─────────────────────────────────────────────────────────────────────────────
+
+• HIPAA Compliance
+  - Protected Health Information (PHI) security
+  - Access controls and audit logs
+  - Data encryption at rest and in transit
+
+• GDPR Compliance (if applicable)
+  - User consent management
+  - Right to data deletion
+  - Data portability features
+
+• Accessibility Standards
+  - WCAG 2.1 Level AA compliance
+  - Section 508 compliance
+  - Keyboard navigation support

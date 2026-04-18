@@ -16,6 +16,13 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
 
   const specializations = [
     'General Physician',
@@ -65,20 +72,53 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Check password strength on password field change
+    if (name === 'password') {
+      setPasswordStrength({
+        length: value.length >= 8,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(value)
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+    // Strong password validation
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!/[A-Z]/.test(formData.password)) {
+      setError('Password must contain at least one uppercase letter');
+      return;
+    }
+
+    if (!/[a-z]/.test(formData.password)) {
+      setError('Password must contain at least one lowercase letter');
+      return;
+    }
+
+    if (!/[0-9]/.test(formData.password)) {
+      setError('Password must contain at least one number');
+      return;
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+      setError('Password must contain at least one special character (!@#$%^&*...)');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -148,10 +188,35 @@ function DoctorRegister({ onRegister, onSwitchToLogin, onSwitchToPatient, darkMo
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Min 6 characters"
+                    placeholder="Strong password"
                     required
+                    minLength="8"
                     className={darkMode ? 'bg-dark text-light' : ''}
                   />
+                  {formData.password && (
+                    <div className="mt-2" style={{ fontSize: '0.75rem' }}>
+                      <div className={passwordStrength.length ? 'text-success' : 'text-muted'}>
+                        <i className={`bi bi-${passwordStrength.length ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                        8+ chars
+                      </div>
+                      <div className={passwordStrength.uppercase ? 'text-success' : 'text-muted'}>
+                        <i className={`bi bi-${passwordStrength.uppercase ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                        Uppercase
+                      </div>
+                      <div className={passwordStrength.lowercase ? 'text-success' : 'text-muted'}>
+                        <i className={`bi bi-${passwordStrength.lowercase ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                        Lowercase
+                      </div>
+                      <div className={passwordStrength.number ? 'text-success' : 'text-muted'}>
+                        <i className={`bi bi-${passwordStrength.number ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                        Number
+                      </div>
+                      <div className={passwordStrength.special ? 'text-success' : 'text-muted'}>
+                        <i className={`bi bi-${passwordStrength.special ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                        Special char
+                      </div>
+                    </div>
+                  )}
                 </Form.Group>
               </Col>
 

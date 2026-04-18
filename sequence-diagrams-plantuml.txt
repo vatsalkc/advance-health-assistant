@@ -1,0 +1,136 @@
+@startuml Symptom Checking Sequence Diagram
+title Symptom Checking Process
+
+actor Patient
+participant "Symptom Checker\nComponent" as SC
+participant "ML Model API" as ML
+participant "Supabase\nDatabase" as DB
+participant "Doctor\nRecommendation" as DR
+
+Patient -> SC: Select symptoms
+activate SC
+SC -> SC: Validate input
+SC -> ML: POST /predict\n(symptoms data)
+activate ML
+ML -> ML: Process symptoms\nwith ML model
+ML --> SC: Return prediction\n(disease, confidence,\nspecialization)
+deactivate ML
+
+SC -> DB: Save symptom check\nhistory
+activate DB
+DB --> SC: Confirmation
+deactivate DB
+
+SC -> DR: Navigate with\nprediction result
+activate DR
+DR -> DB: Fetch doctors by\nspecialization
+activate DB
+DB --> DR: Return doctor list
+deactivate DB
+DR --> Patient: Display disease\nprediction & doctors
+deactivate DR
+deactivate SC
+
+@enduml
+
+@startuml Appointment Booking Sequence Diagram
+title Appointment Booking Process
+
+actor Patient
+participant "Appointments\nComponent" as AC
+participant "Supabase\nDatabase" as DB
+participant "Doctor Portal" as DP
+participant "Notification\nService" as NS
+
+Patient -> AC: Select doctor &\nfill appointment form
+activate AC
+AC -> AC: Validate form data
+AC -> DB: Create appointment\n(patient_id, doctor_id,\ndate, time, reason)
+activate DB
+DB -> DB: Check doctor\navailability
+DB -> DB: Insert appointment\n(status: pending)
+DB --> AC: Appointment created
+deactivate DB
+
+AC -> NS: Show success toast
+activate NS
+NS --> Patient: "Appointment\nbooked successfully"
+deactivate NS
+
+AC --> Patient: Display appointment\ndetails
+deactivate AC
+
+DB -> DP: Real-time update\n(new appointment)
+activate DP
+DP --> DP: Refresh appointment list
+deactivate DP
+
+note right of Patient
+  Patient can view appointment
+  status in Appointments tab
+end note
+
+@enduml
+
+@startuml Medicine Reminder Sequence Diagram
+title Medicine Reminder Process
+
+actor Patient
+participant "Medicine Reminder\nComponent" as MR
+participant "Notification\nService" as NS
+participant "Service Worker" as SW
+participant "Supabase\nDatabase" as DB
+participant "Browser" as BR
+
+Patient -> MR: Add medicine reminder\n(name, dosage, time, frequency)
+activate MR
+MR -> MR: Validate form data
+
+MR -> NS: Check notification\npermission
+activate NS
+alt Permission not granted
+    NS -> BR: Request permission
+    activate BR
+    BR --> Patient: Show browser prompt\n"Allow notifications?"
+    Patient -> BR: Click "Allow"
+    BR --> NS: Permission granted
+    deactivate BR
+end
+
+MR -> DB: Save medicine reminder
+activate DB
+DB --> MR: Confirmation
+deactivate DB
+
+MR -> NS: Schedule reminder\n(medicine, time)
+NS -> NS: Calculate time\nuntil reminder
+NS -> NS: Set timer
+NS --> MR: Reminder scheduled
+deactivate NS
+
+MR --> Patient: "Reminder added\nsuccessfully"
+deactivate MR
+
+... Wait until scheduled time ...
+
+NS -> SW: Trigger notification\nat scheduled time
+activate SW
+SW -> BR: Show notification\n"Time to take [medicine]"
+activate BR
+BR --> Patient: Display notification\n(even if browser closed)
+deactivate BR
+
+Patient -> BR: Click notification
+BR -> MR: Open app to\nMedicine Reminder tab
+activate MR
+MR --> Patient: Show medicine list
+deactivate MR
+deactivate SW
+
+note right of NS
+  Reminders repeat based
+  on frequency (daily,
+  twice-daily, weekly)
+end note
+
+@enduml

@@ -14,6 +14,13 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
 
   useEffect(() => {
     // Check if coming from landing page with register data
@@ -43,7 +50,19 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Check password strength on password field change
+    if (name === 'password') {
+      setPasswordStrength({
+        length: value.length >= 8,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(value)
+      });
+    }
   };
 
   const validateForm = () => {
@@ -52,19 +71,40 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
       return false;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+
+    // Strong password validation
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return false;
+    }
+
+    if (!/[A-Z]/.test(formData.password)) {
+      setError('Password must contain at least one uppercase letter');
+      return false;
+    }
+
+    if (!/[a-z]/.test(formData.password)) {
+      setError('Password must contain at least one lowercase letter');
+      return false;
+    }
+
+    if (!/[0-9]/.test(formData.password)) {
+      setError('Password must contain at least one number');
+      return false;
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+      setError('Password must contain at least one special character (!@#$%^&*...)');
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
-      return false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address');
       return false;
     }
 
@@ -168,12 +208,36 @@ function Register({ onRegister, onSwitchToLogin, onSwitchToDoctor, onSwitchToAdm
               <Form.Control
                 type="password"
                 name="password"
-                placeholder="Enter password (min 6 characters)"
+                placeholder="Enter strong password"
                 value={formData.password}
                 onChange={handleChange}
                 required
-                minLength="6"
+                minLength="8"
               />
+              {formData.password && (
+                <div className="mt-2" style={{ fontSize: '0.85rem' }}>
+                  <div className={passwordStrength.length ? 'text-success' : 'text-muted'}>
+                    <i className={`bi bi-${passwordStrength.length ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                    At least 8 characters
+                  </div>
+                  <div className={passwordStrength.uppercase ? 'text-success' : 'text-muted'}>
+                    <i className={`bi bi-${passwordStrength.uppercase ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                    One uppercase letter
+                  </div>
+                  <div className={passwordStrength.lowercase ? 'text-success' : 'text-muted'}>
+                    <i className={`bi bi-${passwordStrength.lowercase ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                    One lowercase letter
+                  </div>
+                  <div className={passwordStrength.number ? 'text-success' : 'text-muted'}>
+                    <i className={`bi bi-${passwordStrength.number ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                    One number
+                  </div>
+                  <div className={passwordStrength.special ? 'text-success' : 'text-muted'}>
+                    <i className={`bi bi-${passwordStrength.special ? 'check-circle-fill' : 'circle'} me-1`}></i>
+                    One special character (!@#$%...)
+                  </div>
+                </div>
+              )}
             </Form.Group>
 
             <Form.Group className="mb-3">

@@ -1,0 +1,7 @@
+ADVANCED HEALTH ASSISTANT - WEBSITE INTRODUCTION
+
+The Advanced Health Assistant is a comprehensive digital healthcare platform that bridges the gap between patients and healthcare providers through intelligent technology.
+
+The platform provides an AI-powered symptom checker that analyzes symptoms across 34 diseases and 16 medical specializations, offering instant disease predictions with confidence scores. Patients can book appointments with verified doctors, manage their medicine schedules with automated medicine reminders and access a 24/7 AI health chatbot. The system maintains a complete health history including past symptom checks, appointments, and prescriptions.
+
+For doctors, the platform offers a dedicated portal with a comprehensive dashboard displaying appointment statistics, patient management tools, and real-time appointment tracking. Doctors can manage their schedules, view patient histories, create digital prescriptions, and communicate with patients efficiently.

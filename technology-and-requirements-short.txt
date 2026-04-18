@@ -1,0 +1,108 @@
+ADVANCED HEALTH ASSISTANT - TECHNOLOGY & REQUIREMENTS
+
+═══════════════════════════════════════════════════════════════════════════════
+TECHNOLOGY STACK
+═══════════════════════════════════════════════════════════════════════════════
+
+FRONTEND
+• React.js 18.x - UI library with hooks and components
+• Bootstrap 5.3 - Responsive CSS framework
+• React Bootstrap - React components for Bootstrap
+• Bootstrap Icons 1.11 - Icon library
+• CSS3 - Custom styling with variables for themes
+
+BACKEND
+• Supabase - PostgreSQL database with real-time features
+• Supabase Auth - JWT-based authentication
+• Row Level Security - Database-level access control
+
+ARTIFICIAL INTELLIGENCE
+• Google Gemini AI - Chatbot functionality
+• Python 3.x + scikit-learn - ML model for symptom prediction
+• Flask/FastAPI - ML model API endpoints
+
+API & COMMUNICATION
+• Axios - HTTP client for API requests
+• RESTful API - Standard HTTP methods
+• WebSocket - Real-time data synchronization
+
+PWA FEATURES
+• Service Workers - Background notifications and offline support
+• Web Notification API - Browser notifications
+• LocalStorage - Client-side data persistence
+
+DEVELOPMENT TOOLS
+• Node.js 18.x - JavaScript runtime
+• Git & GitHub - Version control and hosting
+• VS Code - Code editor (recommended)
+
+DEPLOYMENT
+• GitHub Pages - Static site hosting with HTTPS
+
+SECURITY
+• JWT - Token-based authentication
+• HTTPS/TLS - Encrypted communication
+• bcrypt - Password hashing
+
+═══════════════════════════════════════════════════════════════════════════════
+SYSTEM REQUIREMENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+CLIENT HARDWARE
+• Processor: Dual-core 2.0 GHz (minimum), Quad-core 2.5 GHz (recommended)
+• RAM: 2 GB (minimum), 8 GB (recommended)
+• Storage: 100 MB free space
+• Display: 1024x768 (minimum), 1920x1080 (recommended)
+• Network: 2 Mbps internet connection
+
+SUPPORTED BROWSERS
+• Google Chrome 90+ (Recommended)
+• Mozilla Firefox 88+
+• Microsoft Edge 90+
+• Safari 14+ (macOS/iOS)
+• Opera 76+
+Note: Internet Explorer NOT supported
+
+MOBILE DEVICES
+• Android 8.0+ with Chrome/Firefox
+• iOS 14.0+ with Safari/Chrome
+• 2 GB RAM minimum
+
+DEVELOPMENT ENVIRONMENT
+• OS: Windows 10/11, macOS 10.15+, Linux (Ubuntu 20.04+)
+• Node.js 18.x or higher
+• Python 3.8+ (for ML model)
+• Git 2.30+
+
+SERVER (ML MODEL)
+• Quad-core CPU 2.5 GHz
+• 4 GB RAM (8 GB recommended)
+• 10 GB storage
+• Linux (Ubuntu 20.04 recommended)
+
+NETWORK
+• Minimum: 2 Mbps download, 1 Mbps upload
+• Recommended: 10 Mbps download, 5 Mbps upload
+• Latency: Less than 100ms
+
+THIRD-PARTY SERVICES
+• Supabase account with API keys
+• Google Gemini AI API key
+• GitHub account for deployment
+
+BROWSER PERMISSIONS
+• Notifications - Required for medicine reminders
+• LocalStorage - Required for preferences
+• Cookies - Required for authentication
+• JavaScript - Must be enabled
+
+SECURITY
+• HTTPS protocol required
+• Strong passwords (8+ characters)
+• Email verification
+• HIPAA-compliant data handling
+
+PERFORMANCE
+• Page load: Less than 3 seconds
+• API response: Less than 500ms
+• Support for 100+ concurrent users
